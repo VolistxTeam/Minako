@@ -1,6 +1,6 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+/** @var Router $router */
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,8 @@
 |
 */
 
+use Laravel\Lumen\Routing\Router;
+
 $router->group(['middleware' => []], function () use ($router) {
     $router->group(['prefix' => 'anime'], function () use ($router) {
         $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
@@ -24,6 +26,7 @@ $router->group(['middleware' => []], function () use ($router) {
         $router->get('/{uniqueID}/producers', 'Services\AnimeController@GetProducers');
         $router->get('/{uniqueID}/licensors', 'Services\AnimeController@GetLicensors');
         $router->get('/{uniqueID}/characters', 'Services\AnimeController@GetCharacters');
+        $router->get('/{uniqueID}/relations', 'Services\AnimeController@GetRelations');
         $router->get('/search/{name}', 'Services\AnimeController@Search');
     });
 

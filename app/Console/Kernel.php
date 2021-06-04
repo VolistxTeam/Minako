@@ -42,7 +42,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('geoip:update')->daily();
-        $schedule->command('logs:purge')->daily();
+        set_time_limit(0);
+
+        $schedule->command('geoip:update')->daily()->runInBackground();
+        $schedule->command('logs:purge')->daily()->runInBackground();
+        $schedule->command('minako:ohys:download')->hourly()->runInBackground();
+
+        $schedule->command('minako:notify:anime')->daily();
+        $schedule->command('minako:notify:characters')->daily();
+        $schedule->command('minako:notify:company')->daily();
+        $schedule->command('minako:notify:relation')->daily();
+        $schedule->command('minako:notify:character-relation')->daily();
+        $schedule->command('minako:notify:thumbnail')->daily();
+        $schedule->command('minako:notify:character-image')->daily();
+
+        $schedule->command('minako:mal:episodes')->daily();
+
+        $schedule->command('responsecache:clear')->mondays();
     }
 }

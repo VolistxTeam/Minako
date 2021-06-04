@@ -313,6 +313,35 @@ class AnimeController extends Controller
         return response()->json($buildResponse);
     }
 
+    public function GetRelations($uniqueID)
+    {
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
+
+        if (empty($itemQuery)) {
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
+        }
+
+        $filteredRelationData = [];
+
+        $itemArray = $itemQuery->relations;
+
+        if (!empty($itemArray) && !empty($itemArray['items'])) {
+            foreach ($itemArray['items'] as $item) {
+                array_push($filteredRelationData, [
+                    'id' => $item['uniqueID'],
+                    'type' => $item['type']
+                ]);
+            }
+        }
+
+        $buildResponse = [
+            'id' => $itemQuery['uniqueID'],
+            'relations' => $filteredRelationData
+        ];
+
+        return response()->json($buildResponse);
+    }
+
     public function GetCharacters($id)
     {
         $characterRelationQuery = NotifyCharacterRelation::query()->latest()->where('uniqueID', $id)->first();
