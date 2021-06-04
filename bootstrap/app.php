@@ -1,8 +1,10 @@
 <?php
 
 use jdavidbakr\CloudfrontProxies\CloudfrontProxies;
+use LumenRateLimiting\ThrottleRequests;
+use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
+use Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
-use Torann\GeoIP\GeoIPServiceProvider;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -21,15 +23,13 @@ $app->withEloquent();
 
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
-$app->register(GeoIPServiceProvider::class);
 $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 
-$app->register(\Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider::class);
-$app->register(\Matchish\ScoutElasticSearch\ElasticSearchServiceProvider::class);
+$app->register(ScoutElasticSearchServiceProvider::class);
+$app->register(ElasticSearchServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
-
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -55,7 +55,7 @@ $app->middleware([
 
 $app->routeMiddleware([
     'cacheResponse' => CacheResponse::class,
-    'throttle' => \LumenRateLimiting\ThrottleRequests::class,
+    'throttle' => ThrottleRequests::class,
 ]);
 
 $app->router->group([
