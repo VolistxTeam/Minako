@@ -15,6 +15,6 @@
 
 $router->group(['middleware' => ['cacheResponse']], function () use ($router) {
     $router->group(['prefix' => 'anime'], function () use ($router) {
-        $router->post('/{uniqueID}', 'Services\AdminController@GetItem');
+        $router->post('/{uniqueID}', 'Services\AnimeController@GetItem');
     });
 });

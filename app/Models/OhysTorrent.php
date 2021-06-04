@@ -16,7 +16,7 @@ class OhysTorrent extends Model
      *
      * @var string
      */
-    protected $table = 'minako_ohys_torrent';
+    protected $table = 'ohys_torrent';
 
     /**
      * Indicates if the model should be timestamped.

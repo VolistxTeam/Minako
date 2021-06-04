@@ -5,18 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class OhysRelation extends Model
 {
-    use HasFactory, Searchable, QueryCacheable;
+    use HasFactory, Searchable;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'minako_ohys_relation';
+    protected $table = 'ohys_relation';
 
     /**
      * Indicates if the model should be timestamped.

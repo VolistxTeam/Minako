@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\ThrottleRequests;
 use jdavidbakr\CloudfrontProxies\CloudfrontProxies;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
 use Torann\GeoIP\GeoIPServiceProvider;
@@ -26,7 +25,8 @@ $app->register(GeoIPServiceProvider::class);
 $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
-
+$app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
+$app->register(Laravel\Scout\ScoutServiceProvider::class);
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
@@ -63,6 +63,8 @@ $app->router->group([
     require __DIR__ . '/../routes/system.php';
     require __DIR__ . '/../routes/api.php';
 });
+
+$app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
 
 collect(scandir(__DIR__ . '/../config'))->each(function ($item) use ($app) {
     $app->configure(basename($item, '.php'));
