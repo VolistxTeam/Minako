@@ -45,8 +45,6 @@ class DownloadCommand extends Command
         $query = (string)$query->getBody();
         $decodedOhysRepo = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $query), true);
 
-        OhysTorrent::flushQueryCache();
-
         foreach ($decodedOhysRepo as $file) {
             $torrentSearch = OhysTorrent::query()->where('torrentName', $file['t'])->first();
 
@@ -127,17 +125,17 @@ class DownloadCommand extends Command
                     }
                 }
 
-                $searchArray = $animeSearchEngine->SearchByTitle($title, 1);
-
-                if (!empty($searchArray)) {
-                    $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
-
-                    OhysRelation::query()->updateOrCreate([
-                        'uniqueID' => $itemID
-                    ], [
-                        'matchingID' => $anime_uniqueID
-                    ]);
-                }
+//                $searchArray = $animeSearchEngine->SearchByTitle($title, 1);
+//
+//                if (!empty($searchArray)) {
+//                    $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
+//
+//                    OhysRelation::query()->updateOrCreate([
+//                        'uniqueID' => $itemID
+//                    ], [
+//                        'matchingID' => $anime_uniqueID
+//                    ]);
+//                }
 
                 $this->info('[Debug] Done: ' . $file['t']);
             } else {
