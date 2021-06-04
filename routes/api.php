@@ -26,4 +26,26 @@ $router->group(['middleware' => []], function () use ($router) {
         $router->get('/{uniqueID}/characters', 'Services\AnimeController@GetCharacters');
         $router->get('/search/{name}', 'Services\AnimeController@Search');
     });
+
+    $router->group(['prefix' => 'episode'], function () use ($router) {
+        $router->get('/{id}', 'Services\EpisodeController@GetEpisode');
+        $router->get('/search/{name}', 'Services\EpisodeController@Search');
+    });
+
+    $router->group(['prefix' => 'company'], function () use ($router) {
+        $router->get('/{id}', 'Services\CompanyController@GetCompany');
+        $router->get('/search/{name}', 'Services\CompanyController@Search');
+    });
+
+    $router->group(['prefix' => 'character'], function () use ($router) {
+        $router->get('/{id}', 'Services\CharacterController@GetCharacter');
+        $router->get('/{id}/image', 'Services\CharacterController@GetImage');
+        $router->get('/search/{name}', 'Services\CharacterController@Search');
+    });
+
+    $router->group(['prefix' => 'ohys'], function () use ($router) {
+        $router->get('/', 'Services\OhysController@GetRecentTorrents');
+        $router->get('/{id}', 'Services\OhysController@GetTorrent');
+        $router->get('/search/{name}', 'Services\OhysController@Search');
+    });
 });

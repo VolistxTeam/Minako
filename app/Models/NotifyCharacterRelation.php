@@ -35,16 +35,4 @@ class NotifyCharacterRelation extends Model
         'created_at'  => 'date:Y-m-d H:i:s',
         'updated_at'  => 'date:Y-m-d H:i:s',
     ];
-
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray() {
-        return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID
-        ];
-    }
 }

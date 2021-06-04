@@ -48,34 +48,34 @@ class CharacterImageCommand extends Command
 
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
-                $existsFile = Storage::disk('local')->exists('minako/characters/' . $item['uniqueID'] . '.jpg');
+                try {
+                    $existsFile = Storage::disk('local')->exists('minako/characters/' . $item['uniqueID'] . '.jpg');
 
-                if ($existsFile) {
-                    $this->error('[+] Character exists. [' . $remainingCount . '/' . $totalCount . ']');
-                    $remainingCount++;
-                    continue;
-                }
-
-                $originalImage = 'https://media.notify.moe/images/characters/original/' . $item['notifyID'] . $item['image_extension'];
-                $largeImage = 'https://media.notify.moe/images/characters/large/' . $item['notifyID'] . $item['image_extension'];
-
-                $fp = tmpfile();
-                $fpPath = stream_get_meta_data($fp)["uri"];
-
-                $imageResponse = $client->request('GET', $largeImage, ['headers' => $headers, 'sink' => $fpPath]);
-
-                if ($imageResponse->getStatusCode() != 200) {
-                    $imageResponse = $client->request('GET', $originalImage, ['headers' => $headers, 'sink' => $fpPath]);
-
-                    if ($imageResponse->getStatusCode() != 200) {
-                        $this->error('[+] Cannot find character image. Ignoring... [' . $remainingCount . '/' . $totalCount . ']');
+                    if ($existsFile) {
+                        $this->error('[+] Character exists. [' . $remainingCount . '/' . $totalCount . ']');
                         $remainingCount++;
-                        fclose($fp);
                         continue;
                     }
-                }
 
-                try {
+                    $originalImage = 'https://media.notify.moe/images/characters/original/' . $item['notifyID'] . $item['image_extension'];
+                    $largeImage = 'https://media.notify.moe/images/characters/large/' . $item['notifyID'] . $item['image_extension'];
+
+                    $fp = tmpfile();
+                    $fpPath = stream_get_meta_data($fp)["uri"];
+
+                    $imageResponse = $client->request('GET', $largeImage, ['headers' => $headers, 'sink' => $fpPath]);
+
+                    if ($imageResponse->getStatusCode() != 200) {
+                        $imageResponse = $client->request('GET', $originalImage, ['headers' => $headers, 'sink' => $fpPath]);
+
+                        if ($imageResponse->getStatusCode() != 200) {
+                            $this->error('[+] Cannot find character image. Ignoring... [' . $remainingCount . '/' . $totalCount . ']');
+                            $remainingCount++;
+                            fclose($fp);
+                            continue;
+                        }
+                    }
+
                     $manager = new ImageManager(array('driver' => 'gd'));
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);

@@ -34,19 +34,6 @@ class OhysRelation extends Model
         'updated_at'  => 'date:Y-m-d H:i:s',
     ];
 
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray() {
-        return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'matchingID' => $this->matchingID
-        ];
-    }
-
     public function torrent()
     {
         return $this->belongsTo(OhysTorrent::class, 'uniqueID');

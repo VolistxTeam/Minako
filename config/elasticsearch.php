@@ -7,7 +7,7 @@ return [
             'default' => [
                 'properties' => [
                     'id' => [
-                        'type' => 'keyword',
+                        'type' => 'text',
                     ],
                 ],
             ],

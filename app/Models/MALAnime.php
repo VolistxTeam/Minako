@@ -46,23 +46,6 @@ class MALAnime extends Model
         'updated_at'  => 'date:Y-m-d H:i:s',
     ];
 
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray()
-    {
-        return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'title' => $this->title,
-            'title_japanese' => $this->title_japanese,
-            'title_romanji' => $this->title_romanji,
-            'episode_id' => $this->episode_id
-        ];
-    }
-
     public function anime()
     {
         return $this->belongsTo(NotifyAnime::class, 'uniqueID');

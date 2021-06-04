@@ -49,20 +49,6 @@ class OhysTorrent extends Model
         'updated_at'  => 'date:Y-m-d H:i:s',
     ];
 
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray() {
-        return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'title' => $this->title,
-            'torrentName' => $this->torrentName,
-        ];
-    }
-
     public function anime()
     {
         return $this->hasOneDeep('App\Models\Minako\NotifyAnime', ['App\Models\Minako\OhysRelation'], ['uniqueID', 'uniqueID'], ['uniqueID', 'matchingID']);
