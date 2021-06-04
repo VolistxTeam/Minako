@@ -16,7 +16,7 @@ class DeleteLogsCommand extends Command
         $date = new DateTime;
         $date->modify('-1 years');
         $formatted = $date->format('Y-m-d H:i:s');
-        Logs::where('created_at', '<=', $formatted)->delete();
+        Logs::query()->where('created_at', '<=', $formatted)->delete();
 
         $this->info('Log purge is completed.');
     }

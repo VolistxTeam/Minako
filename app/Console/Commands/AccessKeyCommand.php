@@ -19,7 +19,7 @@ class AccessKeyCommand extends Command
 
         $generatedKey = $generator->generateString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
-        AccessKeys::create(array(
+        AccessKeys::query()->create(array(
             'token' => $generatedKey,
             'permissions'  => json_encode(array('*'))
         ));
