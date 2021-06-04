@@ -44,7 +44,6 @@ class Kernel extends ConsoleKernel
     {
         set_time_limit(0);
 
-        $schedule->command('geoip:update')->monthly()->runInBackground();
         $schedule->command('minako:ohys:download')->hourly()->runInBackground();
 
         $schedule->command('minako:notify:anime')->daily();
