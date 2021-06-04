@@ -125,17 +125,17 @@ class DownloadCommand extends Command
                     }
                 }
 
-//                $searchArray = $animeSearchEngine->SearchByTitle($title, 1);
-//
-//                if (!empty($searchArray)) {
-//                    $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
-//
-//                    OhysRelation::query()->updateOrCreate([
-//                        'uniqueID' => $itemID
-//                    ], [
-//                        'matchingID' => $anime_uniqueID
-//                    ]);
-//                }
+                $searchArray = $animeSearchEngine->SearchByTitle($title, 1);
+
+                if (!empty($searchArray)) {
+                    $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
+
+                    OhysRelation::query()->updateOrCreate([
+                        'uniqueID' => $itemID
+                    ], [
+                        'matchingID' => $anime_uniqueID
+                    ]);
+                }
 
                 $this->info('[Debug] Done: ' . $file['t']);
             } else {
