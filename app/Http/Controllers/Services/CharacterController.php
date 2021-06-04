@@ -25,7 +25,8 @@ class CharacterController extends Controller
         return response()->json($buildResponse);
     }
 
-    public function GetImage($uniqueID) {
+    public function GetImage($uniqueID)
+    {
         $actualPath = storage_path('app/minako/characters/' . $uniqueID . '.jpg');
 
         ray($actualPath);

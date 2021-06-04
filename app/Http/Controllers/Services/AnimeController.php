@@ -9,7 +9,6 @@ use App\Models\NotifyCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 
 class AnimeController extends Controller
 {
@@ -80,7 +79,8 @@ class AnimeController extends Controller
         return response()->json($buildResponse);
     }
 
-    public function GetImage($uniqueID) {
+    public function GetImage($uniqueID)
+    {
         $actualPath = storage_path('app/minako/posters/' . $uniqueID . '.jpg');
 
         if (!file_exists($actualPath)) {
