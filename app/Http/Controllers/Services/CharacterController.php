@@ -10,7 +10,7 @@ class CharacterController extends Controller
 {
     public function Search($name)
     {
-        $searchQuery = NotifyCharacter::search($name)->paginate(15, 'page', 1);
+        $searchQuery = NotifyCharacter::search($name)->paginate(50, 'page', 1);
 
         $buildResponse = [];
 

@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\KeyGenerateCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
+use Laravelista\LumenVendorPublish\VendorPublishCommand;
 use Spatie\ResponseCache\Commands\ClearCommand;
 
 class Kernel extends ConsoleKernel
@@ -19,6 +20,7 @@ class Kernel extends ConsoleKernel
         Commands\DeleteLogsCommand::class,
         ClearCommand::class,
         KeyGenerateCommand::class,
+        VendorPublishCommand::class,
         Commands\MAL\EpisodeCommand::class,
         Commands\Notify\AnimeCommand::class,
         Commands\Notify\CharacterCommand::class,

@@ -25,8 +25,12 @@ $app->register(GeoIPServiceProvider::class);
 $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
-$app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
+
+$app->register(\Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider::class);
+$app->register(\Matchish\ScoutElasticSearch\ElasticSearchServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
+
+
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class

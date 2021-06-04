@@ -8,7 +8,7 @@ class EpisodeController extends Controller
 {
     public function Search($name)
     {
-        $searchQuery = MALAnime::search($name)->paginate(15, 'page', 1);
+        $searchQuery = MALAnime::search($name)->paginate(50, 'page', 1);
 
         $buildResponse = [];
 

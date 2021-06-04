@@ -8,7 +8,7 @@ class CompanyController extends Controller
 {
     public function Search($name)
     {
-        $searchQuery = NotifyCompany::search($name)->paginate(15, 'page', 1);
+        $searchQuery = NotifyCompany::search($name)->paginate(50, 'page', 1);
 
         $buildResponse = [];
 

@@ -28,6 +28,32 @@ if (!function_exists('public_path')) {
     }
 }
 
+if (!function_exists('app_path')) {
+    /**
+     * Get the path to the application folder.
+     *
+     * @param  string $path
+     * @return string
+     */
+    function app_path($path = '')
+    {
+        return app('path') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+}
+
+if (! function_exists('resolve')) {
+    /**
+     * Resolve a service from the container.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    function resolve($name)
+    {
+        return app($name);
+    }
+}
+
 function now($timezone = null)
 {
     return Carbon::now($timezone);

@@ -18,8 +18,8 @@ class AnimeController extends Controller
         $requestType = $request->input('type');
 
         $searchQuery = empty($requestType)
-            ? NotifyAnime::search($name)->take(100)->paginate(15, 'page', 1)
-            : NotifyAnime::search($name)->take(100)->where('type', strtolower($requestType))->paginate(15, 'page', 1);
+            ? NotifyAnime::search($name)->take(100)->paginate(50, 'page', 1)
+            : NotifyAnime::search($name)->take(100)->where('type', strtolower($requestType))->paginate(50, 'page', 1);
 
         $buildResponse = [];
 

@@ -13,8 +13,17 @@
 |
 */
 
-$router->group(['middleware' => ['cacheResponse']], function () use ($router) {
+$router->group(['middleware' => []], function () use ($router) {
     $router->group(['prefix' => 'anime'], function () use ($router) {
-        $router->post('/{uniqueID}', 'Services\AnimeController@GetItem');
+        $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
+        $router->get('/{uniqueID}/image', 'Services\AnimeController@GetImage');
+        $router->get('/{uniqueID}/episodes/{episodeNumber}', 'Services\AnimeController@GetEpisode');
+        $router->get('/{uniqueID}/episodes', 'Services\AnimeController@GetEpisodes');
+        $router->get('/{uniqueID}/mappings', 'Services\AnimeController@GetMappings');
+        $router->get('/{uniqueID}/studios', 'Services\AnimeController@GetStudios');
+        $router->get('/{uniqueID}/producers', 'Services\AnimeController@GetProducers');
+        $router->get('/{uniqueID}/licensors', 'Services\AnimeController@GetLicensors');
+        $router->get('/{uniqueID}/characters', 'Services\AnimeController@GetCharacters');
+        $router->get('/search/{name}', 'Services\AnimeController@Search');
     });
 });
