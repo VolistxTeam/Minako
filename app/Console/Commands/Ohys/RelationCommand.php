@@ -6,7 +6,6 @@ use App\Classes\AnimeSearch;
 use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
 use Illuminate\Console\Command;
-use function React\Promise\race;
 
 class RelationCommand extends Command
 {
