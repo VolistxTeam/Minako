@@ -6,6 +6,7 @@ use Illuminate\Console\KeyGenerateCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 use Laravelista\LumenVendorPublish\VendorPublishCommand;
+use Mlntn\Console\Commands\Serve;
 use Spatie\ResponseCache\Commands\ClearCommand;
 
 class Kernel extends ConsoleKernel
@@ -30,6 +31,7 @@ class Kernel extends ConsoleKernel
         Commands\Ohys\DownloadCommand::class,
         Commands\Ohys\ParseCommand::class,
         Commands\Ohys\RelationCommand::class,
+        Serve::class,
     ];
 
     /**
