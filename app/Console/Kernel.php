@@ -16,8 +16,6 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\AccessKeyCommand::class,
-        Commands\DeleteLogsCommand::class,
         ClearCommand::class,
         KeyGenerateCommand::class,
         VendorPublishCommand::class,
@@ -44,8 +42,7 @@ class Kernel extends ConsoleKernel
     {
         set_time_limit(0);
 
-        $schedule->command('geoip:update')->daily()->runInBackground();
-        $schedule->command('logs:purge')->daily()->runInBackground();
+        $schedule->command('geoip:update')->monthly()->runInBackground();
         $schedule->command('minako:ohys:download')->hourly()->runInBackground();
 
         $schedule->command('minako:notify:anime')->daily();

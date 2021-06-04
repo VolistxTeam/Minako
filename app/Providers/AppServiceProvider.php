@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         app(RateLimiter::class)->for('global', function () {
-            return Limit::perMinute(2500)->by(request()->getClientIp());
+            return Limit::perMinute(50)->by(request()->getClientIp());
         });
     }
 }

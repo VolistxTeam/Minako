@@ -8,7 +8,7 @@ class CompanyController extends Controller
 {
     public function Search($name)
     {
-        $searchQuery = NotifyCompany::search($name)->paginate(50, 'page', 1);
+        $searchQuery = NotifyCompany::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
 
         $buildResponse = [];
 
@@ -25,7 +25,7 @@ class CompanyController extends Controller
 
     public function GetCompany($id)
     {
-        $itemQuery = NotifyCompany::query()->latest()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Company not found: ' . $id, 404)->header('Content-Type', 'text/plain');

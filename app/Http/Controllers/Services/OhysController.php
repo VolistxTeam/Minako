@@ -26,7 +26,7 @@ class OhysController extends Controller
 
     public function GetRecentTorrents()
     {
-        $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
+        $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
 
         $itemsFiltered = [];
 

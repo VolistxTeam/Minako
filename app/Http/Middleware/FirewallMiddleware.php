@@ -21,12 +21,6 @@ class FirewallMiddleware
             return response('', 403);
         }
 
-        $geoIPLookup = geoip()->getLocation($clientIP);
-
-        if (in_array($geoIPLookup->iso_code, config('firewall.countryBlacklist', []))) {
-            return response('', 403);
-        }
-
         return $next($request);
     }
 }

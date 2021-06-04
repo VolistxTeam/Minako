@@ -8,7 +8,7 @@ class EpisodeController extends Controller
 {
     public function Search($name)
     {
-        $searchQuery = MALAnime::search($name)->paginate(50, 'page', 1);
+        $searchQuery = MALAnime::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
 
         $buildResponse = [];
 
@@ -26,7 +26,7 @@ class EpisodeController extends Controller
 
     public function GetEpisode($id)
     {
-        $episodeQuery = MALAnime::query()->latest()->where('id', $id)->first();
+        $episodeQuery = MALAnime::query()->where('id', $id)->first();
 
         if (empty($episodeQuery)) {
             return response('Episode not found: ' . $id, 404)->header('Content-Type', 'text/plain');

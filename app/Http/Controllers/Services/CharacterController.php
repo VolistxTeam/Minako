@@ -10,7 +10,7 @@ class CharacterController extends Controller
 {
     public function Search($name)
     {
-        $searchQuery = NotifyCharacter::search($name)->paginate(50, 'page', 1);
+        $searchQuery = NotifyCharacter::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
 
         $buildResponse = [];
 
@@ -44,7 +44,7 @@ class CharacterController extends Controller
 
     public function GetCharacter($id)
     {
-        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');

@@ -54,8 +54,6 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'auth.user' => App\Http\Middleware\UserAuthMiddleware::class,
-    'auth.admin' => App\Http\Middleware\AdminAuthMiddleware::class,
     'cacheResponse' => CacheResponse::class,
     'throttle' => \LumenRateLimiting\ThrottleRequests::class,
 ]);
@@ -64,7 +62,6 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'middleware' => 'throttle:global',
 ], function ($router) {
-    require __DIR__ . '/../routes/system.php';
     require __DIR__ . '/../routes/api.php';
 });
 
