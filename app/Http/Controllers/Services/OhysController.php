@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Services;
 
 use App\Models\OhysTorrent;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Http\RedirectResponse;
 
 class OhysController extends Controller
 {
@@ -68,8 +72,8 @@ class OhysController extends Controller
                         'torrent' => 'https://ohys.nl/tt/disk/' . $torrent['torrentName']
                     ],
                     'mirror' => [
-                        'torrent' => 'https://api.minako.moe/ohys/download/?id=' . $torrent['uniqueID'] . '&proper=torrent',
-                        'magnet' => $torrent['hidden_download_magnet']
+                        'torrent' => 'https://api.v2.minako.moe/ohys/download/' . $torrent['uniqueID'] . '&proper=torrent',
+                        'magnet' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '&proper=magnet',
                     ]
                 ]
             ];
@@ -89,7 +93,7 @@ class OhysController extends Controller
 
     public function GetTorrent($id)
     {
-        $torrentQuery = OhysTorrent::query()->latest()->where('uniqueID', $id)->first();
+        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
             return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
@@ -130,12 +134,40 @@ class OhysController extends Controller
                     'torrent' => 'https://ohys.nl/tt/disk/' . $torrentQuery['torrentName']
                 ],
                 'mirror' => [
-                    'torrent' => 'https://api.minako.moe/ohys/download/?id=' . $torrentQuery['uniqueID'] . '&proper=torrent',
-                    'magnet' => $torrentQuery['hidden_download_magnet']
+                    'torrent' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '&proper=torrent',
+                    'magnet' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '&proper=magnet',
                 ]
             ]
         ];
 
         return response()->json($buildResponse);
+    }
+
+    public function DownloadTorrent(Request $request, $id) {
+        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
+
+        if (empty($torrentQuery)) {
+            return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        }
+
+        $requestType = $request->input('type', 'magnet');
+
+        if ($requestType == 'torrent') {
+            $actualPath = storage_path('app/minako/ohys-torrents/' . $torrentQuery->torrentName);
+
+            if (!file_exists($actualPath)) {
+                return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            }
+
+            $type = File::mimeType($actualPath);
+
+            return Response::download($actualPath, $id. '.torrent', ["Content-Type" => $type]);
+        } else {
+            $redirect = new RedirectResponse($torrentQuery->hidden_download_magnet, 302, []);
+
+            $redirect->setRequest($request);
+
+            return $redirect;
+        }
     }
 }
