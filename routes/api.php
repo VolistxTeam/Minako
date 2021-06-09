@@ -15,7 +15,7 @@
 
 use Laravel\Lumen\Routing\Router;
 
-$router->group(['middleware' => ['cacheResponse']], function () use ($router) {
+$router->group(['middleware' => ['cacheResponse:300']], function () use ($router) {
     $router->group(['prefix' => 'anime'], function () use ($router) {
         $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
         $router->get('/{uniqueID}/image', 'Services\AnimeController@GetImage');

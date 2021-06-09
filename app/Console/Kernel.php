@@ -55,7 +55,5 @@ class Kernel extends ConsoleKernel
         $schedule->command('minako:notify:character-image')->weekends()->runInBackground();
 
         $schedule->command('minako:mal:episodes')->weekends();
-
-        $schedule->command('responsecache:clear')->mondays();
     }
 }

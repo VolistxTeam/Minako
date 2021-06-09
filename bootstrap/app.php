@@ -19,11 +19,11 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 $app->withEloquent();
 
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(SwooleTW\Http\LumenServiceProvider::class);
-$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
 
 $app->singleton(
