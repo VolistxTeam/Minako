@@ -19,5 +19,9 @@ class AppServiceProvider extends ServiceProvider
         app(RateLimiter::class)->for('global', function () {
             return Limit::perMinute(150)->by(request()->getClientIp());
         });
+
+        $this->app->singleton(\Illuminate\Contracts\Routing\ResponseFactory::class, function() {
+            return new \Laravel\Lumen\Http\ResponseFactory();
+        });
     }
 }

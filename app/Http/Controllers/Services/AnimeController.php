@@ -85,6 +85,8 @@ class AnimeController extends Controller
     {
         $actualPath = storage_path('app/minako/posters/' . $uniqueID . '.jpg');
 
+        ray($actualPath);
+
         if (!file_exists($actualPath)) {
             return response('Image not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
