@@ -1,8 +1,4 @@
 <IfModule mod_rewrite.c>
 RewriteEngine on
-RewriteCond %{HTTPS} off
-RewriteCond %{HTTP_HOST} (www\.)?p-geoip.volistx.cloud
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-RewriteRule ^(.*)$ public/$1 [L]
+RewriteRule (.*) http://127.0.0.1:6892/$1 [P]
 </IfModule>
