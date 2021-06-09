@@ -18,7 +18,7 @@ class EpisodeController extends Controller
             $newArray = array();
             $newArray['id'] = $item['id'];
             $newArray['anime_id'] = $item['uniqueID'];
-            $newArray['episode_title'] = $item['title'];
+            $newArray['title'] = $item['title'];
 
             $buildResponse[] = $newArray;
         }

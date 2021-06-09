@@ -46,15 +46,15 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('minako:ohys:download')->hourly()->runInBackground();
 
-        $schedule->command('minako:notify:anime')->daily();
-        $schedule->command('minako:notify:characters')->daily();
-        $schedule->command('minako:notify:company')->daily();
-        $schedule->command('minako:notify:relation')->daily();
-        $schedule->command('minako:notify:character-relation')->daily();
-        $schedule->command('minako:notify:thumbnail')->daily();
-        $schedule->command('minako:notify:character-image')->daily();
+        $schedule->command('minako:notify:anime')->weekends()->runInBackground();
+        $schedule->command('minako:notify:characters')->weekends()->runInBackground();
+        $schedule->command('minako:notify:company')->weekends()->runInBackground();
+        $schedule->command('minako:notify:relation')->weekends()->runInBackground();
+        $schedule->command('minako:notify:character-relation')->weekends()->runInBackground();
+        $schedule->command('minako:notify:thumbnail')->weekends()->runInBackground();
+        $schedule->command('minako:notify:character-image')->weekends()->runInBackground();
 
-        $schedule->command('minako:mal:episodes')->daily();
+        $schedule->command('minako:mal:episodes')->weekends();
 
         $schedule->command('responsecache:clear')->mondays();
     }
