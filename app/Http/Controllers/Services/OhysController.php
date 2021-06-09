@@ -72,8 +72,8 @@ class OhysController extends Controller
                         'torrent' => 'https://ohys.nl/tt/disk/' . $torrent['torrentName']
                     ],
                     'mirror' => [
-                        'torrent' => 'https://api.v2.minako.moe/ohys/download/' . $torrent['uniqueID'] . '&proper=torrent',
-                        'magnet' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '&proper=magnet',
+                        'torrent' => 'https://api.v2.minako.moe/ohys/download/' . $torrent['uniqueID'] . '?proper=torrent',
+                        'magnet' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '?proper=magnet',
                     ]
                 ]
             ];
@@ -134,8 +134,8 @@ class OhysController extends Controller
                     'torrent' => 'https://ohys.nl/tt/disk/' . $torrentQuery['torrentName']
                 ],
                 'mirror' => [
-                    'torrent' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '&proper=torrent',
-                    'magnet' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '&proper=magnet',
+                    'torrent' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '?proper=torrent',
+                    'magnet' => 'https://api.v2.minako.moe/ohys/download/' . $torrentQuery['uniqueID'] . '?proper=magnet',
                 ]
             ]
         ];
