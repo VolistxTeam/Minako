@@ -74,7 +74,7 @@ class NotifyAnime extends Model
 
     public function torrents()
     {
-        return $this->hasManyDeep('App\Models\Minako\OhysTorrent', ['App\Models\Minako\OhysRelation'], ['matchingID', 'uniqueID'], ['uniqueID', 'uniqueID']);
+        return $this->hasManyDeep('App\Models\OhysTorrent', ['App\Models\OhysRelation'], ['matchingID', 'uniqueID'], ['uniqueID', 'uniqueID']);
     }
 
     public function relations()
@@ -95,14 +95,5 @@ class NotifyAnime extends Model
     public function characters()
     {
         return $this->hasMany(NotifyCharacterRelation::class, 'uniqueID', 'uniqueID');
-    }
-
-    public function toSearchableArray()
-    {
-        $array = $this->toArray();
-
-        // Customize array...
-
-        return $array;
     }
 }
