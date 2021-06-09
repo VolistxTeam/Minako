@@ -346,12 +346,12 @@ class AnimeController extends Controller
         return response()->json($buildResponse);
     }
 
-    public function GetCharacters($id)
+    public function GetCharacters($uniqueID)
     {
-        $characterRelationQuery = NotifyCharacterRelation::query()->where('uniqueID', $id)->first();
+        $characterRelationQuery = NotifyCharacterRelation::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($characterRelationQuery)) {
-            return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Character not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredCharacterData = [];
