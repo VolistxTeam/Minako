@@ -96,4 +96,13 @@ class NotifyAnime extends Model
     {
         return $this->hasMany(NotifyCharacterRelation::class, 'uniqueID', 'uniqueID');
     }
+
+    public function toSearchableArray()
+    {
+        $array = $this->toArray();
+
+        // Customize array...
+
+        return $array;
+    }
 }

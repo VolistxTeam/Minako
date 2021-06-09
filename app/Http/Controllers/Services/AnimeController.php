@@ -16,6 +16,8 @@ class AnimeController extends Controller
     {
         $requestType = $request->input('type');
 
+        $name = urldecode($name);
+
         $searchQuery = empty($requestType)
             ? NotifyAnime::search($this->escapeElasticReservedChars($name))->take(100)->paginate(50, 'page', 1)
             : NotifyAnime::search($this->escapeElasticReservedChars($name))->take(100)->where('type', strtolower($requestType))->paginate(50, 'page', 1);

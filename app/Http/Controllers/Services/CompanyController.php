@@ -8,6 +8,8 @@ class CompanyController extends Controller
 {
     public function Search($name)
     {
+        $name = urldecode($name);
+
         $searchQuery = NotifyCompany::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
 
         $buildResponse = [];
