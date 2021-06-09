@@ -84,7 +84,7 @@ class ThumbnailCommand extends Command
 
                     unset($fp);
 
-                    $this->info('[+] Character image uploaded for ID ' . $item['notifyID'] . ' [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->info('[+] Thumbnail image uploaded for ID ' . $item['notifyID'] . ' [' . $remainingCount . '/' . $totalCount . ']');
                     $remainingCount++;
                     continue;
                 } catch (Exception $ex) {
