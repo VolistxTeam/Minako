@@ -11,7 +11,7 @@ class CharacterController extends Controller
     public function Search($name)
     {
         $name = urldecode($name);
-        
+
         $searchQuery = NotifyCharacter::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
 
         $buildResponse = [];

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Services;
 
 use App\Models\OhysTorrent;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Http\RedirectResponse;
 
 class OhysController extends Controller
 {
@@ -143,7 +143,8 @@ class OhysController extends Controller
         return response()->json($buildResponse);
     }
 
-    public function DownloadTorrent(Request $request, $id) {
+    public function DownloadTorrent(Request $request, $id)
+    {
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
@@ -161,7 +162,7 @@ class OhysController extends Controller
 
             $type = File::mimeType($actualPath);
 
-            return Response::download($actualPath, $id. '.torrent', ["Content-Type" => $type]);
+            return Response::download($actualPath, $id . '.torrent', ["Content-Type" => $type]);
         } else {
             $redirect = new RedirectResponse($torrentQuery->hidden_download_magnet, 302, []);
 
