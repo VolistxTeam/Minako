@@ -76,7 +76,7 @@ class CharacterImageCommand extends Command
                         }
                     }
 
-                    $manager = new ImageManager(array('driver' => 'gd'));
+                    $manager = new ImageManager(array('driver' => 'imagick'));
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);
 

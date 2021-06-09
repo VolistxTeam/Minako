@@ -148,6 +148,8 @@ class AnimeController extends Controller
             return response('Episodes not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
+        ray($searchQuery->episodes);
+
         $episodesQuery = self::customPaginate($searchQuery->episodes, 15, $paginateNumber);
 
         $itemsFiltered = [];
