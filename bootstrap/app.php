@@ -2,8 +2,6 @@
 
 use jdavidbakr\CloudfrontProxies\CloudfrontProxies;
 use LumenRateLimiting\ThrottleRequests;
-use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
-use Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -27,8 +25,6 @@ $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 
-$app->register(ScoutElasticSearchServiceProvider::class);
-$app->register(ElasticSearchServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
 
 $app->singleton(
