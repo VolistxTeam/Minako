@@ -1,4 +1,4 @@
 <IfModule mod_rewrite.c>
 RewriteEngine on
-RewriteRule (.*) http://127.0.0.1:6892/$1 [P]
+RewriteRule (.*) http://minako_v2_swoole/$1 [P]
 </IfModule>
