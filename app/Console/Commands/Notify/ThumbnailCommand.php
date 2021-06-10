@@ -18,8 +18,6 @@ class ThumbnailCommand extends Command
 
     public function handle()
     {
-        $this->info('[Debug] Setting Time Limit To 0 (Unlimited)');
-
         set_time_limit(0);
 
         $exists = Storage::disk('local')->exists('minako/posters');
@@ -95,8 +93,9 @@ class ThumbnailCommand extends Command
             } else {
                 $this->error('[+] Thumbnail not found. [' . $remainingCount . '/' . $totalCount . ']');
                 $remainingCount++;
-                continue;
             }
         }
+
+        return 0;
     }
 }

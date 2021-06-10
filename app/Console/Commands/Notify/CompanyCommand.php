@@ -200,13 +200,11 @@ class CompanyCommand extends Command
                 }
 
                 $this->info('[+] Item Saved [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
             } catch (Exception $ex) {
                 $this->error('[-] Skipping item. Reason: Unknown Error [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-                continue;
-
             }
+
+            $remainingCount++;
         }
     }
 }

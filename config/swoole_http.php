@@ -26,7 +26,7 @@ return [
             'daemonize' => env('SWOOLE_HTTP_DAEMONIZE', true),
             // Normally this value should be 1~4 times larger according to your cpu cores.
             'reactor_num' => env('SWOOLE_HTTP_REACTOR_NUM', swoole_cpu_num()),
-            'worker_num' => env('SWOOLE_HTTP_WORKER_NUM', swoole_cpu_num()),
+            'worker_num' => env('SWOOLE_HTTP_WORKER_NUM', swoole_cpu_num() * 2),
             'task_worker_num' => env('SWOOLE_HTTP_TASK_WORKER_NUM', swoole_cpu_num()),
             // The data to receive can't be larger than buffer_output_size.
             'package_max_length' => 20 * 1024 * 1024,

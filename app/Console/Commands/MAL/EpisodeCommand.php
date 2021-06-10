@@ -24,17 +24,17 @@ class EpisodeCommand extends Command
 
         $totalCount = count($allAnime);
         $remainingCount = 1;
-        $cooldownCount = 0;
+        $countdownCount = 0;
 
         $internalAPIBaseURL = 'https://api.jikan.moe/v3/';
 
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
 
         foreach ($allAnime as $item) {
-            $cooldownCount++;
+            $countdownCount++;
 
-            if ($cooldownCount > 15) {
-                $cooldownCount = 0;
+            if ($countdownCount > 15) {
+                $countdownCount = 0;
                 $this->info('[+] Waiting for 10 seconds...');
                 sleep(10);
             }
@@ -55,19 +55,7 @@ class EpisodeCommand extends Command
                 continue;
             }
 
-            if ($item['type'] == 'movie' && $item['episodeCount'] >= 2) {
-                $this->error('[-] Skipping item. Reason: Not supported type. [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-                continue;
-            }
-
-            if ($item['type'] == 'music' && $item['episodeCount'] >= 2) {
-                $this->error('[-] Skipping item. Reason: Not supported type. [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-                continue;
-            }
-
-            if (!is_array($item['mappings'])) {
+            if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
                 $this->error('[-] Skipping item. Reason: Not supported type. [' . $remainingCount . '/' . $totalCount . ']');
                 $remainingCount++;
                 continue;
@@ -166,13 +154,12 @@ class EpisodeCommand extends Command
                 } else {
                     $this->info('[-] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
                 }
-
-                $remainingCount++;
             } else {
                 $errorMessage = 'Skipping item. Reason: No MAL binding found.';
                 $this->error('[-] ' . $errorMessage . ' [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
             }
+
+            $remainingCount++;
         }
     }
 }

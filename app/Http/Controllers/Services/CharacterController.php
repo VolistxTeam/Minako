@@ -31,7 +31,6 @@ class CharacterController extends Controller
     {
         $actualPath = storage_path('app/minako/characters/' . $id . '.jpg');
 
-        ray($actualPath);
         if (!file_exists($actualPath)) {
             return response('Image not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
@@ -47,7 +46,7 @@ class CharacterController extends Controller
 
     public function GetCharacter($id)
     {
-        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');

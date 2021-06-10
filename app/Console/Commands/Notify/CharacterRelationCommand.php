@@ -93,12 +93,11 @@ class CharacterRelationCommand extends Command
                 $notifyDBItem->touch();
 
                 $this->line('[+] Item Saved [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
             } catch (Exception $ex) {
                 $this->error('[-] Skipping item. Reason: Unknown Error [' . $ex . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-                continue;
             }
+
+            $remainingCount++;
         }
     }
 }

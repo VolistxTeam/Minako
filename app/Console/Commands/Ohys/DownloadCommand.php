@@ -148,7 +148,7 @@ class DownloadCommand extends Command
 
     private function strContains($source, $whereStr): bool
     {
-        if (strpos($source, $whereStr) !== false) {
+        if (str_contains($source, $whereStr)) {
             return true;
         } else {
             return false;
