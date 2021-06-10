@@ -27,13 +27,13 @@ class CharacterController extends Controller
         return response()->json($buildResponse);
     }
 
-    public function GetImage($uniqueID)
+    public function GetImage($id)
     {
-        $actualPath = storage_path('app/minako/characters/' . $uniqueID . '.jpg');
+        $actualPath = storage_path('app/minako/characters/' . $id . '.jpg');
 
         ray($actualPath);
         if (!file_exists($actualPath)) {
-            return response('Image not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Image not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
         $file = File::get($actualPath);
