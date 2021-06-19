@@ -106,7 +106,7 @@ class AnimeController extends Controller
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $episodeQuery = $itemQuery->episodes->latest()->where('episode_id', $episodeNumber)->first();
+        $episodeQuery = $itemQuery->episodes->where('episode_id', $episodeNumber)->first();
 
         if (empty($episodeQuery)) {
             return response('Episode not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
