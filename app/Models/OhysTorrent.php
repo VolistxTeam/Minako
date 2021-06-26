@@ -58,4 +58,18 @@ class OhysTorrent extends Model
     {
         return $this->hasOneDeep('App\Models\NotifyAnime', ['App\Models\OhysRelation'], ['uniqueID', 'uniqueID'], ['uniqueID', 'matchingID']);
     }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray() {
+        return [
+            'id' => $this->id,
+            'uniqueID' => $this->uniqueID,
+            'title' => $this->title,
+            'torrentName' => $this->torrentName,
+        ];
+    }
 }

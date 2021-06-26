@@ -46,14 +46,14 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('minako:ohys:download')->hourly()->runInBackground();
 
-        $schedule->command('minako:notify:anime')->weekends()->runInBackground();
-        $schedule->command('minako:notify:characters')->weekends()->runInBackground();
-        $schedule->command('minako:notify:company')->weekends()->runInBackground();
-        $schedule->command('minako:notify:relation')->weekends()->runInBackground();
-        $schedule->command('minako:notify:character-relation')->weekends()->runInBackground();
-        $schedule->command('minako:notify:thumbnail')->weekends()->runInBackground();
-        $schedule->command('minako:notify:character-image')->weekends()->runInBackground();
+        $schedule->command('minako:notify:anime')->sundays();
+        $schedule->command('minako:notify:characters')->sundays();
+        $schedule->command('minako:notify:company')->sundays();
+        $schedule->command('minako:notify:relation')->sundays();
+        $schedule->command('minako:notify:character-relation')->sundays();
+        $schedule->command('minako:notify:thumbnail')->sundays();
+        $schedule->command('minako:notify:character-image')->sundays();
 
-        $schedule->command('minako:mal:episodes')->weekends();
+        $schedule->command('minako:mal:episodes')->sundays();
     }
 }

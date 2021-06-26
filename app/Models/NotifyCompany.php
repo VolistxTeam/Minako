@@ -50,4 +50,19 @@ class NotifyCompany extends Model
         'created_at'  => 'date:Y-m-d H:i:s',
         'updated_at'  => 'date:Y-m-d H:i:s',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray() {
+        return [
+            'id' => $this->id,
+            'uniqueID' => $this->uniqueID,
+            'name_english' => $this->name_english,
+            'name_japanese' => $this->name_japanese,
+            'name_synonyms' => empty($this->name_synonyms) ? '' : implode("|", $this->name_synonyms)
+        ];
+    }
 }

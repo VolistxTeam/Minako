@@ -25,6 +25,7 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
+$app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,

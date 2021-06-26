@@ -35,7 +35,7 @@ If you want the Swoole server to run after reboot, add the following line to you
 ### Build Database
 Run commands:
 ```
-php artisan minako:mal:episodes
+
 php artisan minako:notify:anime
 php artisan minako:notify:characters
 php artisan minako:notify:company
@@ -43,7 +43,7 @@ php artisan minako:notify:relation
 php artisan minako:notify:character-relation
 php artisan minako:notify:thumbnail
 php artisan minako:notify:character-image
-
+php artisan minako:mal:episodes
 php artisan minako:ohys:download
 
 php artisan scout:import "App\Models\MALAnime"

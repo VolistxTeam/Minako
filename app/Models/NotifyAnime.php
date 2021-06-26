@@ -101,4 +101,23 @@ class NotifyAnime extends Model
     {
         return $this->hasMany(NotifyCharacterRelation::class, 'uniqueID', 'uniqueID');
     }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'uniqueID' => $this->uniqueID,
+            'title_canonical' => $this->title_canonical,
+            'title_romaji' => $this->title_romaji,
+            'title_english' => $this->title_english,
+            'title_japanese' => $this->title_japanese,
+            'title_hiragana' => $this->title_hiragana,
+            'title_synonyms' => empty($this->title_synonyms) ? '' : implode("|", $this->title_synonyms)
+        ];
+    }
 }

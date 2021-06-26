@@ -48,4 +48,17 @@ class OhysRelation extends Model
     {
         return $this->belongsTo(NotifyAnime::class, 'uniqueID', 'matchingID');
     }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray() {
+        return [
+            'id' => $this->id,
+            'uniqueID' => $this->uniqueID,
+            'matchingID' => $this->matchingID
+        ];
+    }
 }

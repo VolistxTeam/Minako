@@ -18,14 +18,14 @@
         "laravelista/lumen-vendor-publish": "8.0",
         "league/flysystem": " ~1.0",
         "maxsky/lumen-app-key-generator": "^1.0",
-        "meilisearch/meilisearch-php": "^0.18.2",
-        "mlntn/lumen-artisan-serve": "^1.3",
+        "cryental/lumen-artisan-serve": "^1.3",
         "paragonie/random-lib": "^2.0",
         "rennokki/laravel-eloquent-query-cache": "^2.6",
         "rogervila/lumen-rate-limiting": "^1.0",
         "spatie/laravel-responsecache": "^7.0",
         "staudenmeir/eloquent-has-many-deep": "^1.13",
-        "swooletw/laravel-swoole": "^2.8"
+        "swooletw/laravel-swoole": "^2.8",
+        "teamtnt/laravel-scout-tntsearch-driver": "^11.5"
     },
     "require-dev": {
         "mockery/mockery": "^1.3.1",
