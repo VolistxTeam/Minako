@@ -6,11 +6,10 @@ Confirmed to work with LiteSpeed + Laravel Swoole + APCu + MySQL.
 ### Requirements
 - PHP 8.0 or Above
 - PHP Swoole, Imagick, APCu and Required Extension for Laravel/Lumen
-- Meilisearch
 - MySQL 8.0 or Above / MariaDB 10.5 or Above
 
 ### Installation
-You have to install Meilisearch in your system, and set MEILISEARCH_KEY if required. After that, run commands:
+Run commands:
 ```
 composer install
 php artisan key:generate
@@ -35,7 +34,6 @@ If you want the Swoole server to run after reboot, add the following line to you
 ### Build Database
 Run commands:
 ```
-
 php artisan minako:notify:anime
 php artisan minako:notify:characters
 php artisan minako:notify:company
