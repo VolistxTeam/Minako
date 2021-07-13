@@ -19,11 +19,12 @@ class ThumbnailCommand extends Command
     public function handle()
     {
         set_time_limit(0);
+        ini_set('memory_limit', '-1');
 
-        $exists = Storage::disk('local')->exists('minako/posters');
+        $exists = Storage::disk('upcloud')->exists('posters');
 
         if (!$exists) {
-            Storage::disk('local')->makeDirectory('minako/posters');
+            Storage::disk('upcloud')->makeDirectory('posters');
         }
 
         $allAnime = NotifyAnime::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->get()->toArray();
@@ -47,7 +48,7 @@ class ThumbnailCommand extends Command
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
                 try {
-                    $existsFile = Storage::disk('local')->exists('minako/posters/' . $item['uniqueID'] . '.jpg');
+                    $existsFile = Storage::disk('upcloud')->exists('posters/' . $item['uniqueID'] . '.jpg');
 
                     if ($existsFile) {
                         $this->error('[+] Thumbnail exists. [' . $remainingCount . '/' . $totalCount . ']');
@@ -78,7 +79,7 @@ class ThumbnailCommand extends Command
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);
 
-                    Storage::disk('local')->put('minako/posters/' . $item['uniqueID'] . '.jpg', $image);
+                    Storage::disk('upcloud')->put('posters/' . $item['uniqueID'] . '.jpg', $image);
 
                     unset($fp);
 
@@ -86,7 +87,7 @@ class ThumbnailCommand extends Command
                     $remainingCount++;
                     continue;
                 } catch (Exception $ex) {
-                    $this->error('[+] Exception [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[+] Exception [' . $ex . '[]' . $remainingCount . '/' . $totalCount . ']');
                     $remainingCount++;
                     continue;
                 }

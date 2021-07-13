@@ -7,8 +7,10 @@ use App\Models\NotifyCharacter;
 use App\Models\NotifyCharacterRelation;
 use App\Models\NotifyCompany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class AnimeController extends Controller
 {
@@ -83,19 +85,21 @@ class AnimeController extends Controller
 
     public function GetImage($uniqueID)
     {
-        $actualPath = storage_path('app/minako/posters/' . $uniqueID . '.jpg');
+        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
 
-        if (!file_exists($actualPath)) {
-            return response('Image not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
+        if (empty($itemQuery)) {
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $file = File::get($actualPath);
-        $type = File::mimeType($actualPath);
+        $id = $itemQuery->uniqueID;
 
-        $response = Response::make($file, 200);
-        $response->header("Content-Type", $type);
+        $contents = Cache::remember('posters/' . $id . '.jpg', 86400, function () use ($id) {
+            if (Storage::disk('upcloud')->exists('posters/' . $id . '.jpg')) {
+                return Storage::disk('upcloud')->get('posters/' . $id . '.jpg');
+            }
+        });
 
-        return $response;
+        return Response::make($contents, 200)->header("Content-Type", "image/jpeg");
     }
 
     public function GetEpisode($uniqueID, $episodeNumber)

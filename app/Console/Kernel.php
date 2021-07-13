@@ -29,7 +29,6 @@ class Kernel extends ConsoleKernel
         Commands\Notify\RelationCommand::class,
         Commands\Notify\ThumbnailCommand::class,
         Commands\Ohys\DownloadCommand::class,
-        Commands\Ohys\ParseCommand::class,
         Commands\Ohys\RelationCommand::class,
         Serve::class,
     ];

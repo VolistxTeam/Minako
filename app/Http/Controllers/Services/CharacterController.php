@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class CharacterController extends Controller
 {
@@ -29,19 +32,21 @@ class CharacterController extends Controller
 
     public function GetImage($id)
     {
-        $actualPath = storage_path('app/minako/characters/' . $id . '.jpg');
+        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
 
-        if (!file_exists($actualPath)) {
-            return response('Image not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        if (empty($itemQuery)) {
+            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $file = File::get($actualPath);
-        $type = File::mimeType($actualPath);
+        $id = $itemQuery->uniqueID;
 
-        $response = Response::make($file, 200);
-        $response->header("Content-Type", $type);
+        $contents = Cache::remember('characters/' . $id . '.jpg', 86400, function () use ($id) {
+            if (Storage::disk('upcloud')->exists('characters/' . $id . '.jpg')) {
+                return Storage::disk('upcloud')->get('characters/' . $id . '.jpg');
+            }
+        });
 
-        return $response;
+        return Response::make($contents, 200)->header("Content-Type", "image/jpeg");
     }
 
     public function GetCharacter($id)

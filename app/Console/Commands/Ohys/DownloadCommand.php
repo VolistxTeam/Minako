@@ -33,7 +33,7 @@ class DownloadCommand extends Command
             'User-Agent' => $faker->chrome,
         ];
 
-        $client = new Client(['http_errors' => false, 'timeout' => 60.0, "proxy" => "http://y7gxfv:EPKsWN@168.80.123.234:8000"]);
+        $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
 
         $query = $client->get('https://ohys.nl/tt/json.php?dir=disk&p=0', ['headers' => $headers]);
 
@@ -118,9 +118,9 @@ class DownloadCommand extends Command
                     'hidden_download_magnet' => $hidden_download_magnet
                 ]);
 
-                if (Storage::disk('local')->missing('minako/ohys-torrents/' . $file['t'])) {
+                if (Storage::disk('upcloud')->missing('torrents/' . $file['t'])) {
                     if (file_exists($fpPath)) {
-                        Storage::disk('local')->put('minako/ohys-torrents/' . $file['t'], file_get_contents($fpPath));
+                        Storage::disk('upcloud')->put('torrents/' . $file['t'], file_get_contents($fpPath));
                         unlink($fpPath);
                     }
                 }

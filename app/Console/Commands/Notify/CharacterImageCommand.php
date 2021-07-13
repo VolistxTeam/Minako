@@ -22,10 +22,10 @@ class CharacterImageCommand extends Command
 
         set_time_limit(0);
 
-        $exists = Storage::disk('local')->exists('minako/characters');
+        $exists = Storage::disk('upcloud')->exists('characters');
 
         if (!$exists) {
-            Storage::disk('local')->makeDirectory('minako/characters');
+            Storage::disk('upcloud')->makeDirectory('characters');
         }
 
         $allAnime = NotifyCharacter::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->get()->toArray();
@@ -49,7 +49,7 @@ class CharacterImageCommand extends Command
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
                 try {
-                    $existsFile = Storage::disk('local')->exists('minako/characters/' . $item['uniqueID'] . '.jpg');
+                    $existsFile = Storage::disk('upcloud')->exists('characters/' . $item['uniqueID'] . '.jpg');
 
                     if ($existsFile) {
                         $this->error('[+] Character exists. [' . $remainingCount . '/' . $totalCount . ']');
@@ -80,7 +80,7 @@ class CharacterImageCommand extends Command
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);
 
-                    Storage::disk('local')->put('minako/characters/' . $item['uniqueID'] . '.jpg', $image);
+                    Storage::disk('upcloud')->put('characters/' . $item['uniqueID'] . '.jpg', $image);
 
                     unset($fp);
 

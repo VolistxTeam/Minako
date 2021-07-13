@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Services;
 use App\Models\OhysTorrent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class OhysController extends Controller
 {
@@ -154,15 +156,21 @@ class OhysController extends Controller
         $requestType = $request->input('type', 'magnet');
 
         if ($requestType == 'torrent') {
-            $actualPath = storage_path('app/minako/ohys-torrents/' . $torrentQuery->torrentName);
+            $contents = Cache::remember('torrents/' . $torrentQuery->torrentName, 86400, function () use ($torrentQuery) {
+                if (Storage::disk('upcloud')->exists('torrents/' . $torrentQuery->torrentName)) {
+                    return Storage::disk('upcloud')->get('torrents/' . $torrentQuery->torrentName);
+                }
+            });
 
-            if (!file_exists($actualPath)) {
-                return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            if (empty($contents)) {
+                return response()->json([
+                    'result' => false,
+                    'code' => 'xNotFound',
+                    'message' => 'Did not find anything with this ID.'
+                ], 404);
             }
 
-            $type = File::mimeType($actualPath);
-
-            return Response::download($actualPath, $id . '.torrent', ["Content-Type" => $type]);
+            return Response::make($contents, 200)->header("Content-Type", "application/x-bittorrent")->header('Content-disposition','attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
         } else {
             $redirect = new RedirectResponse($torrentQuery->hidden_download_magnet, 302, []);
 
