@@ -1,12 +1,8 @@
 {
-    "name": "cryental/volistx-skeleton",
-    "description": "Reusable Framework for Volistx API Based Lumen PHP.",
-    "license": "MIT",
-    "type": "project",
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "cryental/lumen-artisan-serve": "^1.3",
+        "cryental/lumen-artisan-serve": "^1.5",
         "fakerphp/faker": "^1.9.1",
         "fideloper/proxy": "^4.4",
         "geoip2/geoip2": "^2.11",
@@ -38,7 +34,6 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Illuminate\\": "Illuminate/"
         },
         "files": [
             "app/Helpers.php"
