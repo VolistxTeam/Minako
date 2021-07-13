@@ -19,7 +19,6 @@ class ThumbnailCommand extends Command
     public function handle()
     {
         set_time_limit(0);
-        ini_set('memory_limit', '-1');
 
         $exists = Storage::disk('upcloud')->exists('posters');
 
