@@ -150,7 +150,7 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()->latest()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
-            return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
         $requestType = $request->input('type', 'magnet');
@@ -163,11 +163,7 @@ class OhysController extends Controller
             });
 
             if (empty($contents)) {
-                return response()->json([
-                    'result' => false,
-                    'code' => 'xNotFound',
-                    'message' => 'Did not find anything with this ID.'
-                ], 404);
+                return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
             }
 
             return Response::make($contents, 200)->header("Content-Type", "application/x-bittorrent")->header('Content-disposition','attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
