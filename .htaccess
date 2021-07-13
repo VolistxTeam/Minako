@@ -1,4 +1,4 @@
 <IfModule mod_rewrite.c>
-RewriteEngine on
-RewriteRule (.*) http://minako_v2_swoole/$1 [P]
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
