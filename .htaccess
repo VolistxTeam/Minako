@@ -2,3 +2,7 @@
 RewriteEngine On
 RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
+
+Options -Indexes
+
+Header always unset X-Powered-By
