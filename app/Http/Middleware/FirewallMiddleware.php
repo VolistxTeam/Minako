@@ -4,24 +4,23 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Wikimedia\IPSet;
 
 class FirewallMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param Request $request
-     * @param Closure $next
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         $clientIP = $request->getClientIp();
 
-        if (in_array($clientIP, config('firewall.ipBlacklist', []))) {
+        $ipSet = new IPSet(config('firewall.ipBlacklist', []));
+
+        if ($ipSet->match($clientIP)) {
             return response('', 403);
         }
 
-        return $next($request);
+        $response = $next($request);
+        $response->header('X-Powered-By', 'WebShield/2.86');
+
+        return $response;
     }
 }
