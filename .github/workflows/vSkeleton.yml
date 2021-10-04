@@ -27,6 +27,7 @@ jobs:
       - name: Prepare Database
         run: |
           mkdir -p database
+          touch database/database.sqlite
       - name: Download Database
         uses: wei/wget@v1.1.1
         with:
@@ -34,6 +35,7 @@ jobs:
       - name: Prepare Cache Data
         env:
           DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: |
           php artisan scout:import "App\Models\MALAnime"
           php artisan scout:import "App\Models\NotifyAnime"
