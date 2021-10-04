@@ -13,7 +13,10 @@ if (env('HEROKU_ENV', false)) {
         'proxies' => [
             // Local Proxy
             '127.0.0.1',
-
+            
+            // Srv-Marine Proxies
+            '51.79.39.32/27',
+            
             // StackPath Proxies
             '69.16.133.0/24',
             '69.16.176.0/20',
