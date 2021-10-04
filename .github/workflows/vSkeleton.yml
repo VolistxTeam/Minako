@@ -16,8 +16,6 @@ jobs:
         with:
           php-version: '8.0'
       - uses: actions/checkout@v2
-      - name: Github Action for wget
-        uses: wei/wget@v1.1.1
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       - name: Install Dependencies
