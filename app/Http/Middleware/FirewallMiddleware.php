@@ -19,7 +19,7 @@ class FirewallMiddleware
         }
 
         $response = $next($request);
-        $response->header('X-Powered-By', 'WebShield/2.86');
+        $response->header('Server', 'WebShield/2.86');
 
         return $response;
     }
