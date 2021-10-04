@@ -34,7 +34,6 @@ jobs:
       - name: Prepare Cache Data
         env:
           DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
         run: |
           php artisan scout:import "App\Models\MALAnime"
           php artisan scout:import "App\Models\NotifyAnime"
