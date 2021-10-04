@@ -291,23 +291,25 @@ class AnimeController extends Controller
 
         $filteredLicensorData = [];
 
-        foreach ($itemQuery->licensors as $item) {
-            $licensorQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
+        if (!empty($itemQuery->licensors)) {
+            foreach ($itemQuery->licensors as $item) {
+                $licensorQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
 
-            if (!empty($licensorQuery)) {
-                array_push($filteredLicensorData, [
-                    'id' => $licensorQuery->uniqueID,
-                    'names' => [
-                        'english' => $licensorQuery->name_english,
-                        'japanese' => $licensorQuery->name_japanese,
-                        'synonyms' => $licensorQuery->name_synonyms
-                    ],
-                    'description' => $licensorQuery->description,
-                    'email' => $licensorQuery->email,
-                    'links' => $licensorQuery->links,
-                    'created_at' => (string)$licensorQuery->created_at,
-                    'updated_at' => (string)$licensorQuery->updated_at
-                ]);
+                if (!empty($licensorQuery)) {
+                    array_push($filteredLicensorData, [
+                        'id' => $licensorQuery->uniqueID,
+                        'names' => [
+                            'english' => $licensorQuery->name_english,
+                            'japanese' => $licensorQuery->name_japanese,
+                            'synonyms' => $licensorQuery->name_synonyms
+                        ],
+                        'description' => $licensorQuery->description,
+                        'email' => $licensorQuery->email,
+                        'links' => $licensorQuery->links,
+                        'created_at' => (string)$licensorQuery->created_at,
+                        'updated_at' => (string)$licensorQuery->updated_at
+                    ]);
+                }
             }
         }
 
