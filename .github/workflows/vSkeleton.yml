@@ -31,7 +31,7 @@ jobs:
       - name: Download Database
         uses: wei/wget@v1.1.1
         with:
-          args: -O database.sqlite -P database https://tests.cryental.dev/volistx/minako/database.sqlite
+          args: https://tests.cryental.dev/volistx/minako/database.sqlite -O database/database.sqlite
       - name: Prepare Cache Data
         env:
           DB_CONNECTION: sqlite
