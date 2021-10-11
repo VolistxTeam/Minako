@@ -74,8 +74,8 @@ class OhysController extends Controller
                         'torrent' => 'https://ohys.nl/tt/disk/' . $torrent['torrentName']
                     ],
                     'mirror' => [
-                        'torrent' => env('APP_URL', 'http://localhost') . '/ohys/download/' . $torrent['uniqueID'] . '?type=torrent',
-                        'magnet' => env('APP_URL', 'http://localhost') . '/ohys/download/' . $torrent['uniqueID'] . '?type=magnet',
+                        'torrent' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrent['uniqueID'] . '/download?type=torrent',
+                        'magnet' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrent['uniqueID'] . '/download?type=magnet',
                     ]
                 ]
             ];
@@ -136,8 +136,8 @@ class OhysController extends Controller
                     'torrent' => 'https://ohys.nl/tt/disk/' . $torrentQuery['torrentName']
                 ],
                 'mirror' => [
-                    'torrent' => env('APP_URL', 'http://localhost') . '/ohys/download/' . $torrentQuery['uniqueID'] . '?type=torrent',
-                    'magnet' => env('APP_URL', 'http://localhost') . '/ohys/download/' . $torrentQuery['uniqueID'] . '?type=magnet',
+                    'torrent' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrentQuery['uniqueID'] . '/download?type=torrent',
+                    'magnet' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrentQuery['uniqueID'] . '/download?type=magnet',
                 ]
             ]
         ];
