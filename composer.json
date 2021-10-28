@@ -23,7 +23,8 @@
         "staudenmeir/eloquent-has-many-deep": "^1.13",
         "swooletw/laravel-swoole": "^2.8",
         "teamtnt/laravel-scout-tntsearch-driver": "^11.5",
-        "wikimedia/ip-set": "^3.0"
+        "wikimedia/ip-set": "^3.0",
+      "ext-curl": "*"
     },
     "require-dev": {
         "mockery/mockery": "^1.3.1",

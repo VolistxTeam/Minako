@@ -40,12 +40,12 @@ class CharacterController extends Controller
 
         $id = $itemQuery->uniqueID;
 
-        $contents = Cache::remember('characters/' . $id . '.jpg', 86400, function () use ($id) {
-            if (Storage::disk('upcloud')->exists('characters/' . $id . '.jpg')) {
-                return Storage::disk('upcloud')->get('characters/' . $id . '.jpg');
-            }
-        });
-
+		$contents = Storage::disk('local')->get('characters/' . $id . '.jpg');
+		
+        if (empty($contents)) {
+            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        }
+		
         return Response::make($contents, 200)->header("Content-Type", "image/jpeg");
     }
 

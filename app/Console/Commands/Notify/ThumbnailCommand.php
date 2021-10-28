@@ -20,10 +20,10 @@ class ThumbnailCommand extends Command
     {
         set_time_limit(0);
 
-        $exists = Storage::disk('upcloud')->exists('posters');
+        $exists = Storage::disk('local')->exists('posters');
 
         if (!$exists) {
-            Storage::disk('upcloud')->makeDirectory('posters');
+            Storage::disk('local')->makeDirectory('posters');
         }
 
         $allAnime = NotifyAnime::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->get()->toArray();
@@ -47,7 +47,7 @@ class ThumbnailCommand extends Command
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
                 try {
-                    $existsFile = Storage::disk('upcloud')->exists('posters/' . $item['uniqueID'] . '.jpg');
+                    $existsFile = Storage::disk('local')->exists('posters/' . $item['uniqueID'] . '.jpg');
 
                     if ($existsFile) {
                         $this->error('[+] Thumbnail exists. [' . $remainingCount . '/' . $totalCount . ']');
@@ -78,7 +78,7 @@ class ThumbnailCommand extends Command
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);
 
-                    Storage::disk('upcloud')->put('posters/' . $item['uniqueID'] . '.jpg', $image);
+                    Storage::disk('local')->put('posters/' . $item['uniqueID'] . '.jpg', $image);
 
                     unset($fp);
 

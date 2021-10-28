@@ -1,8 +1,2 @@
-<IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteRule ^(.*)$ public/$1 [L]
-</IfModule>
-
-Options -Indexes
-
-Header always unset X-Powered-By
+RewriteRule ^(.*)$ http://127.0.0.1:26479/$1 [P,L]

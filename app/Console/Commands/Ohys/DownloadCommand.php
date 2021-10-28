@@ -118,9 +118,9 @@ class DownloadCommand extends Command
                     'hidden_download_magnet' => $hidden_download_magnet
                 ]);
 
-                if (Storage::disk('upcloud')->missing('torrents/' . $file['t'])) {
+                if (Storage::disk('local')->missing('torrents/' . $file['t'])) {
                     if (file_exists($fpPath)) {
-                        Storage::disk('upcloud')->put('torrents/' . $file['t'], file_get_contents($fpPath));
+                        Storage::disk('local')->put('torrents/' . $file['t'], file_get_contents($fpPath));
                         unlink($fpPath);
                     }
                 }
