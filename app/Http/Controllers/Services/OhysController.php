@@ -29,19 +29,11 @@ class OhysController extends Controller
 
             $itemsFiltered[] = [
                 'id' => $torrent['uniqueID'],
-                'anime_id' => !empty($torrent->anime->uniqueID) ? $torrent->anime->uniqueID : null,
                 'release_group' => $torrent['releaseGroup'],
                 'broadcaster' => $torrent['broadcaster'],
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
-                'info' => [
-                    'hash' => $torrent['info_totalHash'],
-                    'size' => $torrent['info_totalSize'],
-                    'created_at' => $torrent['info_createdDate'],
-                    'announces' => $announcesRebuild,
-                    'files' => $torrent['info_torrent_files'],
-                ],
                 'metadata' => [
                     'video' => [
                         'codec' => $torrent['metadata_video_codec'],
@@ -49,15 +41,6 @@ class OhysController extends Controller
                     ],
                     'audio' => [
                         'codec' => $torrent['metadata_audio_codec']
-                    ]
-                ],
-                'download' => [
-                    'official' => [
-                        'torrent' => 'https://ohys.nl/tt/disk/' . $torrent['torrentName']
-                    ],
-                    'mirror' => [
-                        'torrent' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrent['uniqueID'] . '/download?type=torrent',
-                        'magnet' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrent['uniqueID'] . '/download?type=magnet',
                     ]
                 ]
             ];
@@ -92,19 +75,11 @@ class OhysController extends Controller
 
             $itemsFiltered[] = [
                 'id' => $torrent['uniqueID'],
-                'anime_id' => !empty($torrent->anime->uniqueID) ? $torrent->anime->uniqueID : null,
                 'release_group' => $torrent['releaseGroup'],
                 'broadcaster' => $torrent['broadcaster'],
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
-                'info' => [
-                    'hash' => $torrent['info_totalHash'],
-                    'size' => $torrent['info_totalSize'],
-                    'created_at' => $torrent['info_createdDate'],
-                    'announces' => $announcesRebuild,
-                    'files' => $torrent['info_torrent_files'],
-                ],
                 'metadata' => [
                     'video' => [
                         'codec' => $torrent['metadata_video_codec'],
@@ -112,15 +87,6 @@ class OhysController extends Controller
                     ],
                     'audio' => [
                         'codec' => $torrent['metadata_audio_codec']
-                    ]
-                ],
-                'download' => [
-                    'official' => [
-                        'torrent' => 'https://ohys.nl/tt/disk/' . $torrent['torrentName']
-                    ],
-                    'mirror' => [
-                        'torrent' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrent['uniqueID'] . '/download?type=torrent',
-                        'magnet' => env('APP_URL', 'http://localhost') . '/ohys/' . $torrent['uniqueID'] . '/download?type=magnet',
                     ]
                 ]
             ];
