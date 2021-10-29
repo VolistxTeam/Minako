@@ -94,7 +94,7 @@ class OhysController extends Controller
                 'id' => $torrent['uniqueID'],
                 'anime_id' => !empty($torrent->anime->uniqueID) ? $torrent->anime->uniqueID : null,
                 'release_group' => $torrent['releaseGroup'],
-                'broadcaster' => $$torrent['broadcaster'],
+                'broadcaster' => $torrent['broadcaster'],
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
