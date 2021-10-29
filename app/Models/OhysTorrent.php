@@ -33,6 +33,7 @@ class OhysTorrent extends Model
     protected $fillable = [
         'uniqueID',
         'releaseGroup',
+        'broadcaster',
         'title',
         'episode',
         'torrentName',

@@ -27,15 +27,11 @@ class OhysController extends Controller
                 }
             }
 
-            $fileBaseName = str_replace('AACx2', 'AAC', $torrent['torrentName']);
-
-            preg_match('/(?:\[([^\r\n]*)\][\W]?)?(?:(?:([^\r\n]+?)(?: - ([0-9.]+?(?: END)?|SP))?)[\W]?[(|[]([^\r\n(]+)? (\d+x\d+|\d{3,}[^\r\n ]*)? ([^\r\n]+)?[)\]][^.\r\n]*(?:\.([^\r\n.]*)(?:\.[\w]+)?)?)$/', $fileBaseName, $fileNameParsedArray);
-
             $itemsFiltered[] = [
                 'id' => $torrent['uniqueID'],
                 'anime_id' => !empty($torrent->anime->uniqueID) ? $torrent->anime->uniqueID : null,
                 'release_group' => $torrent['releaseGroup'],
-                'broadcaster' => $fileNameParsedArray[4],
+                'broadcaster' => $torrent['broadcaster'],
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
@@ -94,15 +90,11 @@ class OhysController extends Controller
                 }
             }
 
-            $fileBaseName = str_replace('AACx2', 'AAC', $torrent['torrentName']);
-
-            preg_match('/(?:\[([^\r\n]*)\][\W]?)?(?:(?:([^\r\n]+?)(?: - ([0-9.]+?(?: END)?|SP))?)[\W]?[(|[]([^\r\n(]+)? (\d+x\d+|\d{3,}[^\r\n ]*)? ([^\r\n]+)?[)\]][^.\r\n]*(?:\.([^\r\n.]*)(?:\.[\w]+)?)?)$/', $fileBaseName, $fileNameParsedArray);
-
             $itemsFiltered[] = [
                 'id' => $torrent['uniqueID'],
                 'anime_id' => !empty($torrent->anime->uniqueID) ? $torrent->anime->uniqueID : null,
                 'release_group' => $torrent['releaseGroup'],
-                'broadcaster' => $fileNameParsedArray[4],
+                'broadcaster' => $$torrent['broadcaster'],
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
@@ -162,15 +154,11 @@ class OhysController extends Controller
             }
         }
 
-        $fileBaseName = str_replace('AACx2', 'AAC', $torrentQuery['torrentName']);
-
-        preg_match('/(?:\[([^\r\n]*)\][\W]?)?(?:(?:([^\r\n]+?)(?: - ([0-9.]+?(?: END)?|SP))?)[\W]?[(|[]([^\r\n(]+)? (\d+x\d+|\d{3,}[^\r\n ]*)? ([^\r\n]+)?[)\]][^.\r\n]*(?:\.([^\r\n.]*)(?:\.[\w]+)?)?)$/', $fileBaseName, $fileNameParsedArray);
-
         $buildResponse = [
             'id' => $torrentQuery['uniqueID'],
             'anime_id' => !empty($torrentQuery->anime->uniqueID) ? $torrentQuery->anime->uniqueID : null,
             'release_group' => $torrentQuery['releaseGroup'],
-            'broadcaster' => $fileNameParsedArray[4],
+            'broadcaster' => $torrentQuery['broadcaster'],
             'title' => $torrentQuery['title'],
             'episode' => $torrentQuery['episode'],
             'torrent_name' => $torrentQuery['torrentName'],

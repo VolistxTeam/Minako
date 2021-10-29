@@ -17,6 +17,7 @@ class CreateOhysTorrentTable extends Migration
             $table->bigIncrements('id');
             $table->string('uniqueID', 8);
             $table->string('releaseGroup')->nullable();
+            $table->string('broadcaster')->nullable();
             $table->text('title')->nullable();
             $table->smallInteger('episode')->nullable();
             $table->text('torrentName')->nullable();

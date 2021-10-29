@@ -98,12 +98,16 @@ class DownloadCommand extends Command
 
                 $metadata_video_codec = empty($metadataCodecParsed[0]) ? null : $metadataCodecParsed[0];
                 $metadata_audio_codec = empty($metadataCodecParsed[1]) ? null : $metadataCodecParsed[1];
+
+                $broadcaster = empty($fileNameParsedArray[4]) ? null : $fileNameParsedArray[4];
+
                 $hidden_download_magnet = $torrent->magnet(false);
 
                 OhysTorrent::query()->updateOrCreate([
                     'uniqueID' => $itemID
                 ], [
                     'releaseGroup' => $releaseGroup,
+                    'broadcaster' => $broadcaster,
                     'title' => $title,
                     'episode' => $episode,
                     'torrentName' => $torrentName,

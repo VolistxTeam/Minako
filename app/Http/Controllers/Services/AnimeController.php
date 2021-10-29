@@ -44,6 +44,14 @@ class AnimeController extends Controller
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
+        $filteredMappingData = [];
+
+        array_push($filteredMappingData, ['service' => 'notify/anime', 'service_id' => (string)$itemQuery->notifyID]);
+
+        foreach ($itemQuery->mappings as $item) {
+            array_push($filteredMappingData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
+        }
+
         $buildResponse = [
             'id' => $itemQuery['uniqueID'],
             'type' => $itemQuery['type'],
@@ -73,7 +81,12 @@ class AnimeController extends Controller
                 'soundtrack' => !empty($itemQuery['rating_soundtrack']) ? round($itemQuery['rating_soundtrack'] * 10, 2) : null,
             ],
             'first_broadcaster' => $itemQuery['firstChannel'],
-            'episodes' => count($itemQuery->episodes ?? array()),
+            'episode_info' => [
+                'total' => $itemQuery['episodeCount'],
+                'length' => $itemQuery['episodeLength']
+            ],
+            'mappings' => $filteredMappingData,
+            'trailers' => $itemQuery['trailers'],
             'created_at' => (string)$itemQuery['created_at'],
             'updated_at' => (string)$itemQuery['updated_at']
         ];
