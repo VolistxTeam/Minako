@@ -34,6 +34,10 @@ class OhysController extends Controller
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
+                'info' => [
+                    'size' => $torrentQuery['info_totalSize'],
+                    'created_at' => $torrentQuery['info_createdDate'],
+                ],
                 'metadata' => [
                     'video' => [
                         'codec' => $torrent['metadata_video_codec'],
@@ -80,6 +84,10 @@ class OhysController extends Controller
                 'title' => $torrent['title'],
                 'episode' => $torrent['episode'],
                 'torrent_name' => $torrent['torrentName'],
+                'info' => [
+                    'size' => $torrentQuery['info_totalSize'],
+                    'created_at' => $torrentQuery['info_createdDate'],
+                ],
                 'metadata' => [
                     'video' => [
                         'codec' => $torrent['metadata_video_codec'],
