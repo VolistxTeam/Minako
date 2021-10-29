@@ -52,6 +52,13 @@ class AnimeController extends Controller
             array_push($filteredMappingData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
         }
 
+        $filteredTrailersData = [];
+
+        foreach ($itemQuery->trailers as $item) {
+            array_push($filteredTrailersData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
+        }
+
+
         $buildResponse = [
             'id' => $itemQuery['uniqueID'],
             'type' => $itemQuery['type'],
@@ -86,7 +93,7 @@ class AnimeController extends Controller
                 'length' => $itemQuery['episodeLength']
             ],
             'mappings' => $filteredMappingData,
-            'trailers' => $itemQuery['trailers'],
+            'trailers' => $filteredTrailersData,
             'created_at' => (string)$itemQuery['created_at'],
             'updated_at' => (string)$itemQuery['updated_at']
         ];
