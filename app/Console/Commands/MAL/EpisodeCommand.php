@@ -22,13 +22,23 @@ class EpisodeCommand extends Command
         set_time_limit(0);
 
         $workingProxies = [
-            'mV7KwB:a6HBC6@196.17.251.188:8000',
-            'mV7KwB:a6HBC6@196.17.249.28:8000',
-            'mV7KwB:a6HBC6@196.17.251.185:8000',
-            'mV7KwB:a6HBC6@196.17.251.91:8000',
-            'mV7KwB:a6HBC6@45.147.100.195:8000',
-            'mV7KwB:a6HBC6@45.147.100.133:8000',
-            'mV7KwB:a6HBC6@45.147.102.183:8000',
+            "0Kw4eD:8Xqzj3@181.177.87.231:9047",
+            "0Kw4eD:8Xqzj3@181.177.86.230:9922",
+            "0Kw4eD:8Xqzj3@181.177.87.240:9090",
+            "0Kw4eD:8Xqzj3@181.177.87.167:9679",
+            "0Kw4eD:8Xqzj3@181.177.85.222:9125",
+            "0Kw4eD:8Xqzj3@181.177.85.157:9173",
+            "0Kw4eD:8Xqzj3@181.177.84.185:9517",
+            "0Kw4eD:8Xqzj3@181.177.84.30:9374",
+            "0Kw4eD:8Xqzj3@181.177.84.88:9866",
+            "0Kw4eD:8Xqzj3@181.177.84.96:9499",
+            "mV7KwB:a6HBC6@196.17.251.188:8000",
+            "mV7KwB:a6HBC6@196.17.249.28:8000",
+            "mV7KwB:a6HBC6@196.17.251.185:8000",
+            "mV7KwB:a6HBC6@196.17.251.91:8000",
+            "mV7KwB:a6HBC6@45.147.100.195:8000",
+            "mV7KwB:a6HBC6@45.147.100.133:8000",
+            "mV7KwB:a6HBC6@45.147.102.183:8000"
         ];
 
         $this->info('[!] Getting all anime information...');
@@ -42,7 +52,7 @@ class EpisodeCommand extends Command
         foreach ($allAnime as $item) {
             $countdownCount++;
 
-            if ($countdownCount > 40) {
+            if ($countdownCount > 25) {
                 $countdownCount = 0;
                 $this->info('[+] Waiting for 10 seconds...');
                 sleep(10);
