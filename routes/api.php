@@ -53,7 +53,7 @@ $router->group(['middleware' => ['cacheResponse:300']], function () use ($router
         $router->get('/search/{name}', 'Services\OhysController@Search');
     });
 
-    $router->group(['prefix' => 'dump'], function () use ($router) {
+    $router->group(['prefix' => 'export'], function () use ($router) {
         $router->get('/anime}', 'Services\ExportController@DumpAnime');
     });
 });
