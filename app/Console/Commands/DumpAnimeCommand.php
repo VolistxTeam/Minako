@@ -21,6 +21,7 @@ class DumpAnimeCommand extends Command
 
         Storage::disk('local')->deleteDir('dump_temp');
         Storage::disk('local')->createDir('dump_temp');
+
         $anime = NotifyAnime::all();
 
         $data = [];
@@ -254,10 +255,12 @@ class DumpAnimeCommand extends Command
                 Storage::disk('local')->put('dump_temp/anime_tmp_' . $partCount . '.dat', serialize($data));
 
                 $data = null;
-                $data = array();
+                unset($data);
 
                 $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
                 gc_collect_cycles();
+
+                $data = [];
 
                 $this->line('[+] Memory Used After Flushing: ' . memory_get_usage());
 
