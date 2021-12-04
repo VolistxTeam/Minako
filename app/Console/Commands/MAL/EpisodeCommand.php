@@ -41,8 +41,8 @@ class EpisodeCommand extends Command
 
         $skipCount = 0;
         
-        if (!empty($this->argument('skip'))) {
-            $skipCount = (int) $this->argument('skip');
+        if (!empty($this->option('skip'))) {
+            $skipCount = (int) $this->option('skip');
         }
         
         foreach ($allAnime as $item) {
