@@ -11,7 +11,7 @@ use Jikan\Jikan;
 
 class EpisodeCommand extends Command
 {
-    protected $signature = "minako:mal:episodes";
+    protected $signature = "minako:mal:episodes {skip?}";
 
     protected $description = "Retrieve all episode information from MAL using internal APIs.";
 
@@ -36,12 +36,24 @@ class EpisodeCommand extends Command
         $allAnime = NotifyAnime::all()->toArray();
 
         $totalCount = count($allAnime);
-        $remainingCount = 1;
+        $remainingCount = 0;
         $countdownCount = 0;
 
+        $skipCount = 0;
+        
+        if (!empty($this->argument('skip'))) {
+            $skipCount = (int) $this->argument('skip');
+        }
+        
         foreach ($allAnime as $item) {
             $countdownCount++;
 
+            if ($remainingCount < $skipCount) {
+                $remainingCount++;
+                $this->info('[-] Skipping Item [' . $remainingCount . '/' . $totalCount . ']');
+                continue;
+            }
+            
             if ($countdownCount > 25) {
                 $countdownCount = 0;
                 $this->info('[+] Waiting for 10 seconds...');
