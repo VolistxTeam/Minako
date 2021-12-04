@@ -254,11 +254,11 @@ class DumpAnimeCommand extends Command
 
                 $data = [];
 
-                $partCount++;
-
                 $this->line('[+] Memory Used Before Flushing: ' . memory_get_usage());
                 $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
                 $this->line('[+] Memory Used After Flushing: ' . memory_get_usage());
+
+                $partCount++;
             }
         }
 
