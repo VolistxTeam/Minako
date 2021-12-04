@@ -250,7 +250,7 @@ class DumpAnimeCommand extends Command
             $this->line('[+] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
             $remainingCount++;
 
-            if ($remainingCount % 100 == 0) {
+            if ($remainingCount % 500 == 0) {
                 Storage::disk('local')->put('dump_temp/anime_tmp_' . $partCount . '.dat', serialize($data));
 
                 $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');

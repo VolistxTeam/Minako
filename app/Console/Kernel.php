@@ -46,7 +46,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('minako:ohys:download')->hourly()->runInBackground();
 
-        $schedule->command('minako:ohys:relation')->everySixHours();
+        $schedule->command('minako:ohys:relation')->everyThreeHours()->runInBackground();
 
         $schedule->command('minako:notify:anime')->sundays();
         $schedule->command('minako:notify:characters')->sundays();
@@ -56,8 +56,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('minako:notify:thumbnail')->sundays();
         $schedule->command('minako:notify:character-image')->sundays();
 
-        $schedule->command('minako:dump-anime')->fridays()->runInBackground();
+        $schedule->command('minako:dump-anime')->everySixHours()->runInBackground();
 
-        $schedule->command('minako:mal:episodes')->weekly()->days([1,4])->at('00:00');
+        $schedule->command('minako:mal:episodes')->weekly()->days([1,4])->at('00:00')->runInBackground();
     }
 }
