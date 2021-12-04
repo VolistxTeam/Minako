@@ -251,18 +251,20 @@ class DumpAnimeCommand extends Command
             $remainingCount++;
 
             if ($remainingCount % 100 == 0) {
-                $this->line('[+] Memory Used Before Flushing: ' . memory_get_usage());
                 Storage::disk('local')->put('dump_temp/anime_tmp_' . $partCount . '.dat', serialize($data));
 
+                $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
+
                 $data = null;
-                unset($data);
+                $data = array();
+
+                $partCount++;
+            }
+
+            if ($remainingCount == $totalCount) {
+                Storage::disk('local')->put('dump_temp/anime_tmp_' . $partCount . '.dat', serialize($data));
 
                 $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
-                gc_collect_cycles();
-
-                $data = [];
-
-                $this->line('[+] Memory Used After Flushing: ' . memory_get_usage());
 
                 $partCount++;
             }
