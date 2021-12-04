@@ -25,6 +25,7 @@ class DumpAnimeCommand extends Command
 
         $totalCount = count($anime);
         $remainingCount = 0;
+        $partCount = 0;
 
         foreach ($anime as $animeItem) {
             $main = $animeItem->first()->toArray();
@@ -245,6 +246,23 @@ class DumpAnimeCommand extends Command
 
             $this->line('[+] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
             $remainingCount++;
+
+            if ($remainingCount % 500 == 0) {
+                Storage::disk('local')->put('anime_tmp_' . $partCount . '.dat', serialize($data));
+
+                $data = [];
+
+                $partCount++;
+
+                $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
+            }
+        }
+
+        $data = [];
+
+        for ($i = 0; $i < $partCount; $i++) {
+            $data[] = unserialize(Storage::disk('local')->get('anime_tmp_' . $i . '.dat'));
+            Storage::disk('local')->delete('anime_tmp_' . $i . '.dat');
         }
 
         Storage::disk('local')->put('anime.json', json_encode([
