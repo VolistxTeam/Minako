@@ -11,7 +11,7 @@ use Jikan\Jikan;
 
 class EpisodeCommand extends Command
 {
-    protected $signature = "minako:mal:episodes  {--skip}";
+    protected $signature = "minako:mal:episodes {--skip=0}";
 
     protected $description = "Retrieve all episode information from MAL using internal APIs.";
 
