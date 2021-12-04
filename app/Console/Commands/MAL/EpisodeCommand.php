@@ -7,6 +7,7 @@ use App\Models\NotifyAnime;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Jikan\Jikan;
 
 class EpisodeCommand extends Command
 {
@@ -20,20 +21,28 @@ class EpisodeCommand extends Command
 
         set_time_limit(0);
 
+        $workingProxies = [
+            'mV7KwB:a6HBC6@196.17.251.188:8000',
+            'mV7KwB:a6HBC6@196.17.249.28:8000',
+            'mV7KwB:a6HBC6@196.17.251.185:8000',
+            'mV7KwB:a6HBC6@196.17.251.91:8000',
+            'mV7KwB:a6HBC6@45.147.100.195:8000',
+            'mV7KwB:a6HBC6@45.147.100.133:8000',
+            'mV7KwB:a6HBC6@45.147.102.183:8000',
+        ];
+
+        $this->info('[!] Getting all anime information...');
+
         $allAnime = NotifyAnime::all()->toArray();
 
         $totalCount = count($allAnime);
         $remainingCount = 1;
         $countdownCount = 0;
 
-        $internalAPIBaseURL = 'https://api.jikan.minako.moe/v3/';
-
-        $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
-
         foreach ($allAnime as $item) {
             $countdownCount++;
 
-            if ($countdownCount > 15) {
+            if ($countdownCount > 40) {
                 $countdownCount = 0;
                 $this->info('[+] Waiting for 10 seconds...');
                 sleep(10);
@@ -76,64 +85,32 @@ class EpisodeCommand extends Command
                     continue;
                 }
 
-                $headers = [
-                    'User-Agent' => 'minako-v2-access-05819xm26',
-                ];
-
                 $pageNumber = 1;
                 $currentLoop = 1;
                 $errorDetected = false;
                 $errorMessage = '';
 
+                $client = new Client(['http_errors' => false, 'timeout' => 30.0, 'proxy' => 'http://' . $workingProxies[array_rand($workingProxies)]]);
+                $jikan = new Jikan($client);
+
                 while ($currentLoop <= $pageNumber) {
                     $s_continue = false;
 
                     while (!$s_continue) {
-                        $episodesResponse = $client->get($internalAPIBaseURL . 'anime/' . $malID . '/episodes/' . $currentLoop, ['headers' => $headers]);
+                        $episodesResponse = $jikan->AnimeEpisodes($malID, $currentLoop)->getEpisodes();
 
-                        if ($episodesResponse->getStatusCode() == 429) {
-                            $this->error('[-] Rate limited. Waiting 5 seconds to retry...');
-                            sleep(5);
-                            $s_continue = false;
-                            continue;
-                        }
-
-                        if ($episodesResponse->getStatusCode() != 200) {
-                            $errorMessage = 'Skipping item. Reason: Something went wrong.';
-                            $s_continue = true;
-                            $errorDetected = true;
-                            $currentLoop = $pageNumber + 1;
-                            continue;
-                        }
-
-                        $episodes = (string)$episodesResponse->getBody();
-
-                        $episodes = json_decode($episodes, true);
-
-                        if (empty($episodes['episodes'])) {
-                            $errorMessage = 'Skipping item. Reason: Episode not found.';
-                            $s_continue = true;
-                            $errorDetected = true;
-                            $currentLoop = $pageNumber + 1;
-                            continue;
-                        }
-
-                        if ($episodes['episodes_last_page'] > 1) {
-                            $pageNumber = $episodes['episodes_last_page'];
-                        }
-
-                        foreach ($episodes['episodes'] as $episodeItem) {
+                        foreach ($episodesResponse as $episodeItem) {
                             $malItem = MALAnime::query()->updateOrCreate([
                                 'uniqueID' => $item['uniqueID'],
                                 'notifyID' => $item['notifyID'],
-                                'episode_id' => $episodeItem['episode_id']
+                                'episode_id' => $episodeItem->getEpisodeId()
                             ], [
-                                'title' => !empty($episodeItem['title']) ? $episodeItem['title'] : null,
-                                'title_japanese' => !empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
-                                'title_romanji' => !empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
-                                'aired' => !empty($episodeItem['aired']) ? $episodeItem['aired'] : null,
-                                'filler' => !empty($episodeItem['filler']) ? $episodeItem['filler'] : null,
-                                'recap' => !empty($episodeItem['recap']) ? $episodeItem['recap'] : null,
+                                'title' => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
+                                'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
+                                'title_romanji' => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
+                                'aired' => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
+                                'filler' => (int)$episodeItem->isFiller(),
+                                'recap' => (int)$episodeItem->isRecap(),
                             ]);
 
                             $malItem->touch();

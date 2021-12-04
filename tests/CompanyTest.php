@@ -1,10 +1,11 @@
 <?php
 
+use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
 class CompanyTest extends BaseTestCase
 {
-    public function createApplication(): \Laravel\Lumen\Application
+    public function createApplication(): Application
     {
         return require __DIR__.'/../bootstrap/app.php';
     }
