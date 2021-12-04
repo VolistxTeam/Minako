@@ -26,7 +26,7 @@ class EpisodeCommand extends Command
         $remainingCount = 1;
         $countdownCount = 0;
 
-        $internalAPIBaseURL = 'https://api.jikan.moe/v3/';
+        $internalAPIBaseURL = 'https://api.jikan.minako.moe/v3/';
 
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
 
