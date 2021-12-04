@@ -19,8 +19,8 @@ class DumpAnimeCommand extends Command
     {
         set_time_limit(0);
 
+        Storage::disk('local')->deleteDir('dump_temp');
         Storage::disk('local')->createDir('dump_temp');
-
         $anime = NotifyAnime::all();
 
         $data = [];
