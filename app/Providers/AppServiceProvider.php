@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Lumen\Http\ResponseFactory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(\Illuminate\Contracts\Routing\ResponseFactory::class, function() {
-            return new ResponseFactory();
+            return new \Laravel\Lumen\Http\ResponseFactory();
         });
     }
 }

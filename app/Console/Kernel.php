@@ -43,16 +43,18 @@ class Kernel extends ConsoleKernel
     {
         set_time_limit(0);
 
-        $schedule->command('minako:ohys:download')->hourly()->runInBackground();
+        $schedule->command('minako:ohys:download')->hourly();
 
-        $schedule->command('minako:notify:anime')->sundays()->runInBackground();
-        $schedule->command('minako:notify:characters')->sundays()->runInBackground();
-        $schedule->command('minako:notify:company')->sundays()->runInBackground();
-        $schedule->command('minako:notify:relation')->sundays()->runInBackground();
-        $schedule->command('minako:notify:character-relation')->sundays()->runInBackground();
-        $schedule->command('minako:notify:thumbnail')->sundays()->runInBackground();
-        $schedule->command('minako:notify:character-image')->sundays()->runInBackground();
+        $schedule->command('minako:ohys:relation')->everySixHours();
 
-        $schedule->command('minako:mal:episodes')->sundays()->runInBackground();
+        $schedule->command('minako:notify:anime')->sundays();
+        $schedule->command('minako:notify:characters')->sundays();
+        $schedule->command('minako:notify:company')->sundays();
+        $schedule->command('minako:notify:relation')->sundays();
+        $schedule->command('minako:notify:character-relation')->sundays();
+        $schedule->command('minako:notify:thumbnail')->sundays();
+        $schedule->command('minako:notify:character-image')->sundays();
+
+        $schedule->command('minako:mal:episodes')->sundays();
     }
 }

@@ -1,8 +1,5 @@
 <?php
 
-use App\Classes\Spatie\ResponseCache\Hasher\CustomMD5Hasher;
-use Spatie\ResponseCache\Serializers\DefaultSerializer;
-
 return [
     /*
      * Determine if the response cache middleware should be enabled.
@@ -63,10 +60,10 @@ return [
      * This class is responsible for generating a hash for a request. This hash
      * is used to look up an cached response.
      */
-    'hasher' => CustomMD5Hasher::class,
+    'hasher' => \App\Classes\Spatie\ResponseCache\Hasher\CustomMD5Hasher::class,
 
     /*
      * This class is responsible for serializing responses.
      */
-    'serializer' => DefaultSerializer::class,
+    'serializer' => \Spatie\ResponseCache\Serializers\DefaultSerializer::class,
 ];
