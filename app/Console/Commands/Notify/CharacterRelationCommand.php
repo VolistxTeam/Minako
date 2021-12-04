@@ -42,7 +42,7 @@ class CharacterRelationCommand extends Command
         $this->info('[!] Starting the process to crawl information...');
 
         $totalCount = count($allAnime);
-        $remainingCount = 1;
+        $remainingCount = 0;
 
         foreach ($allAnime as $item) {
             try {

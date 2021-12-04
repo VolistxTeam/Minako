@@ -62,7 +62,7 @@ class CharacterCommand extends Command
         $this->info('[!] Starting the process to crawl information...');
 
         $totalCount = count($notifyIDs);
-        $remainingCount = 1;
+        $remainingCount = 0;
 
         foreach ($notifyIDs as $item) {
             try {

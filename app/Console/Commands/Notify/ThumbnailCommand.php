@@ -29,7 +29,7 @@ class ThumbnailCommand extends Command
         $allAnime = NotifyAnime::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->get()->toArray();
 
         $totalCount = count($allAnime);
-        $remainingCount = 1;
+        $remainingCount = 0;
 
         $faker = Factory::create();
 
