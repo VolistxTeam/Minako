@@ -246,13 +246,29 @@ class DumpAnimeCommand extends Command
                 'updated_at' => (string)$main['updated_at']
             ];
 
+            $filteredEpisodesData = null;
+            $filteredCharacterData = null;
+            $filteredLicensorData = null;
+            $filteredStudioData = null;
+            $filteredProducerData = null;
+            $filteredMappingData = null;
+            $filteredTrailersData = null;
+            $main = null;
+            $episodes = null;
+            $licensors = null;
+            $studios = null;
+            $producers = null;
+            $mappings = null;
+            $trailers = null;
+
             $this->line('[+] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
             $remainingCount++;
 
             if ($remainingCount % 100 == 0) {
                 Storage::disk('local')->put('dump_temp/anime_tmp_' . $partCount . '.dat', serialize($data));
 
-                $data = [];
+                $data = null;
+                $data = array();
 
                 $this->line('[+] Memory Used Before Flushing: ' . memory_get_usage());
                 $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
@@ -262,7 +278,8 @@ class DumpAnimeCommand extends Command
             }
         }
 
-        $data = [];
+        $data = null;
+        $data = array();
 
         for ($i = 0; $i < $partCount; $i++) {
             $data[] = unserialize(Storage::disk('local')->get('dump_temp/anime_tmp_' . $i . '.dat'));
