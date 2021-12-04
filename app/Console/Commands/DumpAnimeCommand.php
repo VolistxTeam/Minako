@@ -19,6 +19,8 @@ class DumpAnimeCommand extends Command
     {
         set_time_limit(0);
 
+        Storage::disk('local')->createDir('dump_temp');
+
         $anime = NotifyAnime::all();
 
         $data = [];
@@ -247,22 +249,24 @@ class DumpAnimeCommand extends Command
             $this->line('[+] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
             $remainingCount++;
 
-            if ($remainingCount % 500 == 0) {
-                Storage::disk('local')->put('anime_tmp_' . $partCount . '.dat', serialize($data));
+            if ($remainingCount % 100 == 0) {
+                Storage::disk('local')->put('dump_temp/anime_tmp_' . $partCount . '.dat', serialize($data));
 
                 $data = [];
 
                 $partCount++;
 
+                $this->line('[+] Memory Used Before Flushing: ' . memory_get_usage());
                 $this->line('[+] TMP File Generated: anime_tmp_' . $partCount . '.dat');
+                $this->line('[+] Memory Used After Flushing: ' . memory_get_usage());
             }
         }
 
         $data = [];
 
         for ($i = 0; $i < $partCount; $i++) {
-            $data[] = unserialize(Storage::disk('local')->get('anime_tmp_' . $i . '.dat'));
-            Storage::disk('local')->delete('anime_tmp_' . $i . '.dat');
+            $data[] = unserialize(Storage::disk('local')->get('dump_temp/anime_tmp_' . $i . '.dat'));
+            Storage::disk('local')->delete('dump_temp/anime_tmp_' . $i . '.dat');
         }
 
         Storage::disk('local')->put('anime.json', json_encode([
