@@ -30,6 +30,7 @@ class Kernel extends ConsoleKernel
         Commands\Notify\ThumbnailCommand::class,
         Commands\Ohys\DownloadCommand::class,
         Commands\Ohys\RelationCommand::class,
+        Commands\DumpAnimeCommand::class,
         Serve::class,
     ];
 

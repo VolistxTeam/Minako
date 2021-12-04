@@ -52,4 +52,8 @@ $router->group(['middleware' => ['cacheResponse:300']], function () use ($router
         $router->get('/{id}/download', 'Services\OhysController@DownloadTorrent');
         $router->get('/search/{name}', 'Services\OhysController@Search');
     });
+
+    $router->group(['prefix' => 'dump'], function () use ($router) {
+        $router->get('/anime}', 'Services\ExportController@DumpAnime');
+    });
 });
