@@ -79,7 +79,7 @@ class EpisodeCommand extends Command
                     }
                 }
 
-                if (empty($malID)) {
+                if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
                     $this->error('[-] Skipping item. Reason: No MAL ID found. [' . $remainingCount . '/' . $totalCount . ']');
                     $remainingCount++;
                     continue;
@@ -97,7 +97,7 @@ class EpisodeCommand extends Command
                     $s_continue = false;
 
                     while (!$s_continue) {
-                        $episodesResponse = $jikan->AnimeEpisodes($malID, $currentLoop)->getEpisodes();
+                        $episodesResponse = $jikan->AnimeEpisodes((int) $malID, $currentLoop)->getEpisodes();
 
                         foreach ($episodesResponse as $episodeItem) {
                             $malItem = MALAnime::query()->updateOrCreate([
