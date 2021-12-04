@@ -45,12 +45,14 @@ class DumpAnimeCommand extends Command
                     $characterQuery = NotifyCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
 
                     if (!empty($characterQuery)) {
-                        $filteredMappingData = [];
+                        $mappingData = [];
 
-                        array_push($filteredMappingData, ['service' => 'notify/character', 'service_id' => (string)$characterRelationQuery->notifyID]);
+                        array_push($mappingData, ['service' => 'notify/character', 'service_id' => (string)$characterRelationQuery->notifyID]);
 
-                        foreach ($characterQuery->mappings as $item2) {
-                            array_push($filteredMappingData, ['service' => $item2['service'], 'service_id' => $item2['serviceId']]);
+                        if (!empty($characterQuery->mappings)) {
+                            foreach ($characterQuery->mappings as $item2) {
+                                array_push($mappingData, ['service' => $item2['service'], 'service_id' => $item2['serviceId']]);
+                            }
                         }
 
                         $filteredCharacterData[] = [
@@ -69,7 +71,7 @@ class DumpAnimeCommand extends Command
                                 'link' => ''
                             ],
                             'attributes' => $characterQuery->attributes,
-                            'mappings' => $filteredMappingData,
+                            'mappings' => $mappingData,
                             'created_at' => (string)$characterQuery->created_at,
                             'updated_at' => (string)$characterQuery->updated_at
                         ];
