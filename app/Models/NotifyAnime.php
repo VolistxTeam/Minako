@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class NotifyAnime extends Model
 {
-    use HasFactory, Searchable, HasRelationships, QueryCacheable;
-
-    public $cacheFor = 3600; // cache time, in seconds
-
-    protected static $flushCacheOnUpdate = true;
+    use HasFactory, Searchable, HasRelationships;
 
     /**
      * Indicates if the model should be timestamped.

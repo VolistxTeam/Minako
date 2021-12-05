@@ -27,7 +27,7 @@ class CompanyController extends Controller
 
     public function GetCompany($id)
     {
-        $itemQuery = NotifyCompany::query()->latest()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Company not found: ' . $id, 404)->header('Content-Type', 'text/plain');

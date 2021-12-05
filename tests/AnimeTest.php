@@ -1,12 +1,13 @@
 <?php
 
+use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
 class AnimeTest extends BaseTestCase
 {
-    public function createApplication(): \Laravel\Lumen\Application
+    public function createApplication(): Application
     {
-        return require __DIR__.'/../bootstrap/app.php';
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 
     public function testAnime()
@@ -23,6 +24,5 @@ class AnimeTest extends BaseTestCase
         $this->get('anime/' . $animeID . '/licensors')->seeStatusCode(200);
         $this->get('anime/' . $animeID . '/characters')->seeStatusCode(200);
         $this->get('anime/' . $animeID . '/relations')->seeStatusCode(200);
-        $this->get('anime/' . $animeID . '/image')->seeStatusCode(200);
     }
 }

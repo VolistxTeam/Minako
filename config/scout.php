@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'after_commit' => false,
+    'after_commit' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -68,8 +68,8 @@ return [
     */
 
     'chunk' => [
-        'searchable' => 1000,
-        'unsearchable' => 1000,
+        'searchable' => 500,
+        'unsearchable' => 500,
     ],
 
     /*
