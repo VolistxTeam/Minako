@@ -26,7 +26,7 @@ class OhysRelation extends Model
 
     protected $fillable = [
         'uniqueID',
-        'matchingID'
+        'matchingID',
     ];
 
     protected $casts = [
@@ -49,11 +49,12 @@ class OhysRelation extends Model
      *
      * @return array
      */
-    public function toSearchableArray() {
+    public function toSearchableArray()
+    {
         return [
             'id' => $this->id,
             'uniqueID' => $this->uniqueID,
-            'matchingID' => $this->matchingID
+            'matchingID' => $this->matchingID,
         ];
     }
 }

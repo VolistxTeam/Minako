@@ -53,6 +53,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('minako:notify:thumbnail')->sundays();
         $schedule->command('minako:notify:character-image')->sundays();
 
-        $schedule->command('minako:mal:episodes')->weekly()->days([1,4])->at('00:00')->runInBackground();
+        $schedule->command('minako:mal:episodes')->weekly()->days([1, 4])->at('00:00')->runInBackground();
     }
 }

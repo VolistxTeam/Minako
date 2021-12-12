@@ -12,9 +12,9 @@ use Illuminate\Console\Command;
 
 class CompanyCommand extends Command
 {
-    protected $signature = "minako:notify:company";
+    protected $signature = 'minako:notify:company';
 
-    protected $description = "Retrieve all company information from notify.moe.";
+    protected $description = 'Retrieve all company information from notify.moe.';
 
     public function handle()
     {
@@ -22,7 +22,7 @@ class CompanyCommand extends Command
 
         set_time_limit(0);
 
-        $apiBaseURL = "https://notify.moe/api/company/";
+        $apiBaseURL = 'https://notify.moe/api/company/';
 
         $faker = Factory::create();
 
@@ -46,13 +46,13 @@ class CompanyCommand extends Command
 
         foreach ($allAnime as $item) {
             try {
-                if (!empty($item['studios'])) {
+                if (! empty($item['studios'])) {
                     foreach ($item['studios'] as $studioItem) {
                         $dbStudioItem = NotifyCompany::query()->where('notifyID', $studioItem)->select('id', 'created_at', 'updated_at')->first();
 
                         $allowCrawlStudio = false;
 
-                        if (!empty($dbStudioItem)) {
+                        if (! empty($dbStudioItem)) {
                             if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($dbStudioItem->updated_at))) {
                                 $allowCrawlStudio = true;
                             }
@@ -60,11 +60,11 @@ class CompanyCommand extends Command
                             $allowCrawlStudio = true;
                         }
 
-                        if (!$allowCrawlStudio) {
+                        if (! $allowCrawlStudio) {
                             continue;
                         }
 
-                        $realAPIURL = $apiBaseURL . $studioItem;
+                        $realAPIURL = $apiBaseURL.$studioItem;
 
                         $companyResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
@@ -72,38 +72,38 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $downloadedData = (string)$companyResponse->getBody();
+                        $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5' . $studioItem . '5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$studioItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
                             'notifyID' => $downloadedData['id'],
                         ], [
-                            'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
-                            'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
-                            'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                            'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                            'email' => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
-                            'links' => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
-                            'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
-                            'location' => !empty($downloadedData['location']) ? $downloadedData['location'] : null
+                            'name_english' => ! empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                            'name_japanese' => ! empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
+                            'name_synonyms' => ! empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
+                            'description' => ! empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                            'email' => ! empty($downloadedData['email']) ? $downloadedData['email'] : null,
+                            'links' => ! empty($downloadedData['links']) ? $downloadedData['links'] : null,
+                            'mappings' => ! empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
+                            'location' => ! empty($downloadedData['location']) ? $downloadedData['location'] : null,
                         ]);
 
                         $notifyDBItem->touch();
 
-                        $this->line('[-] Studio Item Saved: ' . $studioItem);
+                        $this->line('[-] Studio Item Saved: '.$studioItem);
                     }
                 }
 
-                if (!empty($item['producers'])) {
+                if (! empty($item['producers'])) {
                     foreach ($item['producers'] as $producerItem) {
                         $dbProducerItem = NotifyCompany::query()->where('notifyID', $producerItem)->select('id', 'created_at', 'updated_at')->first();
 
                         $allowCrawlProducer = false;
 
-                        if (!empty($dbProducerItem)) {
+                        if (! empty($dbProducerItem)) {
                             if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($dbProducerItem['updated_at']))) {
                                 $allowCrawlProducer = true;
                             }
@@ -111,11 +111,11 @@ class CompanyCommand extends Command
                             $allowCrawlProducer = true;
                         }
 
-                        if (!$allowCrawlProducer) {
+                        if (! $allowCrawlProducer) {
                             continue;
                         }
 
-                        $realAPIURL = $apiBaseURL . $producerItem;
+                        $realAPIURL = $apiBaseURL.$producerItem;
 
                         $companyResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
@@ -123,38 +123,38 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $downloadedData = (string)$companyResponse->getBody();
+                        $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5' . $producerItem . '5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$producerItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
                             'notifyID' => $downloadedData['id'],
                         ], [
-                            'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
-                            'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
-                            'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                            'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                            'email' => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
-                            'links' => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
-                            'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
-                            'location' => !empty($downloadedData['location']) ? $downloadedData['location'] : null
+                            'name_english' => ! empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                            'name_japanese' => ! empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
+                            'name_synonyms' => ! empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
+                            'description' => ! empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                            'email' => ! empty($downloadedData['email']) ? $downloadedData['email'] : null,
+                            'links' => ! empty($downloadedData['links']) ? $downloadedData['links'] : null,
+                            'mappings' => ! empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
+                            'location' => ! empty($downloadedData['location']) ? $downloadedData['location'] : null,
                         ]);
 
                         $notifyDBItem->touch();
 
-                        $this->line('[-] Producer Item Saved: ' . $producerItem);
+                        $this->line('[-] Producer Item Saved: '.$producerItem);
                     }
                 }
 
-                if (!empty($item['licensors'])) {
+                if (! empty($item['licensors'])) {
                     foreach ($item['licensors'] as $licensorItem) {
                         $dbLicensorItem = NotifyCompany::query()->where('notifyID', $licensorItem)->select('id', 'created_at', 'updated_at')->first();
 
                         $allowCrawlLicensor = false;
 
-                        if (!empty($dbLicensorItem)) {
+                        if (! empty($dbLicensorItem)) {
                             if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($dbLicensorItem['updated_at']))) {
                                 $allowCrawlLicensor = true;
                             }
@@ -162,11 +162,11 @@ class CompanyCommand extends Command
                             $allowCrawlLicensor = true;
                         }
 
-                        if (!$allowCrawlLicensor) {
+                        if (! $allowCrawlLicensor) {
                             continue;
                         }
 
-                        $realAPIURL = $apiBaseURL . $licensorItem;
+                        $realAPIURL = $apiBaseURL.$licensorItem;
 
                         $companyResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
@@ -174,34 +174,34 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $downloadedData = (string)$companyResponse->getBody();
+                        $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5' . $licensorItem . '5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$licensorItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
                             'notifyID' => $downloadedData['id'],
                         ], [
-                            'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
-                            'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
-                            'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                            'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                            'email' => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
-                            'links' => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
-                            'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
-                            'location' => !empty($downloadedData['location']) ? $downloadedData['location'] : null
+                            'name_english' => ! empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                            'name_japanese' => ! empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
+                            'name_synonyms' => ! empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
+                            'description' => ! empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                            'email' => ! empty($downloadedData['email']) ? $downloadedData['email'] : null,
+                            'links' => ! empty($downloadedData['links']) ? $downloadedData['links'] : null,
+                            'mappings' => ! empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
+                            'location' => ! empty($downloadedData['location']) ? $downloadedData['location'] : null,
                         ]);
 
                         $notifyDBItem->touch();
 
-                        $this->line('[-] Licensor Item Saved: ' . $licensorItem);
+                        $this->line('[-] Licensor Item Saved: '.$licensorItem);
                     }
                 }
 
-                $this->info('[+] Item Saved [' . $remainingCount . '/' . $totalCount . ']');
+                $this->info('[+] Item Saved ['.$remainingCount.'/'.$totalCount.']');
             } catch (Exception $ex) {
-                $this->error('[-] Skipping item. Reason: Unknown Error [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Skipping item. Reason: Unknown Error ['.$remainingCount.'/'.$totalCount.']');
             }
 
             $remainingCount++;

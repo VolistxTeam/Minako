@@ -16,6 +16,6 @@ class CustomMD5Hasher implements RequestHasher
 
     public function getHashFor(Request $request): string
     {
-        return 'minako-caching:' . md5("{$request->getHost()}-{$request->getRequestUri()}-{$request->getMethod()}/".$this->cacheProfile->useCacheNameSuffix($request));
+        return 'minako-caching:'.md5("{$request->getHost()}-{$request->getRequestUri()}-{$request->getMethod()}/".$this->cacheProfile->useCacheNameSuffix($request));
     }
 }

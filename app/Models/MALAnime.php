@@ -34,7 +34,7 @@ class MALAnime extends Model
         'aired',
         'filler',
         'recap',
-        'isHidden'
+        'isHidden',
     ];
 
     protected $casts = [
@@ -64,7 +64,7 @@ class MALAnime extends Model
             'title' => $this->title,
             'title_japanese' => $this->title_japanese,
             'title_romanji' => $this->title_romanji,
-            'episode_id' => $this->episode_id
+            'episode_id' => $this->episode_id,
         ];
     }
 }

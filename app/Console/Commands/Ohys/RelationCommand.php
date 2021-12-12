@@ -9,9 +9,9 @@ use Illuminate\Console\Command;
 
 class RelationCommand extends Command
 {
-    protected $signature = "minako:ohys:relation";
+    protected $signature = 'minako:ohys:relation';
 
-    protected $description = "Search and save relationships for ohys torrents.";
+    protected $description = 'Search and save relationships for ohys torrents.';
 
     public function handle()
     {
@@ -25,7 +25,7 @@ class RelationCommand extends Command
         foreach ($allTorrents as $torrent) {
             $existCheck = OhysRelation::query()->where('uniqueID', $torrent['uniqueID'])->first();
 
-            if (!empty($existCheck)) {
+            if (! empty($existCheck)) {
                 continue;
             }
 
@@ -41,9 +41,9 @@ class RelationCommand extends Command
                 $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
 
                 OhysRelation::query()->updateOrCreate([
-                    'uniqueID' => $torrent['uniqueID']
+                    'uniqueID' => $torrent['uniqueID'],
                 ], [
-                    'matchingID' => $anime_uniqueID
+                    'matchingID' => $anime_uniqueID,
                 ]);
 
                 $cachedArrays[] = [
@@ -51,17 +51,17 @@ class RelationCommand extends Command
                     'title' => $torrent['title'],
                 ];
 
-                $this->info('[Debug] Done: ' . $anime_uniqueID . ' (' . $searchArray[0]->obj['title_canonical'] . ') -> ' . $torrent['uniqueID'] . ' (' . $torrent['torrentName'] . ')');
+                $this->info('[Debug] Done: '.$anime_uniqueID.' ('.$searchArray[0]->obj['title_canonical'].') -> '.$torrent['uniqueID'].' ('.$torrent['torrentName'].')');
             } else {
                 $anime_uniqueID = $cachedArrays[$key]['id'];
 
                 OhysRelation::query()->updateOrCreate([
-                    'uniqueID' => $torrent['uniqueID']
+                    'uniqueID' => $torrent['uniqueID'],
                 ], [
-                    'matchingID' => $anime_uniqueID
+                    'matchingID' => $anime_uniqueID,
                 ]);
 
-                $this->info('[Debug] Done: ' . $anime_uniqueID . ' (' . $cachedArrays[$key]['title'] . ') -> ' . $torrent['uniqueID'] . ' (' . $torrent['torrentName'] . ')');
+                $this->info('[Debug] Done: '.$anime_uniqueID.' ('.$cachedArrays[$key]['title'].') -> '.$torrent['uniqueID'].' ('.$torrent['torrentName'].')');
             }
         }
 

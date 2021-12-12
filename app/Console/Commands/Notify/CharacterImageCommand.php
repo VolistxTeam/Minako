@@ -12,9 +12,9 @@ use Intervention\Image\ImageManager;
 
 class CharacterImageCommand extends Command
 {
-    protected $signature = "minako:notify:character-image";
+    protected $signature = 'minako:notify:character-image';
 
-    protected $description = "Download character images from notify.moe.";
+    protected $description = 'Download character images from notify.moe.';
 
     public function handle()
     {
@@ -24,7 +24,7 @@ class CharacterImageCommand extends Command
 
         $exists = Storage::disk('local')->exists('characters');
 
-        if (!$exists) {
+        if (! $exists) {
             Storage::disk('local')->makeDirectory('characters');
         }
 
@@ -47,21 +47,21 @@ class CharacterImageCommand extends Command
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
 
         foreach ($allAnime as $item) {
-            if (!empty($item['image_extension'])) {
+            if (! empty($item['image_extension'])) {
                 try {
-                    $existsFile = Storage::disk('local')->exists('characters/' . $item['uniqueID'] . '.jpg');
+                    $existsFile = Storage::disk('local')->exists('characters/'.$item['uniqueID'].'.jpg');
 
                     if ($existsFile) {
-                        $this->error('[+] Character exists. [' . $remainingCount . '/' . $totalCount . ']');
+                        $this->error('[+] Character exists. ['.$remainingCount.'/'.$totalCount.']');
                         $remainingCount++;
                         continue;
                     }
 
-                    $originalImage = 'https://media.notify.moe/images/characters/original/' . $item['notifyID'] . $item['image_extension'];
-                    $largeImage = 'https://media.notify.moe/images/characters/large/' . $item['notifyID'] . $item['image_extension'];
+                    $originalImage = 'https://media.notify.moe/images/characters/original/'.$item['notifyID'].$item['image_extension'];
+                    $largeImage = 'https://media.notify.moe/images/characters/large/'.$item['notifyID'].$item['image_extension'];
 
                     $fp = tmpfile();
-                    $fpPath = stream_get_meta_data($fp)["uri"];
+                    $fpPath = stream_get_meta_data($fp)['uri'];
 
                     $imageResponse = $client->request('GET', $largeImage, ['headers' => $headers, 'sink' => $fpPath]);
 
@@ -69,31 +69,31 @@ class CharacterImageCommand extends Command
                         $imageResponse = $client->request('GET', $originalImage, ['headers' => $headers, 'sink' => $fpPath]);
 
                         if ($imageResponse->getStatusCode() != 200) {
-                            $this->error('[+] Cannot find character image. Ignoring... [' . $remainingCount . '/' . $totalCount . ']');
+                            $this->error('[+] Cannot find character image. Ignoring... ['.$remainingCount.'/'.$totalCount.']');
                             $remainingCount++;
                             fclose($fp);
                             continue;
                         }
                     }
 
-                    $manager = new ImageManager(array('driver' => config('image.module')));
+                    $manager = new ImageManager(['driver' => config('image.module')]);
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);
 
-                    Storage::disk('local')->put('characters/' . $item['uniqueID'] . '.jpg', $image);
+                    Storage::disk('local')->put('characters/'.$item['uniqueID'].'.jpg', $image);
 
                     unset($fp);
 
-                    $this->info('[+] Character image uploaded for ID ' . $item['notifyID'] . ' [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->info('[+] Character image uploaded for ID '.$item['notifyID'].' ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 } catch (Exception $ex) {
-                    $this->error('[+] Exception [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[+] Exception ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
             } else {
-                $this->error('[+] Character not found. [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[+] Character not found. ['.$remainingCount.'/'.$totalCount.']');
                 $remainingCount++;
             }
         }

@@ -15,7 +15,7 @@ class CompanyController extends Controller
         $buildResponse = [];
 
         foreach ($searchQuery->items() as $item) {
-            $newArray = array();
+            $newArray = [];
             $newArray['id'] = $item['uniqueID'];
             $newArray['title'] = $item['name_english'];
 
@@ -30,7 +30,7 @@ class CompanyController extends Controller
         $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
-            return response('Company not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Company not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $buildResponse = [
@@ -38,13 +38,13 @@ class CompanyController extends Controller
             'names' => [
                 'english' => $itemQuery->name_english,
                 'japanese' => $itemQuery->name_japanese,
-                'synonyms' => $itemQuery->name_synonyms
+                'synonyms' => $itemQuery->name_synonyms,
             ],
             'description' => $itemQuery->description,
             'email' => $itemQuery->email,
             'links' => $itemQuery->links,
-            'created_at' => (string)$itemQuery->created_at,
-            'updated_at' => (string)$itemQuery->updated_at
+            'created_at' => (string) $itemQuery->created_at,
+            'updated_at' => (string) $itemQuery->updated_at,
         ];
 
         return response()->json($buildResponse);

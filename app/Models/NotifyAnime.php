@@ -17,12 +17,14 @@ class NotifyAnime extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'notify_anime';
+
     protected $fillable = [
         'uniqueID',
         'notifyID',
@@ -55,7 +57,7 @@ class NotifyAnime extends Model
         'studios',
         'producers',
         'licensors',
-        'isHidden'
+        'isHidden',
     ];
 
     protected $casts = [
@@ -112,7 +114,7 @@ class NotifyAnime extends Model
             'title_english' => $this->title_english,
             'title_japanese' => $this->title_japanese,
             'title_hiragana' => $this->title_hiragana,
-            'title_synonyms' => empty($this->title_synonyms) ? '' : implode("|", $this->title_synonyms)
+            'title_synonyms' => empty($this->title_synonyms) ? '' : implode('|', $this->title_synonyms),
         ];
     }
 }

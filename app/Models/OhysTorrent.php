@@ -60,7 +60,8 @@ class OhysTorrent extends Model
      *
      * @return array
      */
-    public function toSearchableArray() {
+    public function toSearchableArray()
+    {
         return [
             'id' => $this->id,
             'uniqueID' => $this->uniqueID,

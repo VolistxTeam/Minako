@@ -51,13 +51,14 @@ class NotifyCompany extends Model
      *
      * @return array
      */
-    public function toSearchableArray() {
+    public function toSearchableArray()
+    {
         return [
             'id' => $this->id,
             'uniqueID' => $this->uniqueID,
             'name_english' => $this->name_english,
             'name_japanese' => $this->name_japanese,
-            'name_synonyms' => empty($this->name_synonyms) ? '' : implode("|", $this->name_synonyms)
+            'name_synonyms' => empty($this->name_synonyms) ? '' : implode('|', $this->name_synonyms),
         ];
     }
 }

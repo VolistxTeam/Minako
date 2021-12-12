@@ -17,7 +17,7 @@ class CharacterController extends Controller
         $buildResponse = [];
 
         foreach ($searchQuery->items() as $item) {
-            $newArray = array();
+            $newArray = [];
             $newArray['id'] = $item['uniqueID'];
             $newArray['name'] = $item['name_canonical'];
 
@@ -32,18 +32,18 @@ class CharacterController extends Controller
         $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $id = $itemQuery->uniqueID;
 
-		$contents = Storage::disk('local')->get('characters/' . $id . '.jpg');
-		
+        $contents = Storage::disk('local')->get('characters/'.$id.'.jpg');
+
         if (empty($contents)) {
-            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
-		
-        return Response::make($contents, 200)->header("Content-Type", "image/jpeg");
+
+        return Response::make($contents, 200)->header('Content-Type', 'image/jpeg');
     }
 
     public function GetCharacter($id)
@@ -51,12 +51,12 @@ class CharacterController extends Controller
         $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
-            return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Character not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredMappingData = [];
 
-        array_push($filteredMappingData, ['service' => 'notify/character', 'service_id' => (string)$itemQuery->notifyID]);
+        array_push($filteredMappingData, ['service' => 'notify/character', 'service_id' => (string) $itemQuery->notifyID]);
 
         foreach ($itemQuery->mappings as $item) {
             array_push($filteredMappingData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
@@ -68,19 +68,19 @@ class CharacterController extends Controller
                 'canonical' => $itemQuery->name_canonical,
                 'english' => $itemQuery->name_english,
                 'japanese' => $itemQuery->name_japanese,
-                'synonyms' => $itemQuery->name_synonyms
+                'synonyms' => $itemQuery->name_synonyms,
             ],
             'description' => $itemQuery->description,
             'image' => [
                 'width' => $itemQuery->image_width,
                 'height' => $itemQuery->image_height,
                 'format' => 'jpg',
-                'link' => ''
+                'link' => '',
             ],
             'attributes' => $itemQuery->attributes,
             'mappings' => $filteredMappingData,
-            'created_at' => (string)$itemQuery->created_at,
-            'updated_at' => (string)$itemQuery->updated_at
+            'created_at' => (string) $itemQuery->created_at,
+            'updated_at' => (string) $itemQuery->updated_at,
         ];
 
         return response()->json($buildResponse);

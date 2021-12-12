@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Storage;
 
 class DownloadCommand extends Command
 {
-    protected $signature = "minako:ohys:download";
+    protected $signature = 'minako:ohys:download';
 
-    protected $description = "Check, download and parse the latest torrents using a special permission link.";
+    protected $description = 'Check, download and parse the latest torrents using a special permission link.';
 
     public function handle()
     {
@@ -39,23 +39,24 @@ class DownloadCommand extends Command
 
         if ($query->getStatusCode() != 200) {
             $this->error('[-] Error occurred while connecting to the ohys server.');
+
             return 0;
         }
 
-        $query = (string)$query->getBody();
+        $query = (string) $query->getBody();
         $decodedOhysRepo = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $query), true);
 
         foreach ($decodedOhysRepo as $file) {
             $torrentSearch = OhysTorrent::query()->where('torrentName', $file['t'])->first();
 
-            if (!empty($torrentSearch)) {
+            if (! empty($torrentSearch)) {
                 return 0;
             }
 
             $fp = tmpfile();
-            $fpPath = stream_get_meta_data($fp)["uri"];
+            $fpPath = stream_get_meta_data($fp)['uri'];
 
-            $downloadStatus = $client->request('GET', 'https://ohys.nl/tt/' . $file['a'], ['headers' => $headers, 'sink' => $fpPath]);
+            $downloadStatus = $client->request('GET', 'https://ohys.nl/tt/'.$file['a'], ['headers' => $headers, 'sink' => $fpPath]);
 
             if ($downloadStatus->getStatusCode() != 200) {
                 continue;
@@ -64,7 +65,7 @@ class DownloadCommand extends Command
             $torrent = new Torrent($fpPath);
             $fileBaseName = $file['t'];
 
-            if (self::strContains($fileBaseName, '264') && !self::strContains($fileBaseName, 'x264')) {
+            if (self::strContains($fileBaseName, '264') && ! self::strContains($fileBaseName, 'x264')) {
                 $fileBaseName = str_replace('264', 'x264', $fileBaseName);
             }
 
@@ -78,7 +79,7 @@ class DownloadCommand extends Command
                     continue;
                 }
 
-                $itemID = substr(sha1($file['t'] . '4Q84SN6cYwnz9oeL7J1k'), 0, 8);
+                $itemID = substr(sha1($file['t'].'4Q84SN6cYwnz9oeL7J1k'), 0, 8);
                 $releaseGroup = 'Ohys-Raws';
 
                 $title = $fileNameParsedArray[2];
@@ -94,7 +95,7 @@ class DownloadCommand extends Command
                 $info_torrent_files = $torrent->content(2);
                 $metadata_video_resolution = empty($fileNameParsedArray[5]) ? null : $fileNameParsedArray[5];
 
-                $metadataCodecParsed = empty($fileNameParsedArray[6]) ? array() : explode(" ", $fileNameParsedArray[6]);
+                $metadataCodecParsed = empty($fileNameParsedArray[6]) ? [] : explode(' ', $fileNameParsedArray[6]);
 
                 $metadata_video_codec = empty($metadataCodecParsed[0]) ? null : $metadataCodecParsed[0];
                 $metadata_audio_codec = empty($metadataCodecParsed[1]) ? null : $metadataCodecParsed[1];
@@ -104,7 +105,7 @@ class DownloadCommand extends Command
                 $hidden_download_magnet = $torrent->magnet(false);
 
                 OhysTorrent::query()->updateOrCreate([
-                    'uniqueID' => $itemID
+                    'uniqueID' => $itemID,
                 ], [
                     'releaseGroup' => $releaseGroup,
                     'broadcaster' => $broadcaster,
@@ -119,29 +120,29 @@ class DownloadCommand extends Command
                     'metadata_video_resolution' => $metadata_video_resolution,
                     'metadata_video_codec' => $metadata_video_codec,
                     'metadata_audio_codec' => $metadata_audio_codec,
-                    'hidden_download_magnet' => $hidden_download_magnet
+                    'hidden_download_magnet' => $hidden_download_magnet,
                 ]);
 
-                if (Storage::disk('local')->missing('torrents/' . $file['t'])) {
+                if (Storage::disk('local')->missing('torrents/'.$file['t'])) {
                     if (file_exists($fpPath)) {
-                        Storage::disk('local')->put('torrents/' . $file['t'], file_get_contents($fpPath));
+                        Storage::disk('local')->put('torrents/'.$file['t'], file_get_contents($fpPath));
                         unlink($fpPath);
                     }
                 }
 
                 $searchArray = $animeSearchEngine->SearchByTitle($title, 1);
 
-                if (!empty($searchArray)) {
+                if (! empty($searchArray)) {
                     $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
 
                     OhysRelation::query()->updateOrCreate([
-                        'uniqueID' => $itemID
+                        'uniqueID' => $itemID,
                     ], [
-                        'matchingID' => $anime_uniqueID
+                        'matchingID' => $anime_uniqueID,
                     ]);
                 }
 
-                $this->info('[Debug] Done: ' . $file['t']);
+                $this->info('[Debug] Done: '.$file['t']);
             } else {
                 $this->line('Not Found. Continue...');
             }

@@ -11,9 +11,9 @@ use Illuminate\Console\Command;
 
 class CharacterCommand extends Command
 {
-    protected $signature = "minako:notify:characters";
+    protected $signature = 'minako:notify:characters';
 
-    protected $description = "Retrieve all character information from notify.moe.";
+    protected $description = 'Retrieve all character information from notify.moe.';
 
     public function handle()
     {
@@ -21,9 +21,9 @@ class CharacterCommand extends Command
 
         set_time_limit(0);
 
-        $sitemapURL = "https://notify.moe/sitemap/character.txt";
-        $apiBaseURL = "https://notify.moe/api/character/";
-        $notifyBaseURL = "https://notify.moe/character/";
+        $sitemapURL = 'https://notify.moe/sitemap/character.txt';
+        $apiBaseURL = 'https://notify.moe/api/character/';
+        $notifyBaseURL = 'https://notify.moe/character/';
 
         $this->info('[!] Downloading ID lists from the server...');
 
@@ -44,10 +44,11 @@ class CharacterCommand extends Command
 
         if ($sitemapResponse->getStatusCode() != 200) {
             $this->error('[-] The sitemap does not found.');
+
             return;
         }
 
-        $rawNotifyIDs = explode("\n", (string)$sitemapResponse->getBody());
+        $rawNotifyIDs = explode("\n", (string) $sitemapResponse->getBody());
 
         $notifyIDs = [];
 
@@ -69,7 +70,7 @@ class CharacterCommand extends Command
                 $dbItem = NotifyCharacter::query()->where('notifyID', $item)->select('id', 'notifyID', 'uniqueID', 'created_at', 'updated_at')->first();
                 $allowCrawl = false;
 
-                if (!empty($dbItem)) {
+                if (! empty($dbItem)) {
                     if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($dbItem->updated_at))) {
                         $allowCrawl = true;
                     }
@@ -77,56 +78,56 @@ class CharacterCommand extends Command
                     $allowCrawl = true;
                 }
 
-                if (!$allowCrawl) {
-                    $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. [' . $remainingCount . '/' . $totalCount . ']');
+                if (! $allowCrawl) {
+                    $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
 
-                $realAPIURL = $apiBaseURL . $item;
+                $realAPIURL = $apiBaseURL.$item;
 
                 $characterResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
                 if ($characterResponse->getStatusCode() != 200) {
-                    $this->error('[-] Skipping item. Reason: The item does not found. [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[-] Skipping item. Reason: The item does not found. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
 
-                $downloadedData = (string)$characterResponse->getBody();
+                $downloadedData = (string) $characterResponse->getBody();
 
-                if (!$this->is_json($downloadedData)) {
-                    $this->error('[-] Skipping item. Reason: The item is in an unsupported format. [' . $remainingCount . '/' . $totalCount . ']');
+                if (! $this->is_json($downloadedData)) {
+                    $this->error('[-] Skipping item. Reason: The item is in an unsupported format. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
 
                 $downloadedData = json_decode($downloadedData, true);
-                $uniqueIDGen = substr(sha1('8xzg8yZxEF' . $item . '1IYLCftOHKkGo57zBxpG'), 0, 8);
+                $uniqueIDGen = substr(sha1('8xzg8yZxEF'.$item.'1IYLCftOHKkGo57zBxpG'), 0, 8);
 
                 $notifyDBItem = NotifyCharacter::query()->updateOrCreate([
                     'uniqueID' => $uniqueIDGen,
                     'notifyID' => $downloadedData['id'],
                 ], [
-                    'name_canonical' => !empty($downloadedData['name']['canonical']) ? $downloadedData['name']['canonical'] : null,
-                    'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
-                    'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
-                    'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                    'image_extension' => !empty($downloadedData['image']['extension']) ? $downloadedData['image']['extension'] : null,
-                    'image_width' => !empty($downloadedData['image']['width']) ? $downloadedData['image']['width'] : null,
-                    'image_height' => !empty($downloadedData['image']['height']) ? $downloadedData['image']['height'] : null,
-                    'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                    'spoilers' => !empty($downloadedData['spoilers']) ? $downloadedData['spoilers'] : null,
-                    'attributes' => !empty($downloadedData['attributes']) ? $downloadedData['attributes'] : null,
-                    'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null
+                    'name_canonical' => ! empty($downloadedData['name']['canonical']) ? $downloadedData['name']['canonical'] : null,
+                    'name_english' => ! empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                    'name_japanese' => ! empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
+                    'name_synonyms' => ! empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
+                    'image_extension' => ! empty($downloadedData['image']['extension']) ? $downloadedData['image']['extension'] : null,
+                    'image_width' => ! empty($downloadedData['image']['width']) ? $downloadedData['image']['width'] : null,
+                    'image_height' => ! empty($downloadedData['image']['height']) ? $downloadedData['image']['height'] : null,
+                    'description' => ! empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                    'spoilers' => ! empty($downloadedData['spoilers']) ? $downloadedData['spoilers'] : null,
+                    'attributes' => ! empty($downloadedData['attributes']) ? $downloadedData['attributes'] : null,
+                    'mappings' => ! empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
                 ]);
 
                 $notifyDBItem->touch();
 
-                $this->line('[+] Item Saved [' . $remainingCount . '/' . $totalCount . ']');
+                $this->line('[+] Item Saved ['.$remainingCount.'/'.$totalCount.']');
                 $remainingCount++;
             } catch (Exception $ex) {
-                $this->error('[-] Skipping item. Reason: Unknown Error [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Skipping item. Reason: Unknown Error ['.$remainingCount.'/'.$totalCount.']');
                 $remainingCount++;
                 continue;
             }
@@ -136,6 +137,7 @@ class CharacterCommand extends Command
     private function is_json($string): bool
     {
         json_decode($string);
-        return (json_last_error() == JSON_ERROR_NONE);
+
+        return json_last_error() == JSON_ERROR_NONE;
     }
 }

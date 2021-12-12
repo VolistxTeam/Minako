@@ -4,7 +4,7 @@ use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
 class EpisodeTest extends BaseTestCase
 {
-    public function createApplication(): \Laravel\Lumen\Application
+    public function createApplication(): Laravel\Lumen\Application
     {
         return require __DIR__.'/../bootstrap/app.php';
     }
@@ -15,6 +15,6 @@ class EpisodeTest extends BaseTestCase
 
         $episodeID = $searchResult[0]['id'];
 
-        $this->get('episode/' . $episodeID)->seeStatusCode(200);
+        $this->get('episode/'.$episodeID)->seeStatusCode(200);
     }
 }
