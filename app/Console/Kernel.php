@@ -2,11 +2,8 @@
 
 namespace App\Console;
 
-use Illuminate\Console\KeyGenerateCommand;
 use Illuminate\Console\Scheduling\Schedule;
-use Laravel\Lumen\Console\Kernel as ConsoleKernel;
-use Mlntn\Console\Commands\Serve;
-use Spatie\ResponseCache\Commands\ClearCommand;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,43 +13,29 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        ClearCommand::class,
-        KeyGenerateCommand::class,
-        Commands\MAL\EpisodeCommand::class,
-        Commands\Notify\AnimeCommand::class,
-        Commands\Notify\CharacterCommand::class,
-        Commands\Notify\CharacterImageCommand::class,
-        Commands\Notify\CharacterRelationCommand::class,
-        Commands\Notify\CompanyCommand::class,
-        Commands\Notify\RelationCommand::class,
-        Commands\Notify\ThumbnailCommand::class,
-        Commands\Ohys\DownloadCommand::class,
-        Commands\Ohys\RelationCommand::class,
-        Serve::class,
+        //
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param Schedule $schedule
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        set_time_limit(0);
+        // $schedule->command('inspire')->hourly();
+    }
 
-        $schedule->command('minako:ohys:download')->hourly()->runInBackground();
+    /**
+     * Register the commands for the application.
+     *
+     * @return void
+     */
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
 
-        $schedule->command('minako:ohys:relation')->everyThreeHours()->runInBackground();
-
-        $schedule->command('minako:notify:anime')->sundays();
-        $schedule->command('minako:notify:characters')->sundays();
-        $schedule->command('minako:notify:company')->sundays();
-        $schedule->command('minako:notify:relation')->sundays();
-        $schedule->command('minako:notify:character-relation')->sundays();
-        $schedule->command('minako:notify:thumbnail')->sundays();
-        $schedule->command('minako:notify:character-image')->sundays();
-
-        $schedule->command('minako:mal:episodes')->weekly()->days([1, 4])->at('00:00')->runInBackground();
+        require base_path('routes/console.php');
     }
 }
