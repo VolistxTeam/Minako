@@ -5,7 +5,6 @@ namespace App\Console;
 use Illuminate\Console\KeyGenerateCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
-use Laravelista\LumenVendorPublish\VendorPublishCommand;
 use Mlntn\Console\Commands\Serve;
 use Spatie\ResponseCache\Commands\ClearCommand;
 
@@ -19,7 +18,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         ClearCommand::class,
         KeyGenerateCommand::class,
-        VendorPublishCommand::class,
         Commands\MAL\EpisodeCommand::class,
         Commands\Notify\AnimeCommand::class,
         Commands\Notify\CharacterCommand::class,
@@ -30,7 +28,6 @@ class Kernel extends ConsoleKernel
         Commands\Notify\ThumbnailCommand::class,
         Commands\Ohys\DownloadCommand::class,
         Commands\Ohys\RelationCommand::class,
-        Commands\DumpAnimeCommand::class,
         Serve::class,
     ];
 
@@ -48,12 +45,12 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('minako:ohys:relation')->everyThreeHours()->runInBackground();
 
-        $schedule->command('minako:notify:anime')->sundays();
-        $schedule->command('minako:notify:characters')->sundays();
-        $schedule->command('minako:notify:company')->sundays();
-        $schedule->command('minako:notify:relation')->sundays();
-        $schedule->command('minako:notify:character-relation')->sundays();
-        $schedule->command('minako:notify:thumbnail')->sundays();
+        $schedule->command('minako:notify:anime')->mondays();
+        $schedule->command('minako:notify:characters')->tuesdays();
+        $schedule->command('minako:notify:company')->wednesdays();
+        $schedule->command('minako:notify:relation')->thursdays();
+        $schedule->command('minako:notify:character-relation')->fridays();
+        $schedule->command('minako:notify:thumbnail')->saturdays();
         $schedule->command('minako:notify:character-image')->sundays();
 
         $schedule->command('minako:mal:episodes')->weekly()->days([1,4])->at('00:00')->runInBackground();

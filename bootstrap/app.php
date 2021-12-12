@@ -1,7 +1,5 @@
 <?php
 
-use jdavidbakr\CloudfrontProxies\CloudfrontProxies;
-use LumenRateLimiting\ThrottleRequests;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -23,7 +21,6 @@ $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
-$app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
 $app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
 
@@ -45,18 +42,15 @@ $app->configure('app');
 
 $app->middleware([
     App\Http\Middleware\TrustProxies::class,
-    CloudfrontProxies::class,
     App\Http\Middleware\FirewallMiddleware::class,
 ]);
 
 $app->routeMiddleware([
     'cacheResponse' => CacheResponse::class,
-    'throttle' => ThrottleRequests::class,
 ]);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
-    'middleware' => 'throttle:global',
 ], function ($router) {
     require __DIR__ . '/../routes/api.php';
 });

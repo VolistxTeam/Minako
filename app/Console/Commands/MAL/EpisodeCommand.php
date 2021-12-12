@@ -40,11 +40,11 @@ class EpisodeCommand extends Command
         $countdownCount = 0;
 
         $skipCount = 0;
-        
+
         if (!empty($this->option('skip'))) {
-            $skipCount = (int) $this->option('skip');
+            $skipCount = (int)$this->option('skip');
         }
-        
+
         foreach ($allAnime as $item) {
             $countdownCount++;
 
@@ -53,7 +53,7 @@ class EpisodeCommand extends Command
                 $this->info('[-] Skipping Item [' . $remainingCount . '/' . $totalCount . ']');
                 continue;
             }
-            
+
             if ($countdownCount > 25) {
                 $countdownCount = 0;
                 $this->info('[+] Waiting for 10 seconds...');
@@ -109,7 +109,7 @@ class EpisodeCommand extends Command
                     $s_continue = false;
 
                     while (!$s_continue) {
-                        $episodesResponse = $jikan->AnimeEpisodes((int) $malID, $currentLoop)->getEpisodes();
+                        $episodesResponse = $jikan->AnimeEpisodes((int)$malID, $currentLoop)->getEpisodes();
 
                         foreach ($episodesResponse as $episodeItem) {
                             $malItem = MALAnime::query()->updateOrCreate([

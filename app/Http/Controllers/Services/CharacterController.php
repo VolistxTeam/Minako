@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
-use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,12 +37,12 @@ class CharacterController extends Controller
 
         $id = $itemQuery->uniqueID;
 
-		$contents = Storage::disk('local')->get('characters/' . $id . '.jpg');
-		
+        $contents = Storage::disk('local')->get('characters/' . $id . '.jpg');
+
         if (empty($contents)) {
             return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
-		
+
         return Response::make($contents, 200)->header("Content-Type", "image/jpeg");
     }
 

@@ -14,7 +14,7 @@ class OhysController extends Controller
     {
         $name = urldecode($name);
 
-        $torrentQuery = OhysTorrent::search($this->escapeElasticReservedChars($name))->paginate(50, 'p');
+        $torrentQuery = OhysTorrent::query()->where('torrentName', 'LIKE', "%$name%")->paginate(50, 'p');
 
         $itemsFiltered = [];
 
