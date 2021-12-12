@@ -64,7 +64,7 @@ class OhysController extends Controller
 
     public function GetRecentTorrents()
     {
-        $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
+        $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
 
         $itemsFiltered = [];
 
@@ -114,7 +114,7 @@ class OhysController extends Controller
 
     public function GetTorrent($id)
     {
-        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
+        $torrentQuery = OhysTorrent::query()->latest()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
             return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
@@ -168,7 +168,7 @@ class OhysController extends Controller
 
     public function DownloadTorrent(Request $request, $id)
     {
-        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
+        $torrentQuery = OhysTorrent::query()->latest()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
             return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');

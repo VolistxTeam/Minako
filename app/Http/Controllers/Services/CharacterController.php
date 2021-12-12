@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,7 +32,7 @@ class CharacterController extends Controller
 
     public function GetImage($id)
     {
-        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
@@ -48,7 +51,7 @@ class CharacterController extends Controller
 
     public function GetCharacter($id)
     {
-        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
