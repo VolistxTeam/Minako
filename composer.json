@@ -12,6 +12,7 @@
     "jikan-me/jikan": "^2.18",
     "laravel/lumen-framework": "^8.0",
     "laravel/scout": "^9.1",
+    "league/flysystem": " ~1.0",
     "maxsky/lumen-app-key-generator": "^1.0",
     "rennokki/laravel-eloquent-query-cache": "^2.6",
     "spatie/laravel-responsecache": "^7.0",
