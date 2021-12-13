@@ -11,14 +11,11 @@
     "intervention/image": "^2.5",
     "jikan-me/jikan": "^2.18",
     "laravel/lumen-framework": "^8.0",
-    "laravel/scout": "^9.1",
     "league/flysystem": " ~1.0",
     "maxsky/lumen-app-key-generator": "^1.0",
     "rennokki/laravel-eloquent-query-cache": "^2.6",
-    "spatie/laravel-responsecache": "^7.0",
     "staudenmeir/eloquent-has-many-deep": "^1.13",
-    "teamtnt/laravel-scout-tntsearch-driver": "^11.5",
-    "wikimedia/ip-set": "^3.0"
+    "teamtnt/laravel-scout-tntsearch-driver": "^11.5"
   },
   "require-dev": {
     "mockery/mockery": "^1.3.1",

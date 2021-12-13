@@ -1,7 +1,5 @@
 <?php
 
-use Spatie\ResponseCache\Middlewares\CacheResponse;
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
@@ -20,7 +18,6 @@ $app->withEloquent();
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
-$app->register(Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
 $app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
 
@@ -42,11 +39,6 @@ $app->configure('app');
 
 $app->middleware([
     App\Http\Middleware\TrustProxies::class,
-    App\Http\Middleware\FirewallMiddleware::class,
-]);
-
-$app->routeMiddleware([
-    'cacheResponse' => CacheResponse::class,
 ]);
 
 $app->router->group([

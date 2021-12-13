@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75f1f2c84450c46d2e776b5f91d18e2e",
+    "content-hash": "efd5547aef9f8b1e8d9456eb2d7d2c06",
     "packages": [
         {
             "name": "brick/math",
@@ -3999,151 +3999,6 @@
             "time": "2021-10-09T05:57:31+00:00"
         },
         {
-            "name": "spatie/laravel-package-tools",
-            "version": "1.9.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-package-tools.git",
-                "reference": "f710fe196c126fb9e0aee67eb5af49ad8f13f528"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/f710fe196c126fb9e0aee67eb5af49ad8f13f528",
-                "reference": "f710fe196c126fb9e0aee67eb5af49ad8f13f528",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^7.0|^8.0",
-                "php": "^7.4|^8.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^5.0|^6.0",
-                "phpunit/phpunit": "^9.3",
-                "spatie/test-time": "^1.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\LaravelPackageTools\\": "src",
-                    "Spatie\\LaravelPackageTools\\Database\\Factories\\": "database/factories"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Tools for creating Laravel packages",
-            "homepage": "https://github.com/spatie/laravel-package-tools",
-            "keywords": [
-                "laravel-package-tools",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/laravel-package-tools/issues",
-                "source": "https://github.com/spatie/laravel-package-tools/tree/1.9.2"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2021-09-21T13:06:51+00:00"
-        },
-        {
-            "name": "spatie/laravel-responsecache",
-            "version": "7.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-responsecache.git",
-                "reference": "3bf314f2e6ed7644b9dc182817b48754c928008c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-responsecache/zipball/3bf314f2e6ed7644b9dc182817b48754c928008c",
-                "reference": "3bf314f2e6ed7644b9dc182817b48754c928008c",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/cache": "^7.13|^8.0",
-                "illuminate/console": "^7.13|^8.0",
-                "illuminate/container": "^7.13|^8.0",
-                "illuminate/http": "^7.13|^8.0",
-                "illuminate/support": "^7.13|^8.0",
-                "nesbot/carbon": "^2.35",
-                "php": "^8.0",
-                "spatie/laravel-package-tools": "^1.1"
-            },
-            "require-dev": {
-                "laravel/framework": "^7.13|^8.0",
-                "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^5.2|^6.0",
-                "phpunit/phpunit": "^9.3",
-                "vimeo/psalm": "^4.4"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Spatie\\ResponseCache\\ResponseCacheServiceProvider"
-                    ],
-                    "aliases": {
-                        "ResponseCache": "Spatie\\ResponseCache\\Facades\\ResponseCache"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\ResponseCache\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Speed up a Laravel application by caching the entire response",
-            "homepage": "https://github.com/spatie/laravel-responsecache",
-            "keywords": [
-                "cache",
-                "laravel",
-                "laravel-responsecache",
-                "performance",
-                "response",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/laravel-responsecache/issues",
-                "source": "https://github.com/spatie/laravel-responsecache/tree/7.1.0"
-            },
-            "funding": [
-                {
-                    "url": "https://spatie.be/open-source/support-us",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2021-04-27T07:23:06+00:00"
-        },
-        {
             "name": "staudenmeir/eloquent-has-many-deep",
             "version": "v1.14.4",
             "source": {
@@ -6507,16 +6362,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v5.4.0",
+            "version": "v5.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "d4394d044ed69a8f244f3445bcedf8a0d7fe2403"
+                "reference": "264dce589e7ce37a7ba99cb901eed8249fbec92f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/d4394d044ed69a8f244f3445bcedf8a0d7fe2403",
-                "reference": "d4394d044ed69a8f244f3445bcedf8a0d7fe2403",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/264dce589e7ce37a7ba99cb901eed8249fbec92f",
+                "reference": "264dce589e7ce37a7ba99cb901eed8249fbec92f",
                 "shasum": ""
             },
             "require": {
@@ -6554,11 +6409,13 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk"
+                    "email": "hello@gjcampbell.co.uk",
+                    "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Vance Lucas",
-                    "email": "vance@vancelucas.com"
+                    "email": "vance@vancelucas.com",
+                    "homepage": "https://github.com/vlucas"
                 }
             ],
             "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
@@ -6569,7 +6426,7 @@
             ],
             "support": {
                 "issues": "https://github.com/vlucas/phpdotenv/issues",
-                "source": "https://github.com/vlucas/phpdotenv/tree/v5.4.0"
+                "source": "https://github.com/vlucas/phpdotenv/tree/v5.4.1"
             },
             "funding": [
                 {
@@ -6581,7 +6438,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-10T01:08:39+00:00"
+            "time": "2021-12-12T23:22:04+00:00"
         },
         {
             "name": "voku/portable-ascii",
@@ -6714,111 +6571,6 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.10.0"
             },
             "time": "2021-03-09T10:59:23+00:00"
-        },
-        {
-            "name": "wikimedia/at-ease",
-            "version": "v2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wikimedia/at-ease.git",
-                "reference": "e8ebaa7bb7c8a8395481a05f6dc4deaceab11c33"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wikimedia/at-ease/zipball/e8ebaa7bb7c8a8395481a05f6dc4deaceab11c33",
-                "reference": "e8ebaa7bb7c8a8395481a05f6dc4deaceab11c33",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.9"
-            },
-            "require-dev": {
-                "mediawiki/mediawiki-codesniffer": "35.0.0",
-                "mediawiki/minus-x": "1.1.1",
-                "ockcyp/covers-validator": "1.3.3",
-                "php-parallel-lint/php-console-highlighter": "0.5.0",
-                "php-parallel-lint/php-parallel-lint": "1.2.0",
-                "phpunit/phpunit": "^8.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Wikimedia\\AtEase\\": "src/Wikimedia/AtEase/"
-                },
-                "files": [
-                    "src/Wikimedia/Functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Tim Starling",
-                    "email": "tstarling@wikimedia.org"
-                },
-                {
-                    "name": "MediaWiki developers",
-                    "email": "wikitech-l@lists.wikimedia.org"
-                }
-            ],
-            "description": "Safe replacement to @ for suppressing warnings.",
-            "homepage": "https://www.mediawiki.org/wiki/at-ease",
-            "support": {
-                "source": "https://github.com/wikimedia/at-ease/tree/v2.1.0"
-            },
-            "time": "2021-02-27T15:53:37+00:00"
-        },
-        {
-            "name": "wikimedia/ip-set",
-            "version": "3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wikimedia/IPSet.git",
-                "reference": "4efe81f0ffb907a60778a72faf6ede17bb490081"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wikimedia/IPSet/zipball/4efe81f0ffb907a60778a72faf6ede17bb490081",
-                "reference": "4efe81f0ffb907a60778a72faf6ede17bb490081",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.9",
-                "wikimedia/at-ease": "^2.0.0"
-            },
-            "require-dev": {
-                "mediawiki/mediawiki-codesniffer": "35.0.0",
-                "mediawiki/mediawiki-phan-config": "0.10.6",
-                "mediawiki/minus-x": "1.1.1",
-                "ockcyp/covers-validator": "1.3.3",
-                "php-parallel-lint/php-console-highlighter": "0.5.0",
-                "php-parallel-lint/php-parallel-lint": "1.2.0",
-                "phpunit/phpunit": "^8.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Wikimedia\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Brandon Black",
-                    "email": "blblack@gmail.com"
-                }
-            ],
-            "description": "Efficiently match IP addresses against a set of CIDR specifications.",
-            "homepage": "https://www.mediawiki.org/wiki/IPSet",
-            "support": {
-                "source": "https://github.com/wikimedia/IPSet/tree/3.0.0"
-            },
-            "time": "2021-03-21T17:31:05+00:00"
         }
     ],
     "packages-dev": [
