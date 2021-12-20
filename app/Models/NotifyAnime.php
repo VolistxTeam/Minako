@@ -12,10 +12,8 @@ class NotifyAnime extends Model
 {
     use HasFactory, Searchable, HasRelationships, QueryCacheable;
 
-    public $cacheFor = 3600; // cache time, in seconds
-
-    protected static $flushCacheOnUpdate = true;
-
+    protected static $flushCacheOnUpdate = true; // cache time, in seconds
+    public $cacheFor = 3600;
     /**
      * Indicates if the model should be timestamped.
      *

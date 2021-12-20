@@ -11,24 +11,20 @@ class MALAnime extends Model
 {
     use HasFactory, Searchable, QueryCacheable;
 
-    public $cacheFor = 3600; // cache time, in seconds
-
-    protected static $flushCacheOnUpdate = true;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'mal_anime';
-
+    protected static $flushCacheOnUpdate = true; // cache time, in seconds
+    public $cacheFor = 3600;
     /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
     public $timestamps = true;
-
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'mal_anime';
     protected $fillable = [
         'uniqueID',
         'notifyID',
@@ -47,8 +43,8 @@ class MALAnime extends Model
         'filler' => 'boolean',
         'recap' => 'boolean',
         'isHidden' => 'boolean',
-        'created_at'  => 'date:Y-m-d H:i:s',
-        'updated_at'  => 'date:Y-m-d H:i:s',
+        'created_at' => 'date:Y-m-d H:i:s',
+        'updated_at' => 'date:Y-m-d H:i:s',
     ];
 
     public function anime()
