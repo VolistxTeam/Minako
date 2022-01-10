@@ -22,13 +22,12 @@ class EpisodeCommand extends Command
         set_time_limit(0);
 
         $workingProxies = [
-            'mV7KwB:a6HBC6@196.17.251.188:8000',
-            'mV7KwB:a6HBC6@196.17.249.28:8000',
-            'mV7KwB:a6HBC6@196.17.251.185:8000',
-            'mV7KwB:a6HBC6@196.17.251.91:8000',
-            'mV7KwB:a6HBC6@45.147.100.195:8000',
-            'mV7KwB:a6HBC6@45.147.100.133:8000',
-            'mV7KwB:a6HBC6@45.147.102.183:8000',
+            'LmSLqL:ojGsPe@196.16.108.169:8000',
+            'LmSLqL:ojGsPe@196.16.109.102:8000',
+            'LmSLqL:ojGsPe@196.16.109.87:8000',
+            'LmSLqL:ojGsPe@196.16.108.158:8000',
+            'LmSLqL:ojGsPe@196.16.111.180:8000',
+            'G2F1v8:UUVYDp@196.17.171.187:8000'
         ];
 
         $this->info('[!] Getting all anime information...');
