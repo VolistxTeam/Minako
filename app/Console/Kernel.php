@@ -5,7 +5,7 @@ namespace App\Console;
 use Illuminate\Console\KeyGenerateCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
-use Mlntn\Console\Commands\Serve;
+use Monicahq\Cloudflare\Commands\Reload;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        KeyGenerateCommand::class,
+        Reload::class,
         Commands\MAL\EpisodeCommand::class,
         Commands\Notify\AnimeCommand::class,
         Commands\Notify\CharacterCommand::class,
@@ -26,7 +26,6 @@ class Kernel extends ConsoleKernel
         Commands\Notify\ThumbnailCommand::class,
         Commands\Ohys\DownloadCommand::class,
         Commands\Ohys\RelationCommand::class,
-        Serve::class,
     ];
 
     /**

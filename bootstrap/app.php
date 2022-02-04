@@ -15,9 +15,11 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 $app->withEloquent();
 
+$app->register(Chuckrincon\LumenConfigDiscover\DiscoverServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
 $app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
 
@@ -48,9 +50,5 @@ $app->router->group([
 });
 
 $app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
-
-collect(scandir(__DIR__ . '/../config'))->each(function ($item) use ($app) {
-    $app->configure(basename($item, '.php'));
-});
 
 return $app;
