@@ -12,6 +12,7 @@ Run commands:
 composer install --ignore-platform-reqs
 cp .env.example .env
 php artisan key:generate
+php artisan cloudflare:reload
 php artisan migrate
 ```
 
