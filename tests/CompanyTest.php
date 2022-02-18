@@ -11,10 +11,10 @@ class CompanyTest extends BaseTestCase
 
     public function testCompany()
     {
-        $searchResult = $this->get("company/search/TV Tokyo")->seeStatusCode(200)->response->decodeResponseJson();
+        $searchResult = $this->get('company/search/TV Tokyo')->seeStatusCode(200)->response->decodeResponseJson();
 
         $companyID = $searchResult[0]['id'];
 
-        $this->get('company/' . $companyID)->seeStatusCode(200);
+        $this->get('company/'.$companyID)->seeStatusCode(200);
     }
 }

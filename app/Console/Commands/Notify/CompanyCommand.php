@@ -12,9 +12,9 @@ use Illuminate\Console\Command;
 
 class CompanyCommand extends Command
 {
-    protected $signature = "minako:notify:company";
+    protected $signature = 'minako:notify:company';
 
-    protected $description = "Retrieve all company information from notify.moe.";
+    protected $description = 'Retrieve all company information from notify.moe.';
 
     public function handle()
     {
@@ -22,17 +22,17 @@ class CompanyCommand extends Command
 
         set_time_limit(0);
 
-        $apiBaseURL = "https://notify.moe/api/company/";
+        $apiBaseURL = 'https://notify.moe/api/company/';
 
         $faker = Factory::create();
 
         $headers = [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome,
+            'Cache-Control'   => 'max-age=0',
+            'Connection'      => 'keep-alive',
+            'Keep-Alive'      => '300',
+            'User-Agent'      => $faker->chrome,
         ];
 
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
@@ -64,7 +64,7 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $realAPIURL = $apiBaseURL . $studioItem;
+                        $realAPIURL = $apiBaseURL.$studioItem;
 
                         $companyResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
@@ -72,28 +72,28 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $downloadedData = (string)$companyResponse->getBody();
+                        $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5' . $studioItem . '5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$studioItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
                             'notifyID' => $downloadedData['id'],
                         ], [
-                            'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                            'name_english'  => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
                             'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
                             'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                            'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                            'email' => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
-                            'links' => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
-                            'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
-                            'location' => !empty($downloadedData['location']) ? $downloadedData['location'] : null
+                            'description'   => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                            'email'         => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
+                            'links'         => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
+                            'mappings'      => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
+                            'location'      => !empty($downloadedData['location']) ? $downloadedData['location'] : null,
                         ]);
 
                         $notifyDBItem->touch();
 
-                        $this->line('[-] Studio Item Saved: ' . $studioItem);
+                        $this->line('[-] Studio Item Saved: '.$studioItem);
                     }
                 }
 
@@ -115,7 +115,7 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $realAPIURL = $apiBaseURL . $producerItem;
+                        $realAPIURL = $apiBaseURL.$producerItem;
 
                         $companyResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
@@ -123,28 +123,28 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $downloadedData = (string)$companyResponse->getBody();
+                        $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5' . $producerItem . '5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$producerItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
                             'notifyID' => $downloadedData['id'],
                         ], [
-                            'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                            'name_english'  => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
                             'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
                             'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                            'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                            'email' => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
-                            'links' => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
-                            'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
-                            'location' => !empty($downloadedData['location']) ? $downloadedData['location'] : null
+                            'description'   => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                            'email'         => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
+                            'links'         => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
+                            'mappings'      => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
+                            'location'      => !empty($downloadedData['location']) ? $downloadedData['location'] : null,
                         ]);
 
                         $notifyDBItem->touch();
 
-                        $this->line('[-] Producer Item Saved: ' . $producerItem);
+                        $this->line('[-] Producer Item Saved: '.$producerItem);
                     }
                 }
 
@@ -166,7 +166,7 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $realAPIURL = $apiBaseURL . $licensorItem;
+                        $realAPIURL = $apiBaseURL.$licensorItem;
 
                         $companyResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
@@ -174,34 +174,34 @@ class CompanyCommand extends Command
                             continue;
                         }
 
-                        $downloadedData = (string)$companyResponse->getBody();
+                        $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5' . $licensorItem . '5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$licensorItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
                             'notifyID' => $downloadedData['id'],
                         ], [
-                            'name_english' => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
+                            'name_english'  => !empty($downloadedData['name']['english']) ? $downloadedData['name']['english'] : null,
                             'name_japanese' => !empty($downloadedData['name']['japanese']) ? $downloadedData['name']['japanese'] : null,
                             'name_synonyms' => !empty($downloadedData['name']['synonyms']) ? $downloadedData['name']['synonyms'] : null,
-                            'description' => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
-                            'email' => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
-                            'links' => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
-                            'mappings' => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
-                            'location' => !empty($downloadedData['location']) ? $downloadedData['location'] : null
+                            'description'   => !empty($downloadedData['description']) ? $downloadedData['description'] : null,
+                            'email'         => !empty($downloadedData['email']) ? $downloadedData['email'] : null,
+                            'links'         => !empty($downloadedData['links']) ? $downloadedData['links'] : null,
+                            'mappings'      => !empty($downloadedData['mappings']) ? $downloadedData['mappings'] : null,
+                            'location'      => !empty($downloadedData['location']) ? $downloadedData['location'] : null,
                         ]);
 
                         $notifyDBItem->touch();
 
-                        $this->line('[-] Licensor Item Saved: ' . $licensorItem);
+                        $this->line('[-] Licensor Item Saved: '.$licensorItem);
                     }
                 }
 
-                $this->info('[+] Item Saved [' . $remainingCount . '/' . $totalCount . ']');
+                $this->info('[+] Item Saved ['.$remainingCount.'/'.$totalCount.']');
             } catch (Exception $ex) {
-                $this->error('[-] Skipping item. Reason: Unknown Error [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Skipping item. Reason: Unknown Error ['.$remainingCount.'/'.$totalCount.']');
             }
 
             $remainingCount++;

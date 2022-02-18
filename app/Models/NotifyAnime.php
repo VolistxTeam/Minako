@@ -10,7 +10,10 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class NotifyAnime extends Model
 {
-    use HasFactory, Searchable, HasRelationships, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use HasRelationships;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -58,21 +61,21 @@ class NotifyAnime extends Model
         'studios',
         'producers',
         'licensors',
-        'isHidden'
+        'isHidden',
     ];
 
     protected $casts = [
         'title_synonyms' => 'array',
-        'genres' => 'array',
-        'trailers' => 'array',
-        'n_episodes' => 'array',
-        'mappings' => 'array',
-        'studios' => 'array',
-        'producers' => 'array',
-        'licensors' => 'array',
-        'isHidden' => 'boolean',
-        'created_at' => 'date:Y-m-d H:i:s',
-        'updated_at' => 'date:Y-m-d H:i:s',
+        'genres'         => 'array',
+        'trailers'       => 'array',
+        'n_episodes'     => 'array',
+        'mappings'       => 'array',
+        'studios'        => 'array',
+        'producers'      => 'array',
+        'licensors'      => 'array',
+        'isHidden'       => 'boolean',
+        'created_at'     => 'date:Y-m-d H:i:s',
+        'updated_at'     => 'date:Y-m-d H:i:s',
     ];
 
     public function torrents()
@@ -108,14 +111,14 @@ class NotifyAnime extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
+            'id'              => $this->id,
+            'uniqueID'        => $this->uniqueID,
             'title_canonical' => $this->title_canonical,
-            'title_romaji' => $this->title_romaji,
-            'title_english' => $this->title_english,
-            'title_japanese' => $this->title_japanese,
-            'title_hiragana' => $this->title_hiragana,
-            'title_synonyms' => empty($this->title_synonyms) ? '' : implode("|", $this->title_synonyms)
+            'title_romaji'    => $this->title_romaji,
+            'title_english'   => $this->title_english,
+            'title_japanese'  => $this->title_japanese,
+            'title_hiragana'  => $this->title_hiragana,
+            'title_synonyms'  => empty($this->title_synonyms) ? '' : implode('|', $this->title_synonyms),
         ];
     }
 }

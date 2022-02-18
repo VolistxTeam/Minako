@@ -12,9 +12,9 @@ use Intervention\Image\ImageManager;
 
 class ThumbnailCommand extends Command
 {
-    protected $signature = "minako:notify:thumbnail";
+    protected $signature = 'minako:notify:thumbnail';
 
-    protected $description = "Download poster images from notify.moe.";
+    protected $description = 'Download poster images from notify.moe.';
 
     public function handle()
     {
@@ -34,12 +34,12 @@ class ThumbnailCommand extends Command
         $faker = Factory::create();
 
         $headers = [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome,
+            'Cache-Control'   => 'max-age=0',
+            'Connection'      => 'keep-alive',
+            'Keep-Alive'      => '300',
+            'User-Agent'      => $faker->chrome,
         ];
 
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
@@ -47,19 +47,19 @@ class ThumbnailCommand extends Command
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
                 try {
-                    $existsFile = Storage::disk('local')->exists('posters/' . $item['uniqueID'] . '.jpg');
+                    $existsFile = Storage::disk('local')->exists('posters/'.$item['uniqueID'].'.jpg');
 
                     if ($existsFile) {
-                        $this->error('[+] Thumbnail exists. [' . $remainingCount . '/' . $totalCount . ']');
+                        $this->error('[+] Thumbnail exists. ['.$remainingCount.'/'.$totalCount.']');
                         $remainingCount++;
                         continue;
                     }
 
-                    $originalImage = 'https://media.notify.moe/images/anime/original/' . $item['notifyID'] . $item['image_extension'];
-                    $largeImage = 'https://media.notify.moe/images/anime/large/' . $item['notifyID'] . $item['image_extension'];
+                    $originalImage = 'https://media.notify.moe/images/anime/original/'.$item['notifyID'].$item['image_extension'];
+                    $largeImage = 'https://media.notify.moe/images/anime/large/'.$item['notifyID'].$item['image_extension'];
 
                     $fp = tmpfile();
-                    $fpPath = stream_get_meta_data($fp)["uri"];
+                    $fpPath = stream_get_meta_data($fp)['uri'];
 
                     $imageResponse = $client->request('GET', $originalImage, ['headers' => $headers, 'sink' => $fpPath]);
 
@@ -67,31 +67,31 @@ class ThumbnailCommand extends Command
                         $imageResponse = $client->request('GET', $largeImage, ['headers' => $headers, 'sink' => $fpPath]);
 
                         if ($imageResponse->getStatusCode() != 200) {
-                            $this->error('[+] Cannot find character image. Ignoring... [' . $remainingCount . '/' . $totalCount . ']');
+                            $this->error('[+] Cannot find character image. Ignoring... ['.$remainingCount.'/'.$totalCount.']');
                             $remainingCount++;
                             fclose($fp);
                             continue;
                         }
                     }
 
-                    $manager = new ImageManager(array('driver' => config('image.module')));
+                    $manager = new ImageManager(['driver' => config('image.module')]);
 
                     $image = $manager->make($fpPath)->stream('jpg', 100);
 
-                    Storage::disk('local')->put('posters/' . $item['uniqueID'] . '.jpg', $image);
+                    Storage::disk('local')->put('posters/'.$item['uniqueID'].'.jpg', $image);
 
                     unset($fp);
 
-                    $this->info('[+] Thumbnail image uploaded for ID ' . $item['notifyID'] . ' [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->info('[+] Thumbnail image uploaded for ID '.$item['notifyID'].' ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 } catch (Exception $ex) {
-                    $this->error('[+] Exception [' . $ex . '[]' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[+] Exception ['.$ex.'[]'.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
             } else {
-                $this->error('[+] Thumbnail not found. [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[+] Thumbnail not found. ['.$remainingCount.'/'.$totalCount.']');
                 $remainingCount++;
             }
         }

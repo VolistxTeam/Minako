@@ -15,6 +15,6 @@ class EpisodeTest extends BaseTestCase
 
         $episodeID = $searchResult[0]['id'];
 
-        $this->get('episode/' . $episodeID)->seeStatusCode(200);
+        $this->get('episode/'.$episodeID)->seeStatusCode(200);
     }
 }

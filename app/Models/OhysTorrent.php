@@ -10,7 +10,10 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class OhysTorrent extends Model
 {
-    use HasFactory, Searchable, HasRelationships, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use HasRelationships;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -46,9 +49,9 @@ class OhysTorrent extends Model
 
     protected $casts = [
         'info_torrent_announces' => 'array',
-        'info_torrent_files' => 'array',
-        'created_at' => 'date:Y-m-d H:i:s',
-        'updated_at' => 'date:Y-m-d H:i:s',
+        'info_torrent_files'     => 'array',
+        'created_at'             => 'date:Y-m-d H:i:s',
+        'updated_at'             => 'date:Y-m-d H:i:s',
     ];
 
     public function anime()
@@ -64,9 +67,9 @@ class OhysTorrent extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'title' => $this->title,
+            'id'          => $this->id,
+            'uniqueID'    => $this->uniqueID,
+            'title'       => $this->title,
             'torrentName' => $this->torrentName,
         ];
     }

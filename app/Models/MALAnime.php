@@ -9,7 +9,9 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class MALAnime extends Model
 {
-    use HasFactory, Searchable, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -35,14 +37,14 @@ class MALAnime extends Model
         'aired',
         'filler',
         'recap',
-        'isHidden'
+        'isHidden',
     ];
 
     protected $casts = [
-        'aired' => 'boolean',
-        'filler' => 'boolean',
-        'recap' => 'boolean',
-        'isHidden' => 'boolean',
+        'aired'      => 'boolean',
+        'filler'     => 'boolean',
+        'recap'      => 'boolean',
+        'isHidden'   => 'boolean',
         'created_at' => 'date:Y-m-d H:i:s',
         'updated_at' => 'date:Y-m-d H:i:s',
     ];
@@ -60,12 +62,12 @@ class MALAnime extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'title' => $this->title,
+            'id'             => $this->id,
+            'uniqueID'       => $this->uniqueID,
+            'title'          => $this->title,
             'title_japanese' => $this->title_japanese,
-            'title_romanji' => $this->title_romanji,
-            'episode_id' => $this->episode_id
+            'title_romanji'  => $this->title_romanji,
+            'episode_id'     => $this->episode_id,
         ];
     }
 }

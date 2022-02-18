@@ -9,7 +9,9 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class NotifyCharacter extends Model
 {
-    use HasFactory, Searchable, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -39,17 +41,17 @@ class NotifyCharacter extends Model
         'spoilers',
         'attributes',
         'mappings',
-        'isHidden'
+        'isHidden',
     ];
 
     protected $casts = [
         'name_synonyms' => 'array',
-        'spoilers' => 'array',
-        'attributes' => 'array',
-        'mappings' => 'array',
-        'isHidden' => 'boolean',
-        'created_at' => 'date:Y-m-d H:i:s',
-        'updated_at' => 'date:Y-m-d H:i:s',
+        'spoilers'      => 'array',
+        'attributes'    => 'array',
+        'mappings'      => 'array',
+        'isHidden'      => 'boolean',
+        'created_at'    => 'date:Y-m-d H:i:s',
+        'updated_at'    => 'date:Y-m-d H:i:s',
     ];
 
     /**
@@ -60,12 +62,12 @@ class NotifyCharacter extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
+            'id'             => $this->id,
+            'uniqueID'       => $this->uniqueID,
             'name_canonical' => $this->name_canonical,
-            'name_english' => $this->name_english,
-            'name_japanese' => $this->name_japanese,
-            'name_synonyms' => empty($this->name_synonyms) ? '' : implode("|", $this->name_synonyms)
+            'name_english'   => $this->name_english,
+            'name_japanese'  => $this->name_japanese,
+            'name_synonyms'  => empty($this->name_synonyms) ? '' : implode('|', $this->name_synonyms),
         ];
     }
 }

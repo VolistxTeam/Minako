@@ -9,7 +9,9 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class NotifyCharacterRelation extends Model
 {
-    use HasFactory, Searchable, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -28,11 +30,11 @@ class NotifyCharacterRelation extends Model
     protected $fillable = [
         'uniqueID',
         'notifyID',
-        'items'
+        'items',
     ];
 
     protected $casts = [
-        'items' => 'array',
+        'items'      => 'array',
         'created_at' => 'date:Y-m-d H:i:s',
         'updated_at' => 'date:Y-m-d H:i:s',
     ];
@@ -45,8 +47,8 @@ class NotifyCharacterRelation extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID
+            'id'       => $this->id,
+            'uniqueID' => $this->uniqueID,
         ];
     }
 }

@@ -15,7 +15,7 @@ class EpisodeController extends Controller
         $buildResponse = [];
 
         foreach ($searchQuery->items() as $item) {
-            $newArray = array();
+            $newArray = [];
             $newArray['id'] = $item['id'];
             $newArray['anime_id'] = $item['uniqueID'];
             $newArray['title'] = $item['title'];
@@ -31,20 +31,20 @@ class EpisodeController extends Controller
         $episodeQuery = MALAnime::query()->latest()->where('id', $id)->first();
 
         if (empty($episodeQuery)) {
-            return response('Episode not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Episode not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $buildResponse = [
-            'id' => $episodeQuery['uniqueID'],
+            'id'             => $episodeQuery['uniqueID'],
             'episode_number' => $episodeQuery['episode_id'],
-            'titles' => [
-                'english' => !empty($episodeQuery['title']) ? trim($episodeQuery['title'], chr(0xC2) . chr(0xA0)) : null,
-                'japanese' => !empty($episodeQuery['title_japanese']) ? trim($episodeQuery['title_japanese'], chr(0xC2) . chr(0xA0)) : null,
-                'romaji' => !empty($episodeQuery['title_romanji']) ? trim($episodeQuery['title_romanji'], chr(0xC2) . chr(0xA0)) : null,
+            'titles'         => [
+                'english'  => !empty($episodeQuery['title']) ? trim($episodeQuery['title'], chr(0xC2).chr(0xA0)) : null,
+                'japanese' => !empty($episodeQuery['title_japanese']) ? trim($episodeQuery['title_japanese'], chr(0xC2).chr(0xA0)) : null,
+                'romaji'   => !empty($episodeQuery['title_romanji']) ? trim($episodeQuery['title_romanji'], chr(0xC2).chr(0xA0)) : null,
             ],
-            'aired' => $episodeQuery['aired'],
-            'created_at' => (string)$episodeQuery['created_at'],
-            'updated_at' => (string)$episodeQuery['updated_at']
+            'aired'      => $episodeQuery['aired'],
+            'created_at' => (string) $episodeQuery['created_at'],
+            'updated_at' => (string) $episodeQuery['updated_at'],
         ];
 
         return response()->json($buildResponse);

@@ -9,7 +9,9 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class OhysRelation extends Model
 {
-    use HasFactory, Searchable, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -27,7 +29,7 @@ class OhysRelation extends Model
     protected $table = 'ohys_relation';
     protected $fillable = [
         'uniqueID',
-        'matchingID'
+        'matchingID',
     ];
 
     protected $casts = [
@@ -53,9 +55,9 @@ class OhysRelation extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'matchingID' => $this->matchingID
+            'id'         => $this->id,
+            'uniqueID'   => $this->uniqueID,
+            'matchingID' => $this->matchingID,
         ];
     }
 }

@@ -12,9 +12,9 @@ use Illuminate\Console\Command;
 
 class CharacterRelationCommand extends Command
 {
-    protected $signature = "minako:notify:character-relation";
+    protected $signature = 'minako:notify:character-relation';
 
-    protected $description = "Retrieve all character relation information from notify.moe.";
+    protected $description = 'Retrieve all character relation information from notify.moe.';
 
     public function handle()
     {
@@ -22,17 +22,17 @@ class CharacterRelationCommand extends Command
 
         set_time_limit(0);
 
-        $apiBaseURL = "https://notify.moe/api/animecharacters/";
+        $apiBaseURL = 'https://notify.moe/api/animecharacters/';
 
         $faker = Factory::create();
 
         $headers = [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome,
+            'Cache-Control'   => 'max-age=0',
+            'Connection'      => 'keep-alive',
+            'Keep-Alive'      => '300',
+            'User-Agent'      => $faker->chrome,
         ];
 
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
@@ -58,27 +58,27 @@ class CharacterRelationCommand extends Command
                 }
 
                 if (!$allowCrawl) {
-                    $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
 
-                $realAPIURL = $apiBaseURL . $item['notifyID'];
+                $realAPIURL = $apiBaseURL.$item['notifyID'];
 
                 $characterResponse = $client->get($realAPIURL, ['headers' => $headers]);
 
                 if ($characterResponse->getStatusCode() != 200) {
-                    $this->error('[-] Skipping item. Reason: The item does not found. [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[-] Skipping item. Reason: The item does not found. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
 
-                $downloadedData = (string)$characterResponse->getBody();
+                $downloadedData = (string) $characterResponse->getBody();
 
                 $downloadedData = json_decode($downloadedData, true);
 
                 if (empty($downloadedData['items'])) {
-                    $this->error('[-] Skipping item. Reason: The item does not found. [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[-] Skipping item. Reason: The item does not found. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
@@ -87,14 +87,14 @@ class CharacterRelationCommand extends Command
                     'uniqueID' => $item['uniqueID'],
                     'notifyID' => $downloadedData['animeId'],
                 ], [
-                    'items' => !empty($downloadedData['items']) ? $downloadedData['items'] : null
+                    'items' => !empty($downloadedData['items']) ? $downloadedData['items'] : null,
                 ]);
 
                 $notifyDBItem->touch();
 
-                $this->line('[+] Item Saved [' . $remainingCount . '/' . $totalCount . ']');
+                $this->line('[+] Item Saved ['.$remainingCount.'/'.$totalCount.']');
             } catch (Exception $ex) {
-                $this->error('[-] Skipping item. Reason: Unknown Error [' . $ex . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Skipping item. Reason: Unknown Error ['.$ex.$remainingCount.'/'.$totalCount.']');
             }
 
             $remainingCount++;

@@ -9,7 +9,9 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class NotifyCompany extends Model
 {
-    use HasFactory, Searchable, QueryCacheable;
+    use HasFactory;
+    use Searchable;
+    use QueryCacheable;
 
     protected static $flushCacheOnUpdate = true; // cache time, in seconds
     public $cacheFor = 3600;
@@ -40,11 +42,11 @@ class NotifyCompany extends Model
 
     protected $casts = [
         'name_synonyms' => 'array',
-        'links' => 'array',
-        'mappings' => 'array',
-        'location' => 'array',
-        'created_at' => 'date:Y-m-d H:i:s',
-        'updated_at' => 'date:Y-m-d H:i:s',
+        'links'         => 'array',
+        'mappings'      => 'array',
+        'location'      => 'array',
+        'created_at'    => 'date:Y-m-d H:i:s',
+        'updated_at'    => 'date:Y-m-d H:i:s',
     ];
 
     /**
@@ -55,11 +57,11 @@ class NotifyCompany extends Model
     public function toSearchableArray()
     {
         return [
-            'id' => $this->id,
-            'uniqueID' => $this->uniqueID,
-            'name_english' => $this->name_english,
+            'id'            => $this->id,
+            'uniqueID'      => $this->uniqueID,
+            'name_english'  => $this->name_english,
             'name_japanese' => $this->name_japanese,
-            'name_synonyms' => empty($this->name_synonyms) ? '' : implode("|", $this->name_synonyms)
+            'name_synonyms' => empty($this->name_synonyms) ? '' : implode('|', $this->name_synonyms),
         ];
     }
 }

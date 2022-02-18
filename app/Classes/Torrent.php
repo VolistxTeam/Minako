@@ -16,7 +16,8 @@ class Torrent
      */
     protected static $_errors = [];
 
-    /** Read and decode torrent file/data OR build a torrent from source folder/file(s)
+    /**
+     * Read and decode torrent file/data OR build a torrent from source folder/file(s)
      * Supported signatures:
      * - Torrent(); // get an instance (useful to scrape and check errors)
      * - Torrent( string $torrent ); // analyze a torrent file
@@ -54,7 +55,8 @@ class Torrent
         }
     }
 
-    /** Convert the current Torrent instance in torrent format
+    /**
+     * Convert the current Torrent instance in torrent format.
      *
      * @return string encoded torrent data
      */
@@ -63,7 +65,8 @@ class Torrent
         return $this->encode($this);
     }
 
-    /** Return last error message
+    /**
+     * Return last error message.
      *
      * @return string|bool last error message or false if none
      */
@@ -74,7 +77,8 @@ class Torrent
             self::$_errors[0]->getMessage();
     }
 
-    /** Return Errors
+    /**
+     * Return Errors.
      *
      * @return array|bool error list or false if none
      */
@@ -87,7 +91,8 @@ class Torrent
 
     /**** Getters and setters ****/
 
-    /** Getter and setter of torrent announce url / list
+    /**
+     * Getter and setter of torrent announce url / list
      * If the argument is a string, announce url is added to announce list (or set as announce if announce is not set)
      * If the argument is an array/object, set announce url (with first url) and list (if array has more than one url), tiered list supported
      * If the argument is false announce url & list are unset.
@@ -121,7 +126,8 @@ class Torrent
         unset($this->announce);
     }
 
-    /** Getter and setter of torrent creation date
+    /**
+     * Getter and setter of torrent creation date.
      *
      * @param null|int timestamp (optional, if omitted it's a getter)
      *
@@ -134,7 +140,8 @@ class Torrent
             $this->touch($this->{'creation date'} = (int) $timestamp);
     }
 
-    /** Getter and setter of torrent comment
+    /**
+     * Getter and setter of torrent comment.
      *
      * @param null|string comment (optional, if omitted it's a getter)
      *
@@ -147,7 +154,8 @@ class Torrent
             $this->touch($this->comment = (string) $comment);
     }
 
-    /** Getter and setter of torrent name
+    /**
+     * Getter and setter of torrent name.
      *
      * @param null|string name (optional, if omitted it's a getter)
      *
@@ -160,7 +168,8 @@ class Torrent
             $this->touch($this->info['name'] = (string) $name);
     }
 
-    /** Getter and setter of private flag
+    /**
+     * Getter and setter of private flag.
      *
      * @param null|bool is private or not (optional, if omitted it's a getter)
      *
@@ -173,7 +182,8 @@ class Torrent
             $this->touch($this->info['private'] = $private ? 1 : 0);
     }
 
-    /** Getter and setter of torrent source
+    /**
+     * Getter and setter of torrent source.
      *
      * @param null|string source (optional, if omitted it's a getter)
      *
@@ -186,7 +196,8 @@ class Torrent
             $this->touch($this->info['source'] = (string) $source);
     }
 
-    /** Getter and setter of webseed(s) url list ( GetRight implementation )
+    /**
+     * Getter and setter of webseed(s) url list ( GetRight implementation ).
      *
      * @param null|string|array webseed or webseeds mirror list (optional, if omitted it's a getter)
      *
@@ -199,7 +210,8 @@ class Torrent
             $this->touch($this->{'url-list'} = is_string($urls) ? $urls : (array) $urls);
     }
 
-    /** Getter and setter of httpseed(s) url list ( BitTornado implementation )
+    /**
+     * Getter and setter of httpseed(s) url list ( BitTornado implementation ).
      *
      * @param null|string|array httpseed or httpseeds mirror list (optional, if omitted it's a getter)
      *
@@ -214,7 +226,8 @@ class Torrent
 
     /**** Analyze BitTorrent ****/
 
-    /** Get piece length
+    /**
+     * Get piece length.
      *
      * @return int piece length or null if not set
      */
@@ -225,7 +238,8 @@ class Torrent
             null;
     }
 
-    /** Compute hash info
+    /**
+     * Compute hash info.
      *
      * @return string hash info or null if info not set
      */
@@ -236,7 +250,8 @@ class Torrent
             null;
     }
 
-    /** List torrent content
+    /**
+     * List torrent content.
      *
      * @param int|null size precision (optional, if omitted returns sizes in bytes)
      *
@@ -260,14 +275,15 @@ class Torrent
         return $files;
     }
 
-    /** List torrent content pieces and offset(s)
+    /**
+     * List torrent content pieces and offset(s).
      *
      * @return array file(s) and pieces/offset(s) list, file(s) as keys and pieces/offset(s) as values
      */
     public function offset()
     {
         $files = [];
-        $size  = 0;
+        $size = 0;
         if (isset($this->info['files']) && is_array($this->info['files'])) {
             foreach ($this->info['files'] as $file) {
                 $files[self::path($file['path'], $this->info['name'])] = [
@@ -289,7 +305,8 @@ class Torrent
         return $files;
     }
 
-    /** Sum torrent content size
+    /**
+     * Sum torrent content size.
      *
      * @param int|null size precision (optional, if omitted returns size in bytes)
      *
@@ -311,7 +328,8 @@ class Torrent
             self::format($size, $precision);
     }
 
-    /** Request torrent statistics from scrape page USING CURL!!
+    /**
+     * Request torrent statistics from scrape page USING CURL!!
      *
      * @param string|array announce or scrape page url (optional, to request an alternative tracker BUT required for static call)
      * @param string torrent hash info (optional, required ONLY for static call)
@@ -323,7 +341,7 @@ class Torrent
     public function scrape($announce = null, $hash_info = null, $timeout = self::timeout)
     {
         $packed_hash = urlencode(pack('H*', $hash_info ? $hash_info : $this->hash_info()));
-        $handles     = $scrape     = [];
+        $handles = $scrape = [];
         if (!function_exists('curl_multi_init')) {
             return self::set_error(new Exception('Install CURL with "curl_multi_init" enabled'));
         }
@@ -342,7 +360,7 @@ class Torrent
                 if (isset($handles[$tracker])) {
                     continue;
                 }
-                $handles[$tracker] = curl_init($tracker . '?info_hash=' . $packed_hash);
+                $handles[$tracker] = curl_init($tracker.'?info_hash='.$packed_hash);
                 curl_setopt($handles[$tracker], CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($handles[$tracker], CURLOPT_TIMEOUT, $timeout);
                 curl_multi_add_handle($curl, $handles[$tracker]);
@@ -354,17 +372,17 @@ class Torrent
                 continue;
             }
             while ($done = curl_multi_info_read($curl)) {
-                $info    = curl_getinfo($done['handle']);
+                $info = curl_getinfo($done['handle']);
                 $tracker = explode('?', $info['url'], 2);
                 $tracker = array_shift($tracker);
                 if (empty($info['http_code'])) {
-                    $scrape[$tracker] = self::set_error(new Exception('Tracker request timeout (' . $timeout . 's)'), true);
+                    $scrape[$tracker] = self::set_error(new Exception('Tracker request timeout ('.$timeout.'s)'), true);
                     continue;
                 } elseif (200 != $info['http_code']) {
-                    $scrape[$tracker] = self::set_error(new Exception('Tracker request failed (' . $info['http_code'] . ' code)'), true);
+                    $scrape[$tracker] = self::set_error(new Exception('Tracker request failed ('.$info['http_code'].' code)'), true);
                     continue;
                 }
-                $data  = curl_multi_getcontent($done['handle']);
+                $data = curl_multi_getcontent($done['handle']);
                 $stats = self::decode_data($data);
                 curl_multi_remove_handle($curl, $done['handle']);
                 $scrape[$tracker] = empty($stats['files']) ?
@@ -379,7 +397,8 @@ class Torrent
 
     /**** Save and Send ****/
 
-    /** Save torrent file to disk
+    /**
+     * Save torrent file to disk.
      *
      * @param null|string name of the file (optional)
      *
@@ -387,10 +406,11 @@ class Torrent
      */
     public function save($filename = null)
     {
-        return file_put_contents(is_null($filename) ? $this->info['name'] . '.torrent' : $filename, $this->encode($this));
+        return file_put_contents(is_null($filename) ? $this->info['name'].'.torrent' : $filename, $this->encode($this));
     }
 
-    /** Send torrent file to client
+    /**
+     * Send torrent file to client.
      *
      * @param null|string name of the file (optional)
      */
@@ -398,12 +418,13 @@ class Torrent
     {
         $data = $this->encode($this);
         header('Content-type: application/x-bittorrent');
-        header('Content-Length: ' . strlen($data));
-        header('Content-Disposition: attachment; filename="' . (is_null($filename) ? $this->info['name'] . '.torrent' : $filename) . '"');
+        header('Content-Length: '.strlen($data));
+        header('Content-Disposition: attachment; filename="'.(is_null($filename) ? $this->info['name'].'.torrent' : $filename).'"');
         exit($data);
     }
 
-    /** Get magnet link
+    /**
+     * Get magnet link.
      *
      * @param bool html encode ampersand, default true (optional)
      *
@@ -413,12 +434,13 @@ class Torrent
     {
         $ampersand = $html ? '&amp;' : '&';
 
-        return sprintf('magnet:?xt=urn:btih:%2$s%1$sdn=%3$s%1$sxl=%4$d%1$str=%5$s', $ampersand, $this->hash_info(), urlencode($this->name()), $this->size(), implode($ampersand . 'tr=', self::untier($this->announce())));
+        return sprintf('magnet:?xt=urn:btih:%2$s%1$sdn=%3$s%1$sxl=%4$d%1$str=%5$s', $ampersand, $this->hash_info(), urlencode($this->name()), $this->size(), implode($ampersand.'tr=', self::untier($this->announce())));
     }
 
     /**** Encode BitTorrent ****/
 
-    /** Encode torrent data
+    /**
+     * Encode torrent data.
      *
      * @param mixed data to encode
      *
@@ -440,7 +462,8 @@ class Torrent
         }
     }
 
-    /** Encode torrent string
+    /**
+     * Encode torrent string.
      *
      * @param string string to encode
      *
@@ -448,10 +471,11 @@ class Torrent
      */
     private static function encode_string($string)
     {
-        return strlen($string) . ':' . $string;
+        return strlen($string).':'.$string;
     }
 
-    /** Encode torrent integer
+    /**
+     * Encode torrent integer.
      *
      * @param int integer to encode
      *
@@ -459,10 +483,11 @@ class Torrent
      */
     private static function encode_integer($integer)
     {
-        return 'i' . $integer . 'e';
+        return 'i'.$integer.'e';
     }
 
-    /** Encode torrent dictionary or list
+    /**
+     * Encode torrent dictionary or list.
      *
      * @param array array to encode
      *
@@ -479,16 +504,17 @@ class Torrent
             ksort($array, SORT_STRING);
             $return = 'd';
             foreach ($array as $key => $value) {
-                $return .= self::encode(strval($key)) . self::encode($value);
+                $return .= self::encode(strval($key)).self::encode($value);
             }
         }
 
-        return $return . 'e';
+        return $return.'e';
     }
 
     /**** Decode BitTorrent ****/
 
-    /** Decode torrent data or file
+    /**
+     * Decode torrent data or file.
      *
      * @param string data or file path to decode
      *
@@ -503,7 +529,8 @@ class Torrent
         return (array) self::decode_data($data);
     }
 
-    /** Decode torrent data
+    /**
+     * Decode torrent data.
      *
      * @param string data to decode
      *
@@ -529,7 +556,8 @@ class Torrent
         }
     }
 
-    /** Decode torrent dictionary
+    /**
+     * Decode torrent dictionary.
      *
      * @param string data to decode
      *
@@ -538,7 +566,7 @@ class Torrent
     private static function decode_dictionary(&$data)
     {
         $dictionary = [];
-        $previous   = null;
+        $previous = null;
         while ('e' != ($char = self::char($data))) {
             if (false === $char) {
                 return self::set_error(new Exception('Unterminated dictionary'));
@@ -554,14 +582,15 @@ class Torrent
                 self::set_error(new Exception('Missorted dictionary key'));
             }
             $dictionary[$key] = self::decode_data($data);
-            $previous         = $key;
+            $previous = $key;
         }
         $data = substr($data, 1);
 
         return $dictionary;
     }
 
-    /** Decode torrent list
+    /**
+     * Decode torrent list.
      *
      * @param string data to decode
      *
@@ -581,7 +610,8 @@ class Torrent
         return $list;
     }
 
-    /** Decode torrent string
+    /**
+     * Decode torrent string.
      *
      * @param string data to decode
      *
@@ -600,12 +630,13 @@ class Torrent
             return self::set_error(new Exception('Invalid string, input too short for string length'));
         }
         $string = substr($data, $colon + 1, $length);
-        $data   = substr($data, $colon + $length + 1);
+        $data = substr($data, $colon + $length + 1);
 
         return $string;
     }
 
-    /** Decode torrent integer
+    /**
+     * Decode torrent integer.
      *
      * @param string data to decode
      *
@@ -614,12 +645,12 @@ class Torrent
     private static function decode_integer(&$data)
     {
         $start = 0;
-        $end   = strpos($data, 'e');
+        $end = strpos($data, 'e');
         if (0 === $end) {
             self::set_error(new Exception('Empty integer'));
         }
         if ('-' == self::char($data)) {
-            ++$start;
+            $start++;
         }
         if ('0' == substr($data, $start, 1) && $end > $start + 1) {
             self::set_error(new Exception('Leading zero in integer'));
@@ -628,14 +659,15 @@ class Torrent
             self::set_error(new Exception('Non-digit characters in integer'));
         }
         $integer = substr($data, 0, $end);
-        $data    = substr($data, $end + 1);
+        $data = substr($data, $end + 1);
 
         return 0 + $integer;
     }
 
     /**** Internal Helpers ****/
 
-    /** Build torrent info
+    /**
+     * Build torrent info.
      *
      * @param string|array source folder/file(s) path
      * @param int piece length
@@ -657,7 +689,8 @@ class Torrent
         }
     }
 
-    /** Set torrent creator and creation date
+    /**
+     * Set torrent creator and creation date.
      *
      * @param any param
      *
@@ -665,13 +698,14 @@ class Torrent
      */
     protected function touch($void = null)
     {
-        $this->{'created by'}    = 'Torrent RW PHP Class - http://github.com/adriengibrat/torrent-rw';
+        $this->{'created by'} = 'Torrent RW PHP Class - http://github.com/adriengibrat/torrent-rw';
         $this->{'creation date'} = time();
 
         return $void;
     }
 
-    /** Add an error to errors stack
+    /**
+     * Add an error to errors stack.
      *
      * @param Exception error to add
      * @param bool return error message or not (optional, default to false)
@@ -683,7 +717,8 @@ class Torrent
         return (array_unshift(self::$_errors, $exception) && $message) ? $exception->getMessage() : false;
     }
 
-    /** Build announce list
+    /**
+     * Build announce list.
      *
      * @param string|array announce url / list
      * @param string|array announce url / list to add (optionnal)
@@ -692,10 +727,11 @@ class Torrent
      */
     protected static function announce_list($announce, $merge = [])
     {
-        return array_map(function($a) {return (array) $a;}, array_merge((array) $announce, (array) $merge));
+        return array_map(function ($a) {return (array) $a; }, array_merge((array) $announce, (array) $merge));
     }
 
-    /** Get the first announce url in a list
+    /**
+     * Get the first announce url in a list.
      *
      * @param array announce list (array of arrays if tiered trackers)
      *
@@ -710,7 +746,8 @@ class Torrent
         return $announce;
     }
 
-    /** Helper to pack data hash
+    /**
+     * Helper to pack data hash.
      *
      * @param string data
      *
@@ -718,10 +755,11 @@ class Torrent
      */
     protected static function pack(&$data)
     {
-        return pack('H*', sha1($data)) . ($data = null);
+        return pack('H*', sha1($data)).($data = null);
     }
 
-    /** Helper to build file path
+    /**
+     * Helper to build file path.
      *
      * @param array file path
      * @param string base folder
@@ -735,7 +773,8 @@ class Torrent
         return join(DIRECTORY_SEPARATOR, $path);
     }
 
-    /** Helper to explode file path
+    /**
+     * Helper to explode file path.
      *
      * @param string file path
      *
@@ -746,7 +785,8 @@ class Torrent
         return explode(DIRECTORY_SEPARATOR, $path);
     }
 
-    /** Helper to test if an array is a list
+    /**
+     * Helper to test if an array is a list.
      *
      * @param array array to test
      *
@@ -763,7 +803,8 @@ class Torrent
         return true;
     }
 
-    /** Build pieces depending on piece length from a file handler
+    /**
+     * Build pieces depending on piece length from a file handler.
      *
      * @param ressource file handle
      * @param int piece length
@@ -787,10 +828,11 @@ class Torrent
         }
         fclose($handle);
 
-        return $pieces . ($last && $piece ? self::pack($piece) : null);
+        return $pieces.($last && $piece ? self::pack($piece) : null);
     }
 
-    /** Build torrent info from single file
+    /**
+     * Build torrent info from single file.
      *
      * @param string file path
      * @param int piece length
@@ -800,7 +842,7 @@ class Torrent
     private function file($file, $piece_length)
     {
         if (!$handle = self::fopen($file, $size = self::filesize($file))) {
-            return self::set_error(new Exception('Failed to open file: "' . $file . '"'));
+            return self::set_error(new Exception('Failed to open file: "'.$file.'"'));
         }
         if (self::is_url($file)) {
             $this->url_list($file);
@@ -815,7 +857,8 @@ class Torrent
         ];
     }
 
-    /** Build torrent info from files
+    /**
+     * Build torrent info from files.
      *
      * @param array file list
      * @param int piece length
@@ -825,23 +868,23 @@ class Torrent
     private function files($files, $piece_length)
     {
         sort($files);
-        usort($files, function($a, $b) {
-            return strrpos($a,DIRECTORY_SEPARATOR)-strrpos($b,DIRECTORY_SEPARATOR);
+        usort($files, function ($a, $b) {
+            return strrpos($a, DIRECTORY_SEPARATOR) - strrpos($b, DIRECTORY_SEPARATOR);
         });
         $first = current($files);
         if (!self::is_url($first)) {
             $files = array_map('realpath', $files);
         } else {
-            $this->url_list(dirname($first) . DIRECTORY_SEPARATOR);
+            $this->url_list(dirname($first).DIRECTORY_SEPARATOR);
         }
         $files_path = array_map('self::path_explode', $files);
-        $root       = call_user_func_array('array_intersect_assoc', $files_path);
-        $pieces     = null;
+        $root = call_user_func_array('array_intersect_assoc', $files_path);
+        $pieces = null;
         $info_files = [];
-        $count      = count($files) - 1;
+        $count = count($files) - 1;
         foreach ($files as $i => $file) {
             if (!$handle = self::fopen($file, $filesize = self::filesize($file))) {
-                self::set_error(new Exception('Failed to open file: "' . $file . '" discarded'));
+                self::set_error(new Exception('Failed to open file: "'.$file.'" discarded'));
                 continue;
             }
             $pieces .= $this->pieces($handle, $piece_length, $count == $i);
@@ -859,7 +902,8 @@ class Torrent
         ];
     }
 
-    /** Build torrent info from folder content
+    /**
+     * Build torrent info from folder content.
      *
      * @param string folder path
      * @param int piece length
@@ -871,7 +915,8 @@ class Torrent
         return $this->files(self::scandir($dir), $piece_length);
     }
 
-    /** Helper to return the first char of encoded data
+    /**
+     * Helper to return the first char of encoded data.
      *
      * @param string encoded data
      *
@@ -886,7 +931,8 @@ class Torrent
 
     /**** Public Helpers ****/
 
-    /** Helper to format size in bytes to human readable
+    /**
+     * Helper to format size in bytes to human readable.
      *
      * @param int size in bytes
      * @param int precision after coma
@@ -906,10 +952,11 @@ class Torrent
             $size /= 1024;
         }
 
-        return round($size, $precision) . ' ' . ($next ? prev($units) : end($units));
+        return round($size, $precision).' '.($next ? prev($units) : end($units));
     }
 
-    /** Helper to return filesize (even bigger than 2Gb -linux only- and distant files size)
+    /**
+     * Helper to return filesize (even bigger than 2Gb -linux only- and distant files size).
      *
      * @param string file path
      *
@@ -924,7 +971,8 @@ class Torrent
         }
     }
 
-    /** Helper to open file to read (even bigger than 2Gb, linux only)
+    /**
+     * Helper to open file to read (even bigger than 2Gb, linux only).
      *
      * @param string file path
      * @param int|float file size (optional)
@@ -940,11 +988,12 @@ class Torrent
         } elseif (!is_readable($file)) {
             return false;
         } else {
-            return popen('cat ' . escapeshellarg(realpath($file)), 'r');
+            return popen('cat '.escapeshellarg(realpath($file)), 'r');
         }
     }
 
-    /** Helper to scan directories files and sub directories recursively
+    /**
+     * Helper to scan directories files and sub directories recursively.
      *
      * @param string directory path
      *
@@ -955,7 +1004,7 @@ class Torrent
         $paths = [];
         foreach (scandir($dir) as $item) {
             if ('.' != $item && '..' != $item) {
-                if (is_dir($path = realpath($dir . DIRECTORY_SEPARATOR . $item))) {
+                if (is_dir($path = realpath($dir.DIRECTORY_SEPARATOR.$item))) {
                     $paths = array_merge(self::scandir($path), $paths);
                 } else {
                     $paths[] = $path;
@@ -966,7 +1015,8 @@ class Torrent
         return $paths;
     }
 
-    /** Helper to check if string is an url (http)
+    /**
+     * Helper to check if string is an url (http).
      *
      * @param string url to check
      *
@@ -977,7 +1027,8 @@ class Torrent
         return preg_match('#^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$#i', $url);
     }
 
-    /** Helper to check if url exists
+    /**
+     * Helper to check if url exists.
      *
      * @param string url to check
      *
@@ -990,7 +1041,8 @@ class Torrent
             false;
     }
 
-    /** Helper to check if a file is a torrent
+    /**
+     * Helper to check if a file is a torrent.
      *
      * @param string file location
      * @param float http timeout (optional, default to self::timeout 30s)
@@ -1005,12 +1057,13 @@ class Torrent
             || 'd13:creatio' === $start
             || 'd13:announc' === $start
             || 'd12:_info_l' === $start
-            || 'd7:comment'  === substr($start, 0, 10) // @see https://github.com/adriengibrat/torrent-rw/issues/32
-            || 'd4:info'     === substr($start, 0, 7)
-            || 'd9:'         === substr($start, 0, 3); // @see https://github.com/adriengibrat/torrent-rw/pull/17
+            || 'd7:comment' === substr($start, 0, 10) // @see https://github.com/adriengibrat/torrent-rw/issues/32
+            || 'd4:info' === substr($start, 0, 7)
+            || 'd9:' === substr($start, 0, 3); // @see https://github.com/adriengibrat/torrent-rw/pull/17
     }
 
-    /** Helper to get (distant) file content
+    /**
+     * Helper to get (distant) file content.
      *
      * @param string file location
      * @param float http timeout (optional, default to self::timeout 30s)
@@ -1038,11 +1091,11 @@ class Torrent
             curl_setopt($handle, CURLOPT_TIMEOUT, $timeout);
         }
         if ($offset || $length) {
-            curl_setopt($handle, CURLOPT_RANGE, $offset . '-' . ($length ? $offset + $length - 1 : null));
+            curl_setopt($handle, CURLOPT_RANGE, $offset.'-'.($length ? $offset + $length - 1 : null));
         }
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
         $content = curl_exec($handle);
-        $size    = curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        $size = curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
         curl_close($handle);
 
         return ($offset && $size == -1) || ($length && $length != $size) ? $length ?
@@ -1051,7 +1104,8 @@ class Torrent
             $content;
     }
 
-    /** Flatten announces list
+    /**
+     * Flatten announces list.
      *
      * @param array announces list
      *

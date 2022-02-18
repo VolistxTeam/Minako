@@ -11,7 +11,8 @@ class Controller extends BaseController
 {
     public function escapeElasticReservedChars($string)
     {
-        $regex = "/[\\+\\-\\=\\&\\|\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\<\\>\\?\\:\\\\\\/]/";
+        $regex = '/[\\+\\-\\=\\&\\|\\!\\(\\)\\{\\}\\[\\]\\^\\"\\~\\*\\<\\>\\?\\:\\\\\\/]/';
+
         return preg_replace($regex, addslashes('\\$0'), $string);
     }
 

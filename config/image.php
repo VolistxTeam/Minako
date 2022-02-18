@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'module' => env('IMAGE_MODULE', 'imagick')
+    'module' => env('IMAGE_MODULE', 'imagick'),
 ];

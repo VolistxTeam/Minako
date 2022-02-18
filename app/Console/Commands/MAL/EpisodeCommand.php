@@ -11,9 +11,9 @@ use Jikan\Jikan;
 
 class EpisodeCommand extends Command
 {
-    protected $signature = "minako:mal:episodes {--skip=0}";
+    protected $signature = 'minako:mal:episodes {--skip=0}';
 
-    protected $description = "Retrieve all episode information from MAL using internal APIs.";
+    protected $description = 'Retrieve all episode information from MAL using internal APIs.';
 
     public function handle()
     {
@@ -27,7 +27,7 @@ class EpisodeCommand extends Command
             'LmSLqL:ojGsPe@196.16.109.87:8000',
             'LmSLqL:ojGsPe@196.16.108.158:8000',
             'LmSLqL:ojGsPe@196.16.111.180:8000',
-            'G2F1v8:UUVYDp@196.17.171.187:8000'
+            'G2F1v8:UUVYDp@196.17.171.187:8000',
         ];
 
         $this->info('[!] Getting all anime information...');
@@ -41,7 +41,7 @@ class EpisodeCommand extends Command
         $skipCount = 0;
 
         if (!empty($this->option('skip'))) {
-            $skipCount = (int)$this->option('skip');
+            $skipCount = (int) $this->option('skip');
         }
 
         foreach ($allAnime as $item) {
@@ -49,7 +49,7 @@ class EpisodeCommand extends Command
 
             if ($remainingCount < $skipCount) {
                 $remainingCount++;
-                $this->info('[-] Skipping Item [' . $remainingCount . '/' . $totalCount . ']');
+                $this->info('[-] Skipping Item ['.$remainingCount.'/'.$totalCount.']');
                 continue;
             }
 
@@ -70,13 +70,13 @@ class EpisodeCommand extends Command
             }
 
             if (!$allowCrawl) {
-                $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. ['.$remainingCount.'/'.$totalCount.']');
                 $remainingCount++;
                 continue;
             }
 
             if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
-                $this->error('[-] Skipping item. Reason: Not supported type. [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Skipping item. Reason: Not supported type. ['.$remainingCount.'/'.$totalCount.']');
                 $remainingCount++;
                 continue;
             }
@@ -91,7 +91,7 @@ class EpisodeCommand extends Command
                 }
 
                 if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
-                    $this->error('[-] Skipping item. Reason: No MAL ID found. [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[-] Skipping item. Reason: No MAL ID found. ['.$remainingCount.'/'.$totalCount.']');
                     $remainingCount++;
                     continue;
                 }
@@ -101,27 +101,27 @@ class EpisodeCommand extends Command
                 $errorDetected = false;
                 $errorMessage = '';
 
-                $client = new Client(['http_errors' => false, 'timeout' => 30.0, 'proxy' => 'http://' . $workingProxies[array_rand($workingProxies)]]);
+                $client = new Client(['http_errors' => false, 'timeout' => 30.0, 'proxy' => 'http://'.$workingProxies[array_rand($workingProxies)]]);
                 $jikan = new Jikan($client);
 
                 while ($currentLoop <= $pageNumber) {
                     $s_continue = false;
 
                     while (!$s_continue) {
-                        $episodesResponse = $jikan->AnimeEpisodes((int)$malID, $currentLoop)->getEpisodes();
+                        $episodesResponse = $jikan->AnimeEpisodes((int) $malID, $currentLoop)->getEpisodes();
 
                         foreach ($episodesResponse as $episodeItem) {
                             $malItem = MALAnime::query()->updateOrCreate([
-                                'uniqueID' => $item['uniqueID'],
-                                'notifyID' => $item['notifyID'],
-                                'episode_id' => $episodeItem->getEpisodeId()
+                                'uniqueID'   => $item['uniqueID'],
+                                'notifyID'   => $item['notifyID'],
+                                'episode_id' => $episodeItem->getEpisodeId(),
                             ], [
-                                'title' => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
+                                'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
                                 'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
-                                'title_romanji' => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
-                                'aired' => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
-                                'filler' => (int)$episodeItem->isFiller(),
-                                'recap' => (int)$episodeItem->isRecap(),
+                                'title_romanji'  => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
+                                'aired'          => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
+                                'filler'         => (int) $episodeItem->isFiller(),
+                                'recap'          => (int) $episodeItem->isRecap(),
                             ]);
 
                             $malItem->touch();
@@ -138,13 +138,13 @@ class EpisodeCommand extends Command
                 }
 
                 if ($errorDetected) {
-                    $this->error('[-] ' . $errorMessage . ' [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->error('[-] '.$errorMessage.' ['.$remainingCount.'/'.$totalCount.']');
                 } else {
-                    $this->info('[-] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
+                    $this->info('[-] Item Processed ['.$remainingCount.'/'.$totalCount.']');
                 }
             } else {
                 $errorMessage = 'Skipping item. Reason: No MAL binding found.';
-                $this->error('[-] ' . $errorMessage . ' [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] '.$errorMessage.' ['.$remainingCount.'/'.$totalCount.']');
             }
 
             $remainingCount++;
