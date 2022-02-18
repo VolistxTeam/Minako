@@ -78,7 +78,7 @@ class AnimeController extends Controller
                 'width'  => $itemQuery['image_width'],
                 'height' => $itemQuery['image_height'],
                 'format' => 'jpg',
-                'link'   => '',
+                'link'   => env('APP_URL', 'http://localhost').'/anime/' . $itemQuery['uniqueID'] . '/image',
             ],
             'rating' => [
                 'average'    => !empty($itemQuery['rating_overall']) ? round($itemQuery['rating_overall'] * 10, 2) : null,
@@ -402,7 +402,7 @@ class AnimeController extends Controller
                         'width'  => $characterQuery->image_width,
                         'height' => $characterQuery->image_height,
                         'format' => 'jpg',
-                        'link'   => '',
+                        'link'   => env('APP_URL', 'http://localhost').'/character/' . $characterQuery->uniqueID . '/image',
                     ],
                     'attributes' => $characterQuery->attributes,
                     'mappings'   => $filteredMappingData,
