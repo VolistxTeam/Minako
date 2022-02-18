@@ -75,7 +75,7 @@ class CharacterController extends Controller
                 'width'  => $itemQuery->image_width,
                 'height' => $itemQuery->image_height,
                 'format' => 'jpg',
-                'link'   => '',
+                'link'   => env('APP_URL', 'http://localhost').'/character/' . $itemQuery->uniqueID . '/image',
             ],
             'attributes' => $itemQuery->attributes,
             'mappings'   => $filteredMappingData,
