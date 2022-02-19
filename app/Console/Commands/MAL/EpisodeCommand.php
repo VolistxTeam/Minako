@@ -22,11 +22,6 @@ class EpisodeCommand extends Command
         set_time_limit(0);
 
         $workingProxies = [
-            'LmSLqL:ojGsPe@196.16.108.169:8000',
-            'LmSLqL:ojGsPe@196.16.109.102:8000',
-            'LmSLqL:ojGsPe@196.16.109.87:8000',
-            'LmSLqL:ojGsPe@196.16.108.158:8000',
-            'LmSLqL:ojGsPe@196.16.111.180:8000',
             'G2F1v8:UUVYDp@196.17.171.187:8000',
         ];
 
