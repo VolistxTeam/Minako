@@ -22,7 +22,7 @@ class EpisodeCommand extends Command
         set_time_limit(0);
 
         $workingProxies = [
-            'G2F1v8:UUVYDp@196.17.171.187:8000',
+            'sFyHSG:2HVkE6@45.87.241.97:8000',
         ];
 
         $this->info('[!] Getting all anime information...');
