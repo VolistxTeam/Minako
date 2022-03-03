@@ -9,10 +9,11 @@ Minako is an PHP & REST API for anime. Based on Anime Notifier and MAL.
 ### Installation
 Run commands:
 ```
-composer install --ignore-platform-reqs
+composer install
 cp .env.example .env
 php artisan key:generate
 php artisan cloudflare:reload
+php artisan stackpath:reload
 php artisan migrate
 ```
 

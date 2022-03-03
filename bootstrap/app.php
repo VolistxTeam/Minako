@@ -12,16 +12,19 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
+$app->register(Chuckrincon\LumenConfigDiscover\DiscoverServiceProvider::class);
+
 $app->withFacades();
 $app->withEloquent();
 
-$app->register(Chuckrincon\LumenConfigDiscover\DiscoverServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Laravel\Scout\ScoutServiceProvider::class);
 $app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
+$app->register(Cryental\StackPath\TrustedProxyServiceProvider::class);
+$app->register(\Monicahq\Cloudflare\TrustedProxyServiceProvider::class);
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,

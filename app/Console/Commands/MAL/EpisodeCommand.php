@@ -7,7 +7,6 @@ use App\Models\NotifyAnime;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
-use Jikan\Jikan;
 
 class EpisodeCommand extends Command
 {
