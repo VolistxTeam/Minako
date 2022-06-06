@@ -120,6 +120,7 @@ class EpisodeCommand extends Command
                             }
                         } catch (\Exception $e) {
                             $errorDetected = true;
+                            $errorMessage = $e->getMessage();
                         }
 
                         $currentLoop++;
