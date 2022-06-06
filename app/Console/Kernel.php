@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
         Commands\Notify\ThumbnailCommand::class,
         Commands\Ohys\DownloadCommand::class,
         Commands\Ohys\RelationCommand::class,
-        TestCommand::class
+        TestCommand::class,
     ];
 
     /**
