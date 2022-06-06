@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Console\Commands\TestCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 use Monicahq\Cloudflare\Commands\Reload;
@@ -26,7 +25,6 @@ class Kernel extends ConsoleKernel
         Commands\Notify\ThumbnailCommand::class,
         Commands\Ohys\DownloadCommand::class,
         Commands\Ohys\RelationCommand::class,
-        TestCommand::class,
     ];
 
     /**

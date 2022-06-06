@@ -8,7 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
-use Lib16\RSS\Channel;
+use Suin\RSSWriter\Feed;
+use Suin\RSSWriter\Item;
 
 class OhysController extends Controller
 {
@@ -68,24 +69,26 @@ class OhysController extends Controller
     {
         $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->limit(25)->get()->toArray();
 
-        $channel = Channel::create(
-            'Anime Database',
-            'Anime Database RSS',
-            'https://cryental.dev/services/anime'
-        );
+        $feed = new Feed();
+        $channel = new \Suin\RSSWriter\Channel();
+        $channel
+            ->title('Anime Database')
+            ->description('Anime Database RSS Service')
+            ->url('https://cryental.dev/services/anime')
+            ->feedUrl('https://api.minako.moe/ohys/service/rss')
+            ->appendTo($feed);
 
         foreach ($torrentQuery as $torrentItem) {
             $itemDescription = !empty($torrentItem['episode']) ? " - Episode {$torrentItem['episode']}" : '';
-            $channel
-                ->item(
-                    $torrentItem['torrentName'],
-                    "{$torrentItem['title']}{$itemDescription}",
-                    "https://api.minako.moe/ohys/{$torrentItem['uniqueID']}/download?type=torrent"
-                )
-                ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->toDateTime());
+            $item = new Item();
+            $item
+                ->title("{$torrentItem['title']}{$itemDescription}")
+                ->url("https://api.minako.moe/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
+                ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
+                ->appendTo($channel);
         }
 
-        $rssString = (string) $channel;
+        $rssString = $feed->render();
 
         return response($rssString)->withHeaders(['Content-Type' => 'application/rss+xml; charset=utf-8']);
     }

@@ -17,11 +17,11 @@
     "laravel/lumen-framework": "^9.0",
     "laravel/tinker": "^2.7",
     "league/flysystem": "^3.0",
-    "lib16/rss": "^1.1",
     "monicahq/laravel-cloudflare": "^3.2",
     "rennokki/laravel-eloquent-query-cache": "^3.3.0",
     "rogervila/lumen-rate-limiting": "^1.1",
     "staudenmeir/eloquent-has-many-deep": "^1.15",
+    "suin/php-rss-writer": "^1.6",
     "teamtnt/laravel-scout-tntsearch-driver": "^11.6"
   },
   "require-dev": {
