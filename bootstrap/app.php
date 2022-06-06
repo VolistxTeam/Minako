@@ -60,12 +60,12 @@ $app->routeMiddleware([
 ]);
 
 $app->router->group([
-    'namespace' => 'App\Http\Controllers',
+    'namespace'  => 'App\Http\Controllers',
     'middleware' => 'throttle:api',
 ], function ($router) {
     require __DIR__.'/../routes/api.php';
 });
 
-$app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
+$app->instance('path.config', app()->basePath().DIRECTORY_SEPARATOR.'config');
 
 return $app;
