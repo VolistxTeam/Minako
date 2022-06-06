@@ -11,7 +11,7 @@
     "http-interop/http-factory-guzzle": "^1.2",
     "illuminate/redis": "^9.3",
     "intervention/image": "^2.7",
-    "jikan-me/jikan": "^3",
+    "jikan-me/jikan": "^3.0",
     "laravel/lumen-framework": "^9.0",
     "league/flysystem": "^3.0",
     "maxsky/lumen-app-key-generator": "^1.0",

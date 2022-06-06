@@ -7,9 +7,14 @@ use App\Models\NotifyAnime;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Jikan\Exception\BadResponseException;
+use Jikan\Exception\ParserException;
+use Jikan\MyAnimeList\MalClient;
 
 class EpisodeCommand extends Command
 {
+    private $jikan;
+
     protected $signature = 'minako:mal:episodes {--skip=0}';
 
     protected $description = 'Retrieve all episode information from MAL using internal APIs.';
@@ -19,11 +24,6 @@ class EpisodeCommand extends Command
         $this->info('[Debug] Setting Time Limit To 0 (Unlimited)');
 
         set_time_limit(0);
-
-        $workingProxies = [
-            'sFyHSG:2HVkE6@45.87.241.97:8000',
-            'G2F1v8:UUVYDp@196.17.171.187:8000',
-        ];
 
         $this->info('[!] Getting all anime information...');
 
@@ -38,6 +38,8 @@ class EpisodeCommand extends Command
         if (!empty($this->option('skip'))) {
             $skipCount = (int) $this->option('skip');
         }
+
+        $this->jikan = new MalClient();
 
         foreach ($allAnime as $item) {
             $countdownCount++;
@@ -96,30 +98,32 @@ class EpisodeCommand extends Command
                 $errorDetected = false;
                 $errorMessage = '';
 
-                $client = new Client(['http_errors' => false, 'timeout' => 30.0, 'proxy' => 'http://'.$workingProxies[array_rand($workingProxies)]]);
-                $jikan = new Jikan($client);
-
                 while ($currentLoop <= $pageNumber) {
                     $s_continue = false;
 
                     while (!$s_continue) {
-                        $episodesResponse = $jikan->AnimeEpisodes((int) $malID, $currentLoop)->getEpisodes();
+                        try {
+                            $episodesResponse = $this->jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest($malID, $currentLoop));
 
-                        foreach ($episodesResponse as $episodeItem) {
-                            $malItem = MALAnime::query()->updateOrCreate([
-                                'uniqueID'   => $item['uniqueID'],
-                                'notifyID'   => $item['notifyID'],
-                                'episode_id' => $episodeItem->getEpisodeId(),
-                            ], [
-                                'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
-                                'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
-                                'title_romanji'  => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
-                                'aired'          => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
-                                'filler'         => (int) $episodeItem->isFiller(),
-                                'recap'          => (int) $episodeItem->isRecap(),
-                            ]);
+                            foreach ($episodesResponse->getResults() as $episodeItem) {
+                                $malItem = MALAnime::query()->updateOrCreate([
+                                    'uniqueID'   => $item['uniqueID'],
+                                    'notifyID'   => $item['notifyID'],
+                                    'episode_id' => $episodeItem->getEpisodeId(),
+                                ], [
+                                    'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
+                                    'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
+                                    'title_romanji'  => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
+                                    'aired'          => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
+                                    'filler'         => (int) $episodeItem->isFiller(),
+                                    'recap'          => (int) $episodeItem->isRecap(),
+                                ]);
 
-                            $malItem->touch();
+                                $malItem->touch();
+                            }
+
+                        } catch (\Exception $e) {
+                            $errorDetected = true;
                         }
 
                         $currentLoop++;
