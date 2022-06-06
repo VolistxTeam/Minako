@@ -5,10 +5,7 @@ namespace App\Console\Commands\MAL;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
 use Illuminate\Console\Command;
-use Jikan\Exception\BadResponseException;
-use Jikan\Exception\ParserException;
 use Jikan\MyAnimeList\MalClient;
 
 class EpisodeCommand extends Command
@@ -121,7 +118,6 @@ class EpisodeCommand extends Command
 
                                 $malItem->touch();
                             }
-
                         } catch (\Exception $e) {
                             $errorDetected = true;
                         }
