@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Suin\RSSWriter\Channel;
 use Suin\RSSWriter\Feed;
 use Suin\RSSWriter\Item;
 
@@ -67,10 +68,10 @@ class OhysController extends Controller
 
     public function GetRSS()
     {
-        $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->limit(25)->get()->toArray();
+        $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->limit(100)->get()->toArray();
 
         $feed = new Feed();
-        $channel = new \Suin\RSSWriter\Channel();
+        $channel = new Channel();
         $channel
             ->title('Anime Database')
             ->description('Anime Database RSS Service')
