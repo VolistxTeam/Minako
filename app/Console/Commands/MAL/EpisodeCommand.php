@@ -49,7 +49,7 @@ class EpisodeCommand extends Command
 
             if ($countdownCount > 10) {
                 $countdownCount = 0;
-                $this->info('[+] Waiting for 10 seconds...');
+                $this->info('[+] Waiting for 25 seconds...');
                 sleep(25);
             }
 
