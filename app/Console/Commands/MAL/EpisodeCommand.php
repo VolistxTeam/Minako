@@ -109,7 +109,7 @@ class EpisodeCommand extends Command
                                 $malItem = MALAnime::query()->updateOrCreate([
                                     'uniqueID'   => $item['uniqueID'],
                                     'notifyID'   => $item['notifyID'],
-                                    'episode_id' => $episodeItem->getEpisodeId(),
+                                    'episode_id' => $episodeItem->getMalId(),
                                 ], [
                                     'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
                                     'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
