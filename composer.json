@@ -4,20 +4,22 @@
     "ext-curl": "*",
     "ext-json": "*",
     "chuckrincon/lumen-config-discover": "^1.0",
+    "cryental/larasupport": "^1.7",
     "cryental/laravel-stackpath": "^1.0",
-    "cryental/lumen-generator": "^8.2",
     "fakerphp/faker": "^1.19",
     "fideloper/proxy": "^4.4",
+    "flipbox/lumen-generator": "^9.1",
     "hhxsv5/laravel-s": "^3.7",
     "http-interop/http-factory-guzzle": "^1.2",
-    "illuminate/redis": "^9.3",
+    "illuminate/redis": "^9.16",
     "intervention/image": "^2.7",
     "jikan-me/jikan": "^3.0",
     "laravel/lumen-framework": "^9.0",
+    "laravel/tinker": "^2.7",
     "league/flysystem": "^3.0",
-    "maxsky/lumen-app-key-generator": "^1.0",
     "monicahq/laravel-cloudflare": "^3.2",
     "rennokki/laravel-eloquent-query-cache": "^3.3.0",
+    "rogervila/lumen-rate-limiting": "^1.1",
     "staudenmeir/eloquent-has-many-deep": "^1.15",
     "teamtnt/laravel-scout-tntsearch-driver": "^11.6"
   },
@@ -30,9 +32,6 @@
       "App\\": "app/",
       "Database\\Seeders\\": "database/seeders/"
     },
-    "files": [
-      "app/Helpers.php"
-    ],
     "classmap": [
       "app/Classes"
     ]
