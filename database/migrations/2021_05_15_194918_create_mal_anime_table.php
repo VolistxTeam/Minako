@@ -21,7 +21,7 @@ class CreateMalAnimeTable extends Migration
             $table->text('title')->nullable()->index('title');
             $table->text('title_japanese')->nullable()->index('title_japanese');
             $table->text('title_romanji')->nullable()->index('title_romanji');
-            $table->string('aired')->nullable();
+            $table->dateTime('aired')->nullable();
             $table->tinyInteger('filler')->nullable()->default(0);
             $table->tinyInteger('recap')->nullable()->default(0);
             $table->tinyInteger('isHidden')->nullable()->default(0);

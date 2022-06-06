@@ -41,7 +41,7 @@ class MALAnime extends Model
     ];
 
     protected $casts = [
-        'aired'      => 'boolean',
+        'aired'      => 'date:Y-m-d H:i:s',
         'filler'     => 'boolean',
         'recap'      => 'boolean',
         'isHidden'   => 'boolean',
