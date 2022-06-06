@@ -47,10 +47,10 @@ class EpisodeCommand extends Command
                 continue;
             }
 
-            if ($countdownCount > 25) {
+            if ($countdownCount > 10) {
                 $countdownCount = 0;
                 $this->info('[+] Waiting for 10 seconds...');
-                sleep(10);
+                sleep(25);
             }
 
             $allowCrawl = false;
