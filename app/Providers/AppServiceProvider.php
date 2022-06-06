@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         app(RateLimiter::class)->for('api', function () {
-            return Limit::perMinute(500)->by(request()->getClientIp());
+            return Limit::perMinute(200)->by(request()->getClientIp());
         });
 
         $this->app->singleton(\Illuminate\Contracts\Routing\ResponseFactory::class, function () {
