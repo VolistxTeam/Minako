@@ -141,7 +141,7 @@ class AnimeController extends Controller
                 'japanese' => !empty($episodeQuery['title_japanese']) ? trim($episodeQuery['title_japanese'], chr(0xC2).chr(0xA0)) : null,
                 'romaji'   => !empty($episodeQuery['title_romanji']) ? trim($episodeQuery['title_romanji'], chr(0xC2).chr(0xA0)) : null,
             ],
-            'aired'      => $episodeQuery['aired'],
+            'aired'      => (string) $episodeQuery['aired'],
             'created_at' => (string) $episodeQuery['created_at'],
             'updated_at' => (string) $episodeQuery['updated_at'],
         ];
@@ -180,7 +180,7 @@ class AnimeController extends Controller
                     'japanese' => !empty($episodeQuery['title_japanese']) ? trim($episodeQuery['title_japanese'], chr(0xC2).chr(0xA0)) : null,
                     'romaji'   => !empty($episodeQuery['title_romanji']) ? trim($episodeQuery['title_romanji'], chr(0xC2).chr(0xA0)) : null,
                 ],
-                'aired'      => $episodeQuery['aired'],
+                'aired'      => (string) $episodeQuery['aired'],
                 'created_at' => (string) $episodeQuery['created_at'],
                 'updated_at' => (string) $episodeQuery['updated_at'],
             ];

@@ -50,8 +50,8 @@ class NotifyCharacter extends Model
         'attributes'    => 'array',
         'mappings'      => 'array',
         'isHidden'      => 'boolean',
-        'created_at'    => 'date:Y-m-d H:i:s',
-        'updated_at'    => 'date:Y-m-d H:i:s',
+        'created_at'    => 'datetime:Y-m-d H:i:s',
+        'updated_at'    => 'datetime:Y-m-d H:i:s',
     ];
 
     /**

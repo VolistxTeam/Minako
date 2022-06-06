@@ -41,12 +41,12 @@ class MALAnime extends Model
     ];
 
     protected $casts = [
-        'aired'      => 'date:Y-m-d H:i:s',
+        'aired'      => 'datetime:Y-m-d H:i:s',
         'filler'     => 'boolean',
         'recap'      => 'boolean',
         'isHidden'   => 'boolean',
-        'created_at' => 'date:Y-m-d H:i:s',
-        'updated_at' => 'date:Y-m-d H:i:s',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function anime()
