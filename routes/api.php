@@ -50,5 +50,5 @@ $router->group(['prefix' => 'ohys'], function () use ($router) {
     $router->get('/{id}', 'Services\OhysController@GetTorrent');
     $router->get('/{id}/download', 'Services\OhysController@DownloadTorrent');
     $router->get('/search/{name}', 'Services\OhysController@Search');
-    $router->get('/rss', 'Services\OhysController@GetRSS');
+    $router->get('/client/rss', 'Services\OhysController@GetRSS');
 });
