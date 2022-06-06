@@ -25,6 +25,7 @@ $app->register(Laravel\Scout\ScoutServiceProvider::class);
 $app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
 $app->register(Cryental\StackPath\TrustedProxyServiceProvider::class);
 $app->register(\Monicahq\Cloudflare\TrustedProxyServiceProvider::class);
+$app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,

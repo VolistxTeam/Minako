@@ -44,3 +44,30 @@ php artisan scout:import "App\Models\NotifyRelation"
 php artisan scout:import "App\Models\OhysRelation"
 php artisan scout:import "App\Models\OhysTorrent"
 ```
+
+### Swoole Setup
+Run Laravel/Lumen Swoole using this package:
+```
+php bin/laravels start -i
+```
+
+If you want the Swoole server to run after reboot, add the following line to your crontab:
+```
+@reboot php /path/to/bin/laravels start -i
+```
+
+For supervisor, check following configuration:
+```
+[program:minako-api-swoole-worker]
+directory=/var/www/vhosts/minako.moe/api.minako.moe
+command=php81 bin/laravels start -i
+numprocs=1
+autostart=true
+autorestart=true
+startretries=3
+user=minako.moe
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/%(program_name)s.log
+```
+
+Check more information about it at [hhxsv5/laravel-s](https://github.com/hhxsv5/laravel-s)
