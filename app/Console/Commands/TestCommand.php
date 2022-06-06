@@ -2,14 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Classes\AnimeSearch;
-use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
-use DateTime;
 use Illuminate\Console\Command;
 use Lib16\RSS\Channel;
-use Lib16\RSS\RssMarkup;
 
 class TestCommand extends Command
 {
@@ -40,6 +36,7 @@ class TestCommand extends Command
 
         $rssString = (string) $channel;
         var_export($rssString);
+
         return 0;
     }
 }
