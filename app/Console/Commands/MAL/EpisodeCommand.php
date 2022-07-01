@@ -100,7 +100,7 @@ class EpisodeCommand extends Command
 
                     while (!$s_continue) {
                         try {
-                            $episodesResponse = $this->jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest((int)$malID, $currentLoop));
+                            $episodesResponse = $this->jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest((int) $malID, $currentLoop));
 
                             foreach ($episodesResponse->getResults() as $episodeItem) {
                                 $malItem = MALAnime::query()->updateOrCreate([
