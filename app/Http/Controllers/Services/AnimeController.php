@@ -219,7 +219,7 @@ class AnimeController extends Controller
                 }
             }
 
-            if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
+            if (empty($malID)) {
                 return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
             }
 
