@@ -6,7 +6,10 @@ use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Jikan\Exception\BadResponseException;
+use Jikan\Exception\ParserException;
 use Jikan\MyAnimeList\MalClient;
+use Jikan\Request\Anime\AnimeEpisodesRequest;
 
 class EpisodeCommand extends Command
 {
@@ -75,7 +78,7 @@ class EpisodeCommand extends Command
                 continue;
             }
 
-                $malID = '';
+                $malID = null;
 
                 foreach ($item['mappings'] as $value) {
                     if ($value['service'] == 'myanimelist/anime') {
@@ -99,7 +102,7 @@ class EpisodeCommand extends Command
 
                     while (!$s_continue) {
                         try {
-                            $episodesResponse = $this->jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest((int) $malID, $currentLoop));
+                            $episodesResponse = $this->jikan->getAnimeEpisodes(new AnimeEpisodesRequest((int) $malID, $currentLoop));
 
                             foreach ($episodesResponse->getResults() as $episodeItem) {
                                 $malItem = MALAnime::query()->updateOrCreate([
@@ -117,7 +120,7 @@ class EpisodeCommand extends Command
 
                                 $malItem->touch();
                             }
-                        } catch (\Exception $e) {
+                        } catch (BadResponseException|ParserException $e) {
                             $errorDetected = true;
                             $errorMessage = $e->getMessage();
                         }
