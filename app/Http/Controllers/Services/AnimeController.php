@@ -10,6 +10,8 @@ use App\Models\NotifyCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Jikan\Exception\BadResponseException;
+use Jikan\Exception\ParserException;
 use Jikan\MyAnimeList\MalClient;
 
 class AnimeController extends Controller
@@ -210,7 +212,6 @@ class AnimeController extends Controller
             return response('Not supported type: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        if (array_search('myanimelist/anime', array_column($item['mappings'], 'service'))) {
             $malID = '';
 
             foreach ($item['mappings'] as $value) {
@@ -251,7 +252,7 @@ class AnimeController extends Controller
 
                             $malItem->touch();
                         }
-                    } catch (\Exception $e) {
+                    } catch (BadResponseException|ParserException $e) {
                         $errorDetected = true;
                         $errorMessage = $e->getMessage();
                     }
@@ -271,9 +272,6 @@ class AnimeController extends Controller
             } else {
                 return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
             }
-        } else {
-            return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
-        }
     }
 
     public function GetMappings($uniqueID)

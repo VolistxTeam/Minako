@@ -75,7 +75,6 @@ class EpisodeCommand extends Command
                 continue;
             }
 
-            if (array_search('myanimelist/anime', array_column($item['mappings'], 'service'))) {
                 $malID = '';
 
                 foreach ($item['mappings'] as $value) {
@@ -138,10 +137,6 @@ class EpisodeCommand extends Command
                 } else {
                     $this->info('[-] Item Processed ['.$remainingCount.'/'.$totalCount.']');
                 }
-            } else {
-                $errorMessage = 'Skipping item. Reason: No MAL binding found.';
-                $this->error('[-] '.$errorMessage.' ['.$remainingCount.'/'.$totalCount.']');
-            }
 
             $remainingCount++;
         }
