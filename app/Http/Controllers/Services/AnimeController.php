@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
 use App\Models\NotifyCharacterRelation;
@@ -9,6 +10,7 @@ use App\Models\NotifyCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Jikan\MyAnimeList\MalClient;
 
 class AnimeController extends Controller
 {
@@ -196,6 +198,82 @@ class AnimeController extends Controller
         ];
 
         return response()->json($buildResponse);
+    }
+
+    public function SyncEpisodes(Request $request, $uniqueID)
+    {
+        $jikan = new MalClient();
+
+        $item = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+
+        if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
+            return response('Not supported type: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+        }
+
+        if (array_search('myanimelist/anime', array_column($item['mappings'], 'service'))) {
+            $malID = '';
+
+            foreach ($item['mappings'] as $value) {
+                if ($value['service'] == 'myanimelist/anime') {
+                    $malID = $value['serviceId'];
+                }
+            }
+
+            if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
+                return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            }
+
+            $pageNumber = 1;
+            $currentLoop = 1;
+            $errorDetected = false;
+            $errorMessage = '';
+
+            while ($currentLoop <= $pageNumber) {
+                $s_continue = false;
+
+                while (!$s_continue) {
+                    try {
+                        $episodesResponse = $jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest($malID, $currentLoop));
+
+                        foreach ($episodesResponse->getResults() as $episodeItem) {
+                            $malItem = MALAnime::query()->updateOrCreate([
+                                'uniqueID'   => $item['uniqueID'],
+                                'notifyID'   => $item['notifyID'],
+                                'episode_id' => $episodeItem->getMalId(),
+                            ], [
+                                'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
+                                'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
+                                'title_romanji'  => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
+                                'aired'          => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
+                                'filler'         => (int) $episodeItem->isFiller(),
+                                'recap'          => (int) $episodeItem->isRecap(),
+                            ]);
+
+                            $malItem->touch();
+                        }
+                    } catch (\Exception $e) {
+                        $errorDetected = true;
+                        $errorMessage = $e->getMessage();
+                    }
+
+                    $currentLoop++;
+
+                    $s_continue = true;
+                }
+
+                if ($errorDetected) {
+                    break;
+                }
+            }
+
+            if ($errorDetected) {
+                return response('Error occurred: '.$uniqueID, 500)->header('Content-Type', 'text/plain');
+            } else {
+                return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
+            }
+        } else {
+            return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+        }
     }
 
     public function GetMappings($uniqueID)
