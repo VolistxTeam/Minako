@@ -233,7 +233,7 @@ class AnimeController extends Controller
 
                 while (!$s_continue) {
                     try {
-                        $episodesResponse = $jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest($malID, $currentLoop));
+                        $episodesResponse = $jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest((int) $malID, $currentLoop));
 
                         foreach ($episodesResponse->getResults() as $episodeItem) {
                             $malItem = MALAnime::query()->updateOrCreate([
