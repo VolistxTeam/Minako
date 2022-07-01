@@ -212,66 +212,66 @@ class AnimeController extends Controller
             return response('Not supported type: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-            $malID = '';
+        $malID = '';
 
-            foreach ($item['mappings'] as $value) {
-                if ($value['service'] == 'myanimelist/anime') {
-                    $malID = $value['serviceId'];
-                }
+        foreach ($item['mappings'] as $value) {
+            if ($value['service'] == 'myanimelist/anime') {
+                $malID = $value['serviceId'];
             }
+        }
 
-            if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
-                return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
-            }
+        if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
+            return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+        }
 
-            $pageNumber = 1;
-            $currentLoop = 1;
-            $errorDetected = false;
-            $errorMessage = '';
+        $pageNumber = 1;
+        $currentLoop = 1;
+        $errorDetected = false;
+        $errorMessage = '';
 
-            while ($currentLoop <= $pageNumber) {
-                $s_continue = false;
+        while ($currentLoop <= $pageNumber) {
+            $s_continue = false;
 
-                while (!$s_continue) {
-                    try {
-                        $episodesResponse = $jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest((int) $malID, $currentLoop));
+            while (!$s_continue) {
+                try {
+                    $episodesResponse = $jikan->getAnimeEpisodes(new \Jikan\Request\Anime\AnimeEpisodesRequest((int) $malID, $currentLoop));
 
-                        foreach ($episodesResponse->getResults() as $episodeItem) {
-                            $malItem = MALAnime::query()->updateOrCreate([
-                                'uniqueID'   => $item['uniqueID'],
-                                'notifyID'   => $item['notifyID'],
-                                'episode_id' => $episodeItem->getMalId(),
-                            ], [
-                                'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
-                                'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
-                                'title_romanji'  => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
-                                'aired'          => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
-                                'filler'         => (int) $episodeItem->isFiller(),
-                                'recap'          => (int) $episodeItem->isRecap(),
-                            ]);
+                    foreach ($episodesResponse->getResults() as $episodeItem) {
+                        $malItem = MALAnime::query()->updateOrCreate([
+                            'uniqueID'   => $item['uniqueID'],
+                            'notifyID'   => $item['notifyID'],
+                            'episode_id' => $episodeItem->getMalId(),
+                        ], [
+                            'title'          => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
+                            'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
+                            'title_romanji'  => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
+                            'aired'          => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
+                            'filler'         => (int) $episodeItem->isFiller(),
+                            'recap'          => (int) $episodeItem->isRecap(),
+                        ]);
 
-                            $malItem->touch();
-                        }
-                    } catch (BadResponseException|ParserException $e) {
-                        $errorDetected = true;
-                        $errorMessage = $e->getMessage();
+                        $malItem->touch();
                     }
-
-                    $currentLoop++;
-
-                    $s_continue = true;
+                } catch (BadResponseException|ParserException $e) {
+                    $errorDetected = true;
+                    $errorMessage = $e->getMessage();
                 }
 
-                if ($errorDetected) {
-                    break;
-                }
+                $currentLoop++;
+
+                $s_continue = true;
             }
 
             if ($errorDetected) {
-                return response('Error occurred: '.$uniqueID, 500)->header('Content-Type', 'text/plain');
-            } else {
-                return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
+                break;
             }
+        }
+
+        if ($errorDetected) {
+            return response('Error occurred: '.$uniqueID, 500)->header('Content-Type', 'text/plain');
+        } else {
+            return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
+        }
     }
 
     public function GetMappings($uniqueID)
