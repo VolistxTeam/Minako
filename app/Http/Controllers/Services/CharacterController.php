@@ -12,7 +12,15 @@ class CharacterController extends Controller
     {
         $name = urldecode($name);
 
-        $searchQuery = NotifyCharacter::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
+        $name = $this->escapeElasticReservedChars($name);
+
+        $searchQuery = NotifyCharacter::query()
+            ->where('name_canonical', 'LIKE', "%$name%")
+            ->orWhere('name_english', 'LIKE', "%$name%")
+            ->orWhere('name_japanese', 'LIKE', "%$name%")
+            ->orWhereJsonContains('name_synonyms', $name)
+            ->take(100)
+            ->paginate(50, ['*'], 'page', 1);
 
         $buildResponse = [];
 
@@ -29,7 +37,7 @@ class CharacterController extends Controller
 
     public function GetImage($id)
     {
-        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
@@ -48,7 +56,7 @@ class CharacterController extends Controller
 
     public function GetCharacter($id)
     {
-        $itemQuery = NotifyCharacter::query()->latest()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Character not found: '.$id, 404)->header('Content-Type', 'text/plain');
@@ -56,10 +64,10 @@ class CharacterController extends Controller
 
         $filteredMappingData = [];
 
-        array_push($filteredMappingData, ['service' => 'notify/character', 'service_id' => (string) $itemQuery->notifyID]);
+        $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string)$itemQuery->notifyID];
 
         foreach ($itemQuery->mappings as $item) {
-            array_push($filteredMappingData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
+            $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
         }
 
         $buildResponse = [

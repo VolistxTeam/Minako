@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\Models\MALAnime;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -18,19 +19,14 @@ class OhysController extends Controller
     {
         $name = urldecode($name);
 
-        $torrentQuery = OhysTorrent::search($name)->paginate(50, 'p');
+        $torrentQuery = OhysTorrent::query()
+            ->where('title', 'LIKE', "%$name%")
+            ->orWhere('torrentName', 'LIKE', "%$name%")
+            ->paginate(50, ['*'], 'page', 1);
 
         $itemsFiltered = [];
 
         foreach ($torrentQuery->items() as $torrent) {
-            $announcesRebuild = [];
-
-            foreach ($torrent['info_torrent_announces'] as $item) {
-                if (count($item) > 0) {
-                    $announcesRebuild[] = $item[0];
-                }
-            }
-
             $itemsFiltered[] = [
                 'id'            => $torrent['uniqueID'],
                 'release_group' => $torrent['releaseGroup'],
@@ -68,7 +64,7 @@ class OhysController extends Controller
 
     public function GetRSS()
     {
-        $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->limit(100)->get()->toArray();
+        $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->limit(100)->get()->toArray();
 
         $feed = new Feed();
         $channel = new Channel();
@@ -96,19 +92,11 @@ class OhysController extends Controller
 
     public function GetRecentTorrents()
     {
-        $torrentQuery = OhysTorrent::query()->latest()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
+        $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
 
         $itemsFiltered = [];
 
         foreach ($torrentQuery->items() as $torrent) {
-            $announcesRebuild = [];
-
-            foreach ($torrent['info_torrent_announces'] as $item) {
-                if (count($item) > 0) {
-                    $announcesRebuild[] = $item[0];
-                }
-            }
-
             $itemsFiltered[] = [
                 'id'            => $torrent['uniqueID'],
                 'release_group' => $torrent['releaseGroup'],
@@ -146,7 +134,7 @@ class OhysController extends Controller
 
     public function GetTorrent($id)
     {
-        $torrentQuery = OhysTorrent::query()->latest()->where('uniqueID', $id)->first();
+        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
             return response('Torrent not found: '.$id, 404)->header('Content-Type', 'text/plain');
@@ -200,7 +188,7 @@ class OhysController extends Controller
 
     public function DownloadTorrent(Request $request, $id)
     {
-        $torrentQuery = OhysTorrent::query()->latest()->where('uniqueID', $id)->first();
+        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
             return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');

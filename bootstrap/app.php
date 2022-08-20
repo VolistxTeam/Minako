@@ -32,8 +32,6 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
 // Additional libraries
-$app->register(Laravel\Scout\ScoutServiceProvider::class);
-$app->register(TeamTNT\Scout\TNTSearchScoutServiceProvider::class);
 $app->register(Cryental\StackPath\TrustedProxyServiceProvider::class);
 $app->register(\Monicahq\Cloudflare\TrustedProxyServiceProvider::class);
 $app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
@@ -53,6 +51,7 @@ $app->configure('app');
 
 $app->middleware([
     App\Http\Middleware\TrustProxies::class,
+    App\Http\Middleware\CorsMiddleware::class,
 ]);
 
 $app->routeMiddleware([

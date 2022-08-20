@@ -19,8 +19,8 @@ $router->group(['prefix' => 'anime'], function () use ($router) {
     $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
     $router->get('/{uniqueID}/image', 'Services\AnimeController@GetImage');
     $router->get('/{uniqueID}/episodes/{episodeNumber}', 'Services\AnimeController@GetEpisode');
+    $router->get('/{uniqueID}/sync', 'Services\AnimeController@SyncEpisodes');
     $router->get('/{uniqueID}/episodes', 'Services\AnimeController@GetEpisodes');
-    $router->get('/{uniqueID}/sync/episodes', 'Services\AnimeController@SyncEpisodes');
     $router->get('/{uniqueID}/mappings', 'Services\AnimeController@GetMappings');
     $router->get('/{uniqueID}/studios', 'Services\AnimeController@GetStudios');
     $router->get('/{uniqueID}/producers', 'Services\AnimeController@GetProducers');

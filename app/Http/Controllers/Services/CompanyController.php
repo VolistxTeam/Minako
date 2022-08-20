@@ -10,7 +10,14 @@ class CompanyController extends Controller
     {
         $name = urldecode($name);
 
-        $searchQuery = NotifyCompany::search($this->escapeElasticReservedChars($name))->paginate(50, 'page', 1);
+        $name = $this->escapeElasticReservedChars($name);
+
+        $searchQuery = NotifyCompany::query()
+            ->where('name_english', 'LIKE', "%$name%")
+            ->orWhere('name_japanese', 'LIKE', "%$name%")
+            ->orWhereJsonContains('name_synonyms', $name)
+            ->take(100)
+            ->paginate(50, ['*'], 'page', 1);
 
         $buildResponse = [];
 
@@ -27,7 +34,7 @@ class CompanyController extends Controller
 
     public function GetCompany($id)
     {
-        $itemQuery = NotifyCompany::query()->latest()->where('uniqueID', $id)->first();
+        $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
 
         if (empty($itemQuery)) {
             return response('Company not found: '.$id, 404)->header('Content-Type', 'text/plain');

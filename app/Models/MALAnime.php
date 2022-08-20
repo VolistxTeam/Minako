@@ -4,17 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class MALAnime extends Model
 {
     use HasFactory;
-    use Searchable;
-    use QueryCacheable;
 
-    protected static $flushCacheOnUpdate = true; // cache time, in seconds
-    public $cacheFor = 3600;
     /**
      * Indicates if the model should be timestamped.
      *
@@ -52,22 +46,5 @@ class MALAnime extends Model
     public function anime()
     {
         return $this->belongsTo(NotifyAnime::class, 'uniqueID');
-    }
-
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray()
-    {
-        return [
-            'id'             => $this->id,
-            'uniqueID'       => $this->uniqueID,
-            'title'          => $this->title,
-            'title_japanese' => $this->title_japanese,
-            'title_romanji'  => $this->title_romanji,
-            'episode_id'     => $this->episode_id,
-        ];
     }
 }

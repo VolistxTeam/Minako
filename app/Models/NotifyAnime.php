@@ -4,19 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class NotifyAnime extends Model
 {
     use HasFactory;
-    use Searchable;
     use HasRelationships;
-    use QueryCacheable;
 
-    protected static $flushCacheOnUpdate = true; // cache time, in seconds
-    public $cacheFor = 3600;
     /**
      * Indicates if the model should be timestamped.
      *
@@ -101,24 +95,5 @@ class NotifyAnime extends Model
     public function characters()
     {
         return $this->hasMany(NotifyCharacterRelation::class, 'uniqueID', 'uniqueID');
-    }
-
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray()
-    {
-        return [
-            'id'              => $this->id,
-            'uniqueID'        => $this->uniqueID,
-            'title_canonical' => $this->title_canonical,
-            'title_romaji'    => $this->title_romaji,
-            'title_english'   => $this->title_english,
-            'title_japanese'  => $this->title_japanese,
-            'title_hiragana'  => $this->title_hiragana,
-            'title_synonyms'  => empty($this->title_synonyms) ? '' : implode('|', $this->title_synonyms),
-        ];
     }
 }

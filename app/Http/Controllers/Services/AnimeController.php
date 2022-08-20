@@ -22,9 +22,30 @@ class AnimeController extends Controller
 
         $name = urldecode($name);
 
-        $searchQuery = empty($requestType)
-            ? NotifyAnime::search($this->escapeElasticReservedChars($name))->take(100)->paginate(50, 'page', 1)
-            : NotifyAnime::search($this->escapeElasticReservedChars($name))->take(100)->where('type', strtolower($requestType))->paginate(50, 'page', 1);
+        $name = $this->escapeElasticReservedChars($name);
+
+        if (empty($requestType)) {
+            $searchQuery = NotifyAnime::query()
+                ->where('title_canonical', 'LIKE', "%$name%")
+                ->orWhere('title_romaji', 'LIKE', "%$name%")
+                ->orWhere('title_english', 'LIKE', "%$name%")
+                ->orWhere('title_japanese', 'LIKE', "%$name%")
+                ->orWhere('title_hiragana', 'LIKE', "%$name%")
+                ->orWhereJsonContains('title_synonyms', $name)
+                ->take(100)
+                ->paginate(50, ['*'], 'page', 1);
+        } else {
+            $searchQuery = NotifyAnime::query()
+                ->where('type', strtolower($requestType))
+                ->where('title_canonical', 'LIKE', "%$name%")
+                ->orWhere('title_romaji', 'LIKE', "%$name%")
+                ->orWhere('title_english', 'LIKE', "%$name%")
+                ->orWhere('title_japanese', 'LIKE', "%$name%")
+                ->orWhere('title_hiragana', 'LIKE', "%$name%")
+                ->orWhereJsonContains('title_synonyms', $name)
+                ->take(100)
+                ->paginate(50, ['*'], 'page', 1);
+        }
 
         $buildResponse = [];
 
@@ -42,7 +63,7 @@ class AnimeController extends Controller
 
     public function GetItem($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -50,16 +71,16 @@ class AnimeController extends Controller
 
         $filteredMappingData = [];
 
-        array_push($filteredMappingData, ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID]);
+        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string)$itemQuery->notifyID];
 
         foreach ($itemQuery->mappings as $item) {
-            array_push($filteredMappingData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
+            $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
         }
 
         $filteredTrailersData = [];
 
         foreach ($itemQuery->trailers as $item) {
-            array_push($filteredTrailersData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
+            $filteredTrailersData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
         }
 
         $buildResponse = [
@@ -106,7 +127,7 @@ class AnimeController extends Controller
 
     public function GetImage($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -161,7 +182,7 @@ class AnimeController extends Controller
             $paginateNumber = 1;
         }
 
-        $searchQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $searchQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($searchQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -206,7 +227,7 @@ class AnimeController extends Controller
     {
         $jikan = new MalClient();
 
-        $item = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $item = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
             return response('Not supported type: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -276,7 +297,7 @@ class AnimeController extends Controller
 
     public function GetMappings($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -284,10 +305,10 @@ class AnimeController extends Controller
 
         $filteredMappingData = [];
 
-        array_push($filteredMappingData, ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID]);
+        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string)$itemQuery->notifyID];
 
         foreach ($itemQuery->mappings as $item) {
-            array_push($filteredMappingData, ['service' => $item['service'], 'service_id' => $item['serviceId']]);
+            $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
         }
 
         $buildResponse = [
@@ -300,7 +321,7 @@ class AnimeController extends Controller
 
     public function GetStudios($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -309,22 +330,22 @@ class AnimeController extends Controller
         $filteredStudioData = [];
 
         foreach ($itemQuery->studios as $item) {
-            $studioQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
+            $studioQuery = NotifyCompany::query()->where('notifyID', $item)->first();
 
             if (!empty($studioQuery)) {
-                array_push($filteredStudioData, [
-                    'id'    => $studioQuery->uniqueID,
+                $filteredStudioData[] = [
+                    'id' => $studioQuery->uniqueID,
                     'names' => [
-                        'english'  => $studioQuery->name_english,
+                        'english' => $studioQuery->name_english,
                         'japanese' => $studioQuery->name_japanese,
                         'synonyms' => $studioQuery->name_synonyms,
                     ],
                     'description' => $studioQuery->description,
-                    'email'       => $studioQuery->email,
-                    'links'       => $studioQuery->links,
-                    'created_at'  => (string) $studioQuery->created_at,
-                    'updated_at'  => (string) $studioQuery->updated_at,
-                ]);
+                    'email' => $studioQuery->email,
+                    'links' => $studioQuery->links,
+                    'created_at' => (string)$studioQuery->created_at,
+                    'updated_at' => (string)$studioQuery->updated_at,
+                ];
             }
         }
 
@@ -338,7 +359,7 @@ class AnimeController extends Controller
 
     public function GetProducers($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -350,19 +371,19 @@ class AnimeController extends Controller
             $producerQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
 
             if (!empty($producerQuery)) {
-                array_push($filteredProducerData, [
-                    'id'    => $producerQuery->uniqueID,
+                $filteredProducerData[] = [
+                    'id' => $producerQuery->uniqueID,
                     'names' => [
-                        'english'  => $producerQuery->name_english,
+                        'english' => $producerQuery->name_english,
                         'japanese' => $producerQuery->name_japanese,
                         'synonyms' => $producerQuery->name_synonyms,
                     ],
                     'description' => $producerQuery->description,
-                    'email'       => $producerQuery->email,
-                    'links'       => $producerQuery->links,
-                    'created_at'  => (string) $producerQuery->created_at,
-                    'updated_at'  => (string) $producerQuery->updated_at,
-                ]);
+                    'email' => $producerQuery->email,
+                    'links' => $producerQuery->links,
+                    'created_at' => (string)$producerQuery->created_at,
+                    'updated_at' => (string)$producerQuery->updated_at,
+                ];
             }
         }
 
@@ -376,7 +397,7 @@ class AnimeController extends Controller
 
     public function GetLicensors($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -386,22 +407,22 @@ class AnimeController extends Controller
 
         if (!empty($itemQuery->licensors)) {
             foreach ($itemQuery->licensors as $item) {
-                $licensorQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
+                $licensorQuery = NotifyCompany::query()->where('notifyID', $item)->first();
 
                 if (!empty($licensorQuery)) {
-                    array_push($filteredLicensorData, [
-                        'id'    => $licensorQuery->uniqueID,
+                    $filteredLicensorData[] = [
+                        'id' => $licensorQuery->uniqueID,
                         'names' => [
-                            'english'  => $licensorQuery->name_english,
+                            'english' => $licensorQuery->name_english,
                             'japanese' => $licensorQuery->name_japanese,
                             'synonyms' => $licensorQuery->name_synonyms,
                         ],
                         'description' => $licensorQuery->description,
-                        'email'       => $licensorQuery->email,
-                        'links'       => $licensorQuery->links,
-                        'created_at'  => (string) $licensorQuery->created_at,
-                        'updated_at'  => (string) $licensorQuery->updated_at,
-                    ]);
+                        'email' => $licensorQuery->email,
+                        'links' => $licensorQuery->links,
+                        'created_at' => (string)$licensorQuery->created_at,
+                        'updated_at' => (string)$licensorQuery->updated_at,
+                    ];
                 }
             }
         }
@@ -416,7 +437,7 @@ class AnimeController extends Controller
 
     public function GetRelations($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -428,10 +449,10 @@ class AnimeController extends Controller
 
         if (!empty($itemArray) && !empty($itemArray['items'])) {
             foreach ($itemArray['items'] as $item) {
-                array_push($filteredRelationData, [
-                    'id'   => $item['uniqueID'],
+                $filteredRelationData[] = [
+                    'id' => $item['uniqueID'],
                     'type' => $item['type'],
-                ]);
+                ];
             }
         }
 
@@ -445,7 +466,7 @@ class AnimeController extends Controller
 
     public function GetCharacters($uniqueID)
     {
-        $characterRelationQuery = NotifyCharacterRelation::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $characterRelationQuery = NotifyCharacterRelation::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($characterRelationQuery)) {
             return response('Character not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -459,10 +480,10 @@ class AnimeController extends Controller
             if (!empty($characterQuery)) {
                 $filteredMappingData = [];
 
-                array_push($filteredMappingData, ['service' => 'notify/character', 'service_id' => (string) $characterRelationQuery->notifyID]);
+                $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string)$characterRelationQuery->notifyID];
 
                 foreach ($characterQuery->mappings as $item2) {
-                    array_push($filteredMappingData, ['service' => $item2['service'], 'service_id' => $item2['serviceId']]);
+                    $filteredMappingData[] = ['service' => $item2['service'], 'service_id' => $item2['serviceId']];
                 }
 
                 $filteredCharacterData[] = [
