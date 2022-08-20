@@ -64,7 +64,7 @@ class CharacterController extends Controller
 
         $filteredMappingData = [];
 
-        $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string)$itemQuery->notifyID];
+        $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string) $itemQuery->notifyID];
 
         foreach ($itemQuery->mappings as $item) {
             $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
