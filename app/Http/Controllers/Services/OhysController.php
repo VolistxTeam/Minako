@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Services;
 
-use App\Models\MALAnime;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;

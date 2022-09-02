@@ -71,7 +71,7 @@ class AnimeController extends Controller
 
         $filteredMappingData = [];
 
-        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string)$itemQuery->notifyID];
+        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID];
 
         foreach ($itemQuery->mappings as $item) {
             $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
@@ -305,7 +305,7 @@ class AnimeController extends Controller
 
         $filteredMappingData = [];
 
-        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string)$itemQuery->notifyID];
+        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID];
 
         foreach ($itemQuery->mappings as $item) {
             $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
@@ -334,17 +334,17 @@ class AnimeController extends Controller
 
             if (!empty($studioQuery)) {
                 $filteredStudioData[] = [
-                    'id' => $studioQuery->uniqueID,
+                    'id'    => $studioQuery->uniqueID,
                     'names' => [
-                        'english' => $studioQuery->name_english,
+                        'english'  => $studioQuery->name_english,
                         'japanese' => $studioQuery->name_japanese,
                         'synonyms' => $studioQuery->name_synonyms,
                     ],
                     'description' => $studioQuery->description,
-                    'email' => $studioQuery->email,
-                    'links' => $studioQuery->links,
-                    'created_at' => (string)$studioQuery->created_at,
-                    'updated_at' => (string)$studioQuery->updated_at,
+                    'email'       => $studioQuery->email,
+                    'links'       => $studioQuery->links,
+                    'created_at'  => (string) $studioQuery->created_at,
+                    'updated_at'  => (string) $studioQuery->updated_at,
                 ];
             }
         }
@@ -372,17 +372,17 @@ class AnimeController extends Controller
 
             if (!empty($producerQuery)) {
                 $filteredProducerData[] = [
-                    'id' => $producerQuery->uniqueID,
+                    'id'    => $producerQuery->uniqueID,
                     'names' => [
-                        'english' => $producerQuery->name_english,
+                        'english'  => $producerQuery->name_english,
                         'japanese' => $producerQuery->name_japanese,
                         'synonyms' => $producerQuery->name_synonyms,
                     ],
                     'description' => $producerQuery->description,
-                    'email' => $producerQuery->email,
-                    'links' => $producerQuery->links,
-                    'created_at' => (string)$producerQuery->created_at,
-                    'updated_at' => (string)$producerQuery->updated_at,
+                    'email'       => $producerQuery->email,
+                    'links'       => $producerQuery->links,
+                    'created_at'  => (string) $producerQuery->created_at,
+                    'updated_at'  => (string) $producerQuery->updated_at,
                 ];
             }
         }
@@ -411,17 +411,17 @@ class AnimeController extends Controller
 
                 if (!empty($licensorQuery)) {
                     $filteredLicensorData[] = [
-                        'id' => $licensorQuery->uniqueID,
+                        'id'    => $licensorQuery->uniqueID,
                         'names' => [
-                            'english' => $licensorQuery->name_english,
+                            'english'  => $licensorQuery->name_english,
                             'japanese' => $licensorQuery->name_japanese,
                             'synonyms' => $licensorQuery->name_synonyms,
                         ],
                         'description' => $licensorQuery->description,
-                        'email' => $licensorQuery->email,
-                        'links' => $licensorQuery->links,
-                        'created_at' => (string)$licensorQuery->created_at,
-                        'updated_at' => (string)$licensorQuery->updated_at,
+                        'email'       => $licensorQuery->email,
+                        'links'       => $licensorQuery->links,
+                        'created_at'  => (string) $licensorQuery->created_at,
+                        'updated_at'  => (string) $licensorQuery->updated_at,
                     ];
                 }
             }
@@ -450,7 +450,7 @@ class AnimeController extends Controller
         if (!empty($itemArray) && !empty($itemArray['items'])) {
             foreach ($itemArray['items'] as $item) {
                 $filteredRelationData[] = [
-                    'id' => $item['uniqueID'],
+                    'id'   => $item['uniqueID'],
                     'type' => $item['type'],
                 ];
             }
@@ -480,7 +480,7 @@ class AnimeController extends Controller
             if (!empty($characterQuery)) {
                 $filteredMappingData = [];
 
-                $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string)$characterRelationQuery->notifyID];
+                $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string) $characterRelationQuery->notifyID];
 
                 foreach ($characterQuery->mappings as $item2) {
                     $filteredMappingData[] = ['service' => $item2['service'], 'service_id' => $item2['serviceId']];
