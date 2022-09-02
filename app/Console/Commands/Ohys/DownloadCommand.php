@@ -2,9 +2,7 @@
 
 namespace App\Console\Commands\Ohys;
 
-use App\Classes\AnimeSearch;
 use App\Classes\Torrent;
-use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
 use Faker\Factory;
 use GuzzleHttp\Client;
@@ -22,7 +20,6 @@ class DownloadCommand extends Command
         set_time_limit(0);
 
         $faker = Factory::create();
-        $animeSearchEngine = new AnimeSearch();
 
         $headers = [
             'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -128,18 +125,6 @@ class DownloadCommand extends Command
                         Storage::disk('local')->put('torrents/'.$file['t'], file_get_contents($fpPath));
                         unlink($fpPath);
                     }
-                }
-
-                $searchArray = $animeSearchEngine->SearchByTitle($title, 1);
-
-                if (!empty($searchArray)) {
-                    $anime_uniqueID = $searchArray[0]->obj['uniqueID'];
-
-                    OhysRelation::query()->updateOrCreate([
-                        'uniqueID' => $itemID,
-                    ], [
-                        'matchingID' => $anime_uniqueID,
-                    ]);
                 }
 
                 $this->info('[Debug] Done: '.$file['t']);
