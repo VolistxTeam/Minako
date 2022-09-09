@@ -41,7 +41,6 @@ class Kernel extends ConsoleKernel
         set_time_limit(0);
 
         $schedule->command('minako:ohys:download')->hourly()->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:ohys:relation')->everyThreeHours()->runInBackground()->withoutOverlapping(5000);
 
         $schedule->command('minako:notify:anime')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
         $schedule->command('minako:notify:characters')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
