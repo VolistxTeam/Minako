@@ -15,7 +15,6 @@ use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Laravel\Lumen\Http\Redirector;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -60,7 +59,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-
         if ($exception instanceof MethodNotAllowedHttpException) {
             return response('', 405);
         }
@@ -69,10 +67,10 @@ class Handler extends ExceptionHandler
             return response('', 429);
         }
 
-        $whoops = new \Whoops\Run;
+        $whoops = new \Whoops\Run();
         $whoops->allowQuit(false);
         $whoops->writeToOutput(false);
-        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
         $html = $whoops->handleException($exception);
 
         return response($html);
