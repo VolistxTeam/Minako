@@ -74,10 +74,10 @@ class Handler extends ExceptionHandler
             return response('', 429);
         }
 
-        $whoops = new Run;
+        $whoops = new Run();
         $whoops->allowQuit(false);
         $whoops->writeToOutput(false);
-        $whoops->pushHandler(new PrettyPageHandler);
+        $whoops->pushHandler(new PrettyPageHandler());
         $html = $whoops->handleException($exception);
 
         return response($html);
