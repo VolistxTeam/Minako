@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Laravel\Lumen\Http\Redirector;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+use Whoops\Handler\JsonResponseHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 
@@ -31,7 +33,7 @@ class Handler extends ExceptionHandler
         AuthorizationException::class,
         HttpException::class,
         ModelNotFoundException::class,
-        ValidationException::class,
+        ValidationException::class
     ];
 
     /**
@@ -74,12 +76,16 @@ class Handler extends ExceptionHandler
             return response('', 429);
         }
 
-        $whoops = new Run();
-        $whoops->allowQuit(false);
-        $whoops->writeToOutput(false);
-        $whoops->pushHandler(new PrettyPageHandler());
-        $html = $whoops->handleException($exception);
+        if (config('app.debug', false)) {
+            $whoops = new Run;
+            $whoops->allowQuit(false);
+            $whoops->writeToOutput(false);
+            $whoops->pushHandler(new PrettyPageHandler());
+            $html = $whoops->handleException($exception);
 
-        return response($html);
+            return response($html, 500);
+        } else {
+            return response(File::get(resource_path('views/error.html')), 500)->header('Content-Type', 'text/html');
+        }
     }
 }
