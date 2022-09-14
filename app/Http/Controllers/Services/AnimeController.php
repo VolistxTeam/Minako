@@ -73,14 +73,18 @@ class AnimeController extends Controller
 
         $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID];
 
-        foreach ($itemQuery->mappings as $item) {
-            $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+        if (is_array($itemQuery->mappings)) {
+            foreach ($itemQuery->mappings as $item) {
+                $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+            }
         }
 
         $filteredTrailersData = [];
 
-        foreach ($itemQuery->trailers as $item) {
-            $filteredTrailersData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+        if (is_array($itemQuery->trailers)) {
+            foreach ($itemQuery->trailers as $item) {
+                $filteredTrailersData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+            }
         }
 
         $buildResponse = [
@@ -103,7 +107,7 @@ class AnimeController extends Controller
                 'width'  => $itemQuery['image_width'],
                 'height' => $itemQuery['image_height'],
                 'format' => 'jpg',
-                'link'   => env('APP_URL', 'http://localhost').'/anime/'.$itemQuery['uniqueID'].'/image',
+                'link'   => config('APP_URL', 'http://localhost').'/anime/'.$itemQuery['uniqueID'].'/image',
             ],
             'rating' => [
                 'average'    => !empty($itemQuery['rating_overall']) ? round($itemQuery['rating_overall'] * 10, 2) : null,
@@ -307,8 +311,10 @@ class AnimeController extends Controller
 
         $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID];
 
-        foreach ($itemQuery->mappings as $item) {
-            $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+        if (is_array($itemQuery->mappings)) {
+            foreach ($itemQuery->mappings as $item) {
+                $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+            }
         }
 
         $buildResponse = [
@@ -367,23 +373,25 @@ class AnimeController extends Controller
 
         $filteredProducerData = [];
 
-        foreach ($itemQuery->producers as $item) {
-            $producerQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
+        if (is_array($itemQuery->producers)) {
+            foreach ($itemQuery->producers as $item) {
+                $producerQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
 
-            if (!empty($producerQuery)) {
-                $filteredProducerData[] = [
-                    'id'    => $producerQuery->uniqueID,
-                    'names' => [
-                        'english'  => $producerQuery->name_english,
-                        'japanese' => $producerQuery->name_japanese,
-                        'synonyms' => $producerQuery->name_synonyms,
-                    ],
-                    'description' => $producerQuery->description,
-                    'email'       => $producerQuery->email,
-                    'links'       => $producerQuery->links,
-                    'created_at'  => (string) $producerQuery->created_at,
-                    'updated_at'  => (string) $producerQuery->updated_at,
-                ];
+                if (!empty($producerQuery)) {
+                    $filteredProducerData[] = [
+                        'id'    => $producerQuery->uniqueID,
+                        'names' => [
+                            'english'  => $producerQuery->name_english,
+                            'japanese' => $producerQuery->name_japanese,
+                            'synonyms' => $producerQuery->name_synonyms,
+                        ],
+                        'description' => $producerQuery->description,
+                        'email'       => $producerQuery->email,
+                        'links'       => $producerQuery->links,
+                        'created_at'  => (string) $producerQuery->created_at,
+                        'updated_at'  => (string) $producerQuery->updated_at,
+                    ];
+                }
             }
         }
 
@@ -474,38 +482,40 @@ class AnimeController extends Controller
 
         $filteredCharacterData = [];
 
-        foreach ($characterRelationQuery->items as $item) {
-            $characterQuery = NotifyCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
+        if (is_array($characterRelationQuery->items)) {
+            foreach ($characterRelationQuery->items as $item) {
+                $characterQuery = NotifyCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
 
-            if (!empty($characterQuery)) {
-                $filteredMappingData = [];
+                if (!empty($characterQuery)) {
+                    $filteredMappingData = [];
 
-                $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string) $characterRelationQuery->notifyID];
+                    $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string) $characterRelationQuery->notifyID];
 
-                foreach ($characterQuery->mappings as $item2) {
-                    $filteredMappingData[] = ['service' => $item2['service'], 'service_id' => $item2['serviceId']];
+                    foreach ($characterQuery->mappings as $item2) {
+                        $filteredMappingData[] = ['service' => $item2['service'], 'service_id' => $item2['serviceId']];
+                    }
+
+                    $filteredCharacterData[] = [
+                        'id'    => $characterQuery->uniqueID,
+                        'names' => [
+                            'canonical' => $characterQuery->name_canonical,
+                            'english'   => $characterQuery->name_english,
+                            'japanese'  => $characterQuery->name_japanese,
+                            'synonyms'  => $characterQuery->name_synonyms,
+                        ],
+                        'description' => $characterQuery->description,
+                        'image'       => [
+                            'width'  => $characterQuery->image_width,
+                            'height' => $characterQuery->image_height,
+                            'format' => 'jpg',
+                            'link'   => config('APP_URL', 'http://localhost').'/character/'.$characterQuery->uniqueID.'/image',
+                        ],
+                        'attributes' => $characterQuery->attributes,
+                        'mappings'   => $filteredMappingData,
+                        'created_at' => (string) $characterQuery->created_at,
+                        'updated_at' => (string) $characterQuery->updated_at,
+                    ];
                 }
-
-                $filteredCharacterData[] = [
-                    'id'    => $characterQuery->uniqueID,
-                    'names' => [
-                        'canonical' => $characterQuery->name_canonical,
-                        'english'   => $characterQuery->name_english,
-                        'japanese'  => $characterQuery->name_japanese,
-                        'synonyms'  => $characterQuery->name_synonyms,
-                    ],
-                    'description' => $characterQuery->description,
-                    'image'       => [
-                        'width'  => $characterQuery->image_width,
-                        'height' => $characterQuery->image_height,
-                        'format' => 'jpg',
-                        'link'   => env('APP_URL', 'http://localhost').'/character/'.$characterQuery->uniqueID.'/image',
-                    ],
-                    'attributes' => $characterQuery->attributes,
-                    'mappings'   => $filteredMappingData,
-                    'created_at' => (string) $characterQuery->created_at,
-                    'updated_at' => (string) $characterQuery->updated_at,
-                ];
             }
         }
 

@@ -60,9 +60,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($exception instanceof NotFoundHttpException) {
-            return response('', 404);
-        }
 
         if ($exception instanceof MethodNotAllowedHttpException) {
             return response('', 405);
@@ -72,6 +69,12 @@ class Handler extends ExceptionHandler
             return response('', 429);
         }
 
-        return parent::render($request, $exception);
+        $whoops = new \Whoops\Run;
+        $whoops->allowQuit(false);
+        $whoops->writeToOutput(false);
+        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+        $html = $whoops->handleException($exception);
+
+        return response($html);
     }
 }

@@ -8,6 +8,7 @@
     "cryental/laravel-stackpath": "^1.0",
     "fakerphp/faker": "^1.19",
     "fideloper/proxy": "^4.4",
+    "filp/whoops": "^2.14",
     "flipbox/lumen-generator": "^9.1",
     "hhxsv5/laravel-s": "^3.7",
     "http-interop/http-factory-guzzle": "^1.2",

@@ -66,8 +66,10 @@ class CharacterController extends Controller
 
         $filteredMappingData[] = ['service' => 'notify/character', 'service_id' => (string) $itemQuery->notifyID];
 
-        foreach ($itemQuery->mappings as $item) {
-            $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+        if (is_array($itemQuery->mappings)) {
+            foreach ($itemQuery->mappings as $item) {
+                $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
+            }
         }
 
         $buildResponse = [
@@ -83,7 +85,7 @@ class CharacterController extends Controller
                 'width'  => $itemQuery->image_width,
                 'height' => $itemQuery->image_height,
                 'format' => 'jpg',
-                'link'   => env('APP_URL', 'http://localhost').'/character/'.$itemQuery->uniqueID.'/image',
+                'link'   => config('APP_URL', 'http://localhost').'/character/'.$itemQuery->uniqueID.'/image',
             ],
             'attributes' => $itemQuery->attributes,
             'mappings'   => $filteredMappingData,
