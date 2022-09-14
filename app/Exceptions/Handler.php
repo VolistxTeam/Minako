@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
-use Whoops\Handler\JsonResponseHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 
@@ -33,7 +32,7 @@ class Handler extends ExceptionHandler
         AuthorizationException::class,
         HttpException::class,
         ModelNotFoundException::class,
-        ValidationException::class
+        ValidationException::class,
     ];
 
     /**
@@ -77,7 +76,7 @@ class Handler extends ExceptionHandler
         }
 
         if (config('app.debug', false)) {
-            $whoops = new Run;
+            $whoops = new Run();
             $whoops->allowQuit(false);
             $whoops->writeToOutput(false);
             $whoops->pushHandler(new PrettyPageHandler());
