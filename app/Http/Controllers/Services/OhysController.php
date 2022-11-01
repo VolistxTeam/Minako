@@ -21,7 +21,7 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()
             ->where('title', 'LIKE', "%$name%")
             ->orWhere('torrentName', 'LIKE', "%$name%")
-            ->paginate(50, ['*'], 'p', 1);
+            ->paginate(50, ['*'], 'p');
 
         $itemsFiltered = [];
 
