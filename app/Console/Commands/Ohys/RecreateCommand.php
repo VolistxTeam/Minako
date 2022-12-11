@@ -44,9 +44,8 @@ class RecreateCommand extends Command
                 $releaseGroup = 'Ohys-Raws';
 
                 $title = $fileNameParsedArray[2];
-                $episode = empty($fileNameParsedArray[3]) ? null : preg_replace('/[^0-9]/', '', $fileNameParsedArray[3]);
-                $this->info($fileNameParsedArray[3]);
-                exit;
+                $episode = empty($fileNameParsedArray[3]) ? null : preg_replace('/[^0-9.]/', '', $fileNameParsedArray[3]);
+
                 $episode = empty($episode) ? null : $episode;
 
                 $torrentName = $file;
