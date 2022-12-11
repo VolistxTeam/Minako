@@ -22,7 +22,7 @@ class RecreateCommand extends Command
         foreach ($allFilesList as $file) {
             $file = basename($file);
 
-            $torrent = new Torrent($file);
+            $torrent = new Torrent(Storage::disk('local')->path('torrents/'.$file));
             $fileBaseName = $file;
             $this->info($file);
             if (self::strContains($fileBaseName, '264') && !self::strContains($fileBaseName, 'x264')) {
@@ -30,6 +30,7 @@ class RecreateCommand extends Command
             }
 
             $fileBaseName = str_replace('AACx2', 'AAC', $fileBaseName);
+            $fileBaseName = str_replace('x264+', 'x264', $fileBaseName);
 
             preg_match('/(?:\[([^\r\n]*)\][\W]?)?(?:(?:([^\r\n]+?)(?: - ([0-9.]+?(?: END)?|SP))?)[\W]?[(|[]([^\r\n(]+)? (\d+x\d+|\d{3,}[^\r\n ]*)? ([^\r\n]+)?[)\]][^.\r\n]*(?:\.([^\r\n.]*)(?:\.[\w]+)?)?)$/', $fileBaseName, $fileNameParsedArray);
 
