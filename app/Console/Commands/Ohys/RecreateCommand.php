@@ -20,6 +20,8 @@ class RecreateCommand extends Command
         $allFilesList = Storage::disk('local')->allFiles('torrents');
 
         foreach ($allFilesList as $file) {
+            $file = basename($file);
+
             $torrent = new Torrent($file);
             $fileBaseName = $file;
             $this->info($file);
