@@ -24,7 +24,7 @@ class RecreateCommand extends Command
 
             $torrent = new Torrent(Storage::disk('local')->path('torrents/'.$file));
             $fileBaseName = $file;
-            $this->info($file);
+
             if (self::strContains($fileBaseName, '264') && !self::strContains($fileBaseName, 'x264')) {
                 $fileBaseName = str_replace('264', 'x264', $fileBaseName);
             }
