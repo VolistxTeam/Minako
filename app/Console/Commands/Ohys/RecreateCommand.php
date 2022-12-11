@@ -47,7 +47,7 @@ class RecreateCommand extends Command
 
                 $episode = empty($episode) ? null : $episode;
 
-                $torrentName = $file['t'];
+                $torrentName = $file;
                 $info_totalHash = $torrent->hash_info();
                 $info_totalSize = $torrent->size(2);
                 $info_createdDate = date('Y-m-d H:i:s', $torrent->creation_date());
@@ -83,7 +83,7 @@ class RecreateCommand extends Command
                     'hidden_download_magnet'    => $hidden_download_magnet,
                 ]);
 
-                $this->info('[Debug] Done: '.$file['t']);
+                $this->info('[Debug] Done: '.$file);
             } else {
                 $this->line('Not Found. Continue...');
             }
