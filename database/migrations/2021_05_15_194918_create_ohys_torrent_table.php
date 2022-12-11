@@ -19,7 +19,7 @@ class CreateOhysTorrentTable extends Migration
             $table->string('releaseGroup')->nullable();
             $table->string('broadcaster')->nullable();
             $table->text('title')->nullable();
-            $table->smallInteger('episode')->nullable();
+            $table->float('episode')->nullable();
             $table->text('torrentName')->nullable();
             $table->string('info_totalHash', 40)->nullable();
             $table->string('info_totalSize')->nullable();
