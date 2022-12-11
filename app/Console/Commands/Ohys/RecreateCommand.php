@@ -22,7 +22,7 @@ class RecreateCommand extends Command
         foreach ($allFilesList as $file) {
             $torrent = new Torrent($file);
             $fileBaseName = $file;
-
+            $this->info($file);
             if (self::strContains($fileBaseName, '264') && !self::strContains($fileBaseName, 'x264')) {
                 $fileBaseName = str_replace('264', 'x264', $fileBaseName);
             }
@@ -37,7 +37,7 @@ class RecreateCommand extends Command
                     continue;
                 }
 
-                $itemID = substr(sha1($file['t'].'4Q84SN6cYwnz9oeL7J1k'), 0, 8);
+                $itemID = substr(sha1($file.'4Q84SN6cYwnz9oeL7J1k'), 0, 8);
                 $releaseGroup = 'Ohys-Raws';
 
                 $title = $fileNameParsedArray[2];
