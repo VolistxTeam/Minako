@@ -5,7 +5,6 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
-use Monicahq\Cloudflare\Commands\Reload;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,7 +14,6 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Reload::class,
         ScheduleListCommand::class,
         Commands\MAL\EpisodeCommand::class,
         Commands\Notify\AnimeCommand::class,
