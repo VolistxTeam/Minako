@@ -92,7 +92,7 @@ class NotifyCharacterRelationJob extends Job
     private function assignCharacterRelationData($notifyCharacterRelation, array $downloadedData)
     {
         $keys = [
-            'items' => ['items']
+            'items' => ['items'],
         ];
 
         foreach ($keys as $key => $path) {

@@ -4,10 +4,6 @@ namespace App\Jobs;
 
 use App\Models\NotifyCharacter;
 use GuzzleHttp\Client;
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
 class NotifyCharacterJob extends Job

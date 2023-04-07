@@ -85,7 +85,7 @@ class NotifyCompanyJob extends Job
             return $this->companyDataCache[$companyId];
         }
 
-        $url = $this->apiBaseUrl . $companyId;
+        $url = $this->apiBaseUrl.$companyId;
         $client = $this->createHttpClient();
         $response = $client->get($url);
 
@@ -93,7 +93,7 @@ class NotifyCompanyJob extends Job
             return null;
         }
 
-        $data = json_decode((string)$response->getBody(), true);
+        $data = json_decode((string) $response->getBody(), true);
         $this->companyDataCache[$companyId] = $data;
 
         return $data;
@@ -121,14 +121,14 @@ class NotifyCompanyJob extends Job
     private function assignCompanyData($notifyCompany, array $downloadedData)
     {
         $keys = [
-            'name_english' => ['name', 'english'],
+            'name_english'  => ['name', 'english'],
             'name_japanese' => ['name', 'japanese'],
             'name_synonyms' => ['name', 'synonyms'],
-            'description' => ['description'],
-            'email' => ['email'],
-            'links' => ['links'],
-            'mappings' => ['mappings'],
-            'location' => ['location'],
+            'description'   => ['description'],
+            'email'         => ['email'],
+            'links'         => ['links'],
+            'mappings'      => ['mappings'],
+            'location'      => ['location'],
         ];
 
         foreach ($keys as $key => $path) {

@@ -3,10 +3,6 @@
 namespace App\Jobs;
 
 use GuzzleHttp\Client;
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 
