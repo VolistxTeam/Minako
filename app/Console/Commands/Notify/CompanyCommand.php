@@ -9,6 +9,7 @@ use Exception;
 use Faker\Factory;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class CompanyCommand extends Command
 {
@@ -75,7 +76,7 @@ class CompanyCommand extends Command
                         $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$studioItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = Str::random(10);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
@@ -126,7 +127,7 @@ class CompanyCommand extends Command
                         $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$producerItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = Str::random(10);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,
@@ -177,7 +178,7 @@ class CompanyCommand extends Command
                         $downloadedData = (string) $companyResponse->getBody();
 
                         $downloadedData = json_decode($downloadedData, true);
-                        $uniqueIDGen = substr(sha1('6ASRjSGuS5'.$licensorItem.'5fqX2x73DMD84G2PtnC5'), 0, 8);
+                        $uniqueIDGen = Str::random(10);
 
                         $notifyDBItem = NotifyCompany::query()->updateOrCreate([
                             'uniqueID' => $uniqueIDGen,

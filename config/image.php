@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'module' => env('IMAGE_MODULE', 'imagick'),
+    'driver' => env('IMAGE_DRIVER', 'gd'),
 ];

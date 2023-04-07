@@ -6,6 +6,7 @@ use App\Classes\Torrent;
 use App\Models\OhysTorrent;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class RecreateCommand extends Command
 {
@@ -40,10 +41,11 @@ class RecreateCommand extends Command
                     continue;
                 }
 
-                $itemID = substr(sha1($file.'4Q84SN6cYwnz9oeL7J1k'), 0, 8);
+                $itemID = Str::random(10);
                 $releaseGroup = 'Ohys-Raws';
 
                 $title = $fileNameParsedArray[2];
+
                 $episode = empty($fileNameParsedArray[3]) ? null : preg_replace('/[^0-9.]/', '', $fileNameParsedArray[3]);
 
                 $episode = empty($episode) ? null : $episode;

@@ -3,6 +3,7 @@
     "php": "^8.1",
     "ext-curl": "*",
     "ext-json": "*",
+    "amphp/parallel": "^2.1",
     "chuckrincon/lumen-config-discover": "^1.0",
     "cryental/larasupport": "^1.7",
     "cryental/laravel-stackpath": "^1.0",
@@ -14,7 +15,7 @@
     "http-interop/http-factory-guzzle": "^1.2",
     "illuminate/redis": "^9.16",
     "intervention/image": "^2.7",
-    "jikan-me/jikan": "^3.0",
+    "jikan-me/jikan": "^4.0",
     "laravel/lumen-framework": "^9.0",
     "laravel/tinker": "^2.7",
     "league/flysystem": "^3.0",
@@ -39,7 +40,12 @@
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.1",
+      "ext-pcntl": "8.1",
+      "ext-posix": "8.1"
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
