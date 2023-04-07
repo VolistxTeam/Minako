@@ -60,7 +60,7 @@ class CharacterImageCommand extends Command
 
     private function processAnimeItem($item)
     {
-        if (Storage::disk('local')->exists('characters/' . $item['uniqueID'] . '.jpg')) {
+        if (Storage::disk('local')->exists('characters/'.$item['uniqueID'].'.jpg')) {
             return;
         }
 

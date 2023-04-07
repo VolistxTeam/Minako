@@ -50,12 +50,12 @@ class AnimeCommand extends Command
         $faker = Factory::create();
 
         return [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome,
+            'Cache-Control'   => 'max-age=0',
+            'Connection'      => 'keep-alive',
+            'Keep-Alive'      => '300',
+            'User-Agent'      => $faker->chrome,
         ];
     }
 
@@ -65,10 +65,12 @@ class AnimeCommand extends Command
 
         if ($sitemapResponse->getStatusCode() != 200) {
             $this->error('[-] The sitemap does not found.');
+
             return false;
         }
 
-        $rawNotifyIDs = explode("\n", (string)$sitemapResponse->getBody());
+        $rawNotifyIDs = explode("\n", (string) $sitemapResponse->getBody());
+
         return array_map(function ($item) {
             return str_replace($this->notifyBaseURL, '', $item);
         }, $rawNotifyIDs);
@@ -96,6 +98,7 @@ class AnimeCommand extends Command
 
         if ($totalCount == 0) {
             $this->info('[!] No new anime found.');
+
             return;
         }
 
