@@ -50,7 +50,7 @@ class StringCompareJaroWinkler
         }
         $transpositions /= 2.0;
         // return the Jaro distance
-        return ($commons1_len / ($str1_len) + $commons2_len / ($str2_len) + ($commons1_len - $transpositions) / ($commons1_len)) / 3.0;
+        return ($commons1_len / $str1_len + $commons2_len / $str2_len + ($commons1_len - $transpositions) / $commons1_len) / 3.0;
     }
 
     private function getCommonCharacters($string1, $string2, $allowedDistance): string

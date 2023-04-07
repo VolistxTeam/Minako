@@ -12,7 +12,10 @@ use Illuminate\Support\Str;
 
 class NotifyCharacterJob extends Job
 {
-    use Batchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected string $notifyCharacterItem;
 
@@ -35,7 +38,7 @@ class NotifyCharacterJob extends Job
             return;
         }
 
-        $realApiUrl = $apiBaseUrl . $this->notifyCharacterItem;
+        $realApiUrl = $apiBaseUrl.$this->notifyCharacterItem;
         $downloadedData = $this->fetchData($client, $realApiUrl);
 
         if (!$downloadedData) {
@@ -61,12 +64,12 @@ class NotifyCharacterJob extends Job
     private function createHttpClient(): Client
     {
         $headers = [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+            'Cache-Control'   => 'max-age=0',
+            'Connection'      => 'keep-alive',
+            'Keep-Alive'      => '300',
+            'User-Agent'      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
         ];
 
         return new Client(['http_errors' => false, 'timeout' => 60.0, 'headers' => $headers]);
@@ -80,7 +83,7 @@ class NotifyCharacterJob extends Job
             return null;
         }
 
-        $data = (string)$response->getBody();
+        $data = (string) $response->getBody();
 
         if (!$this->isJson($data)) {
             return null;
@@ -99,17 +102,17 @@ class NotifyCharacterJob extends Job
     private function assignDownloadedData($notifyDbItem, array $downloadedData): void
     {
         $keys = [
-            'name_canonical' => ['name', 'canonical'],
-            'name_english' => ['name', 'english'],
-            'name_japanese' => ['name', 'japanese'],
-            'name_synonyms' => ['name', 'synonyms'],
+            'name_canonical'  => ['name', 'canonical'],
+            'name_english'    => ['name', 'english'],
+            'name_japanese'   => ['name', 'japanese'],
+            'name_synonyms'   => ['name', 'synonyms'],
             'image_extension' => ['image', 'extension'],
-            'image_width' => ['image', 'width'],
-            'image_height' => ['image', 'height'],
-            'description' => ['description'],
-            'spoilers' => ['spoilers'],
-            'attributes' => ['attributes'],
-            'mappings' => ['mappings'],
+            'image_width'     => ['image', 'width'],
+            'image_height'    => ['image', 'height'],
+            'description'     => ['description'],
+            'spoilers'        => ['spoilers'],
+            'attributes'      => ['attributes'],
+            'mappings'        => ['mappings'],
         ];
 
         foreach ($keys as $key => $path) {
@@ -124,4 +127,3 @@ class NotifyCharacterJob extends Job
         }
     }
 }
-

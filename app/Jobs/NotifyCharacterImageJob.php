@@ -12,7 +12,10 @@ use Intervention\Image\ImageManager;
 
 class NotifyCharacterImageJob extends Job
 {
-    use Batchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected int $id;
     protected string $notifyID;
@@ -52,12 +55,12 @@ class NotifyCharacterImageJob extends Job
     private function getClient()
     {
         $headers = [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+            'Cache-Control'   => 'max-age=0',
+            'Connection'      => 'keep-alive',
+            'Keep-Alive'      => '300',
+            'User-Agent'      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
         ];
 
         return new Client(['http_errors' => false, 'timeout' => 60.0, 'headers' => $headers]);
@@ -66,16 +69,18 @@ class NotifyCharacterImageJob extends Job
     private function getImageUrls()
     {
         return [
-            'original' => 'https://media.notify.moe/images/characters/original/' . $this->notifyID . $this->imageExtension,
-            'large' => 'https://media.notify.moe/images/characters/large/' . $this->notifyID . $this->imageExtension,
+            'original' => 'https://media.notify.moe/images/characters/original/'.$this->notifyID.$this->imageExtension,
+            'large'    => 'https://media.notify.moe/images/characters/large/'.$this->notifyID.$this->imageExtension,
         ];
     }
+
     private function fetchImage($client, $imageUrl)
     {
         $response = $client->request('GET', $imageUrl);
         if ($response->getStatusCode() !== 200) {
             return null;
         }
+
         return $response->getBody()->getContents();
     }
 
@@ -83,6 +88,6 @@ class NotifyCharacterImageJob extends Job
     {
         $manager = new ImageManager(['driver' => config('image.driver')]);
         $image = $manager->make($imageData)->encode('jpg', 100);
-        Storage::disk('local')->put('characters/' . $this->uniqueID . '.jpg', $image);
+        Storage::disk('local')->put('characters/'.$this->uniqueID.'.jpg', $image);
     }
 }
