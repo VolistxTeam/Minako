@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Models\NotifyCharacterRelation;
 use GuzzleHttp\Client;
-use Illuminate\Support\Str;
 
 class NotifyCharacterRelationJob extends Job
 {
