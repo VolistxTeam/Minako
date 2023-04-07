@@ -8,9 +8,9 @@ use Illuminate\Support\Str;
 
 class NotifyCharacterRelationJob extends Job
 {
-    protected string $notifyCharacterRelationItem;
+    protected array $notifyCharacterRelationItem;
 
-    public function __construct(string $notifyCharacterRelationItem)
+    public function __construct(array $notifyCharacterRelationItem)
     {
         $this->notifyCharacterRelationItem = $notifyCharacterRelationItem;
     }
@@ -27,19 +27,17 @@ class NotifyCharacterRelationJob extends Job
         }
 
         $client = $this->createHttpClient();
-        $downloadedData = $this->fetchData($client, 'https://notify.moe/api/animecharacters/'.$this->notifyCharacterRelationItem);
+        $downloadedData = $this->fetchData($client, 'https://notify.moe/api/animecharacters/'.$this->notifyCharacterRelationItem['notifyID']);
 
         if (!$downloadedData) {
             return;
         }
 
-        $uniqueId = Str::random(10);
-
         if (empty($downloadedData['items'])) {
             return;
         }
 
-        $notifyCharacterRelation = NotifyCharacterRelation::query()->where('notifyID', $this->notifyCharacterRelationItem)->first();
+        $notifyCharacterRelation = NotifyCharacterRelation::query()->where('notifyID', $this->notifyCharacterRelationItem['notifyID'])->first();
 
         if ($notifyCharacterRelation) {
             $this->assignCharacterRelationData($notifyCharacterRelation, $downloadedData);
@@ -47,8 +45,8 @@ class NotifyCharacterRelationJob extends Job
             $notifyCharacterRelation->save();
         } else {
             $newNotifyCharacterRelation = new NotifyCharacterRelation([
-                'uniqueID' => $uniqueId,
-                'notifyID' => $this->notifyCharacterRelationItem,
+                'uniqueID' => $this->notifyCharacterRelationItem['uniqueID'],
+                'notifyID' => $downloadedData['animeId'],
             ]);
             $this->assignCharacterRelationData($newNotifyCharacterRelation, $downloadedData);
             $newNotifyCharacterRelation->save();

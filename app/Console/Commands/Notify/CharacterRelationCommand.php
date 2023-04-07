@@ -19,7 +19,7 @@ class CharacterRelationCommand extends Command
         $this->setUnlimitedTimeLimit();
 
         $allAnime = NotifyAnime::query()
-            ->select('id', 'notifyID', 'uniqueID', 'studios', 'producers', 'licensors')
+            ->select('id', 'uniqueID', 'notifyID', 'studios', 'producers', 'licensors')
             ->cursor();
 
         $totalCount = NotifyAnime::query()->count();
@@ -39,7 +39,7 @@ class CharacterRelationCommand extends Command
                         ->where('notifyID', $item->notifyID)
                         ->whereDate('updated_at', '<', $sevenDaysAgo)
                         ->count() > 0) {
-                    dispatch(new NotifyCharacterRelationJob($item->notifyID));
+                    dispatch(new NotifyCharacterRelationJob($item->toArray()));
                 }
             } catch (Exception $ex) {
                 continue;
