@@ -99,11 +99,11 @@ class CharacterCommand extends Command
             return;
         }
 
+        $this->info(PHP_EOL . '[!] Querying for Work...' . PHP_EOL);
+
         $progressBar = $this->output->createProgressBar($totalCount);
         $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
         $progressBar->start();
-
-        $this->info(PHP_EOL . '[!] Querying for Work...' . PHP_EOL);
 
         foreach ($notifyIDs as $item) {
             dispatch(new NotifyCharacterJob($item));

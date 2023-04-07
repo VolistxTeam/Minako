@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CharacterImageCommand extends Command
 {
-    protected $signature = 'minako:notify:character-image';
+    protected $signature = 'minako:notify:character-images';
 
     protected $description = 'Download character images from notify.moe.';
 
@@ -39,11 +39,23 @@ class CharacterImageCommand extends Command
 
     private function processAllAnime($allAnime)
     {
+        $totalCount = count($allAnime);
+
+        $this->info(PHP_EOL . '[!] Querying for Work...' . PHP_EOL);
+
+        $progressBar = $this->output->createProgressBar($totalCount);
+        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+        $progressBar->start();
+
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
                 $this->processAnimeItem($item);
             }
+
+            $progressBar->advance();
         }
+
+        $progressBar->finish();
     }
 
     private function processAnimeItem($item)

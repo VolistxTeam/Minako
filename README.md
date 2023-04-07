@@ -31,7 +31,7 @@ php artisan minako:notify:company
 php artisan minako:notify:relation
 php artisan minako:notify:character-relation
 php artisan minako:notify:thumbnail
-php artisan minako:notify:character-image
+php artisan minako:notify:character-images
 php artisan minako:mal:episodes
 php artisan minako:ohys:download
 
