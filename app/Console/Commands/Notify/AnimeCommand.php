@@ -16,7 +16,6 @@ class AnimeCommand extends Command
     protected $description = 'Retrieve all anime information from notify.moe.';
 
     private $sitemapURL = 'https://notify.moe/sitemap/anime.txt';
-    private $apiBaseURL = 'https://notify.moe/api/anime/';
     private $notifyBaseURL = 'https://notify.moe/anime/';
 
     public function handle()
@@ -32,8 +31,18 @@ class AnimeCommand extends Command
             return;
         }
 
-        $dbItems = NotifyAnime::query()->whereDate('updated_at', '>', Carbon::now()->subDays(7))->get();
-        $dbItemIds = $dbItems->pluck('notifyID')->toArray();
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+
+        $dbItems = NotifyAnime::query()
+            ->select('notifyID', 'updated_at')
+            ->whereDate('updated_at', '>', $sevenDaysAgo)
+            ->cursor();
+
+        $dbItemIds = [];
+        foreach ($dbItems as $dbItem) {
+            $dbItemIds[] = $dbItem->notifyID;
+        }
+
         $cleanedArray = $this->compareAndRemove($dbItemIds, $notifyIDs);
 
         $this->processNotifyIDs($cleanedArray);

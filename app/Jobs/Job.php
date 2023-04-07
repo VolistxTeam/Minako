@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -20,6 +21,7 @@ abstract class Job implements ShouldQueue
     |
     */
 
+    use Batchable;
     use InteractsWithQueue;
     use Queueable;
     use SerializesModels;

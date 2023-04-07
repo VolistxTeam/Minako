@@ -12,11 +12,6 @@ use Intervention\Image\ImageManager;
 
 class NotifyCharacterImageJob extends Job
 {
-    use Batchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
-
     protected int $id;
     protected string $notifyID;
     protected string $uniqueID;

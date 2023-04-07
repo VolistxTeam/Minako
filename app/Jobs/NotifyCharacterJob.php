@@ -12,11 +12,6 @@ use Illuminate\Support\Str;
 
 class NotifyCharacterJob extends Job
 {
-    use Batchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
-
     protected string $notifyCharacterItem;
 
     public function __construct(string $notifyCharacterItem)
@@ -50,6 +45,7 @@ class NotifyCharacterJob extends Job
 
         if ($notifyCharacter) {
             $this->assignDownloadedData($notifyCharacter, $downloadedData);
+            $notifyCharacter->touch();
             $notifyCharacter->save();
         } else {
             $newNotifyCharacter = new NotifyCharacter([

@@ -4,19 +4,10 @@ namespace App\Jobs;
 
 use App\Models\NotifyAnime;
 use GuzzleHttp\Client;
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
 class NotifyAnimeJob extends Job
 {
-    use Batchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
-
     protected string $notifyItem;
 
     public function __construct(string $notifyItem)
@@ -47,6 +38,7 @@ class NotifyAnimeJob extends Job
 
         if ($notifyAnime) {
             $this->assignAnimeData($notifyAnime, $downloadedData);
+            $notifyAnime->touch();
             $notifyAnime->save();
         } else {
             $newNotifyAnime = new NotifyAnime([

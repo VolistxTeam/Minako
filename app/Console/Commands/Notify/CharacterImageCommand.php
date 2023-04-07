@@ -49,6 +49,10 @@ class CharacterImageCommand extends Command
 
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
+                if (Storage::disk('local')->exists('characters/'.$item['uniqueID'].'.jpg')) {
+                    continue;
+                }
+
                 $this->processAnimeItem($item);
             }
 
@@ -60,10 +64,6 @@ class CharacterImageCommand extends Command
 
     private function processAnimeItem($item)
     {
-        if (Storage::disk('local')->exists('characters/'.$item['uniqueID'].'.jpg')) {
-            return;
-        }
-
         try {
             dispatch(new NotifyCharacterImageJob($item['id'], $item['notifyID'], $item['uniqueID'], $item['image_extension']));
         } catch (Exception $ex) {

@@ -16,7 +16,6 @@ class CharacterCommand extends Command
     protected $description = 'Retrieve all character information from notify.moe.';
 
     private string $sitemapURL = 'https://notify.moe/sitemap/character.txt';
-    private string $apiBaseURL = 'https://notify.moe/api/character/';
     private string $notifyBaseURL = 'https://notify.moe/character/';
 
     public function handle()
@@ -32,8 +31,18 @@ class CharacterCommand extends Command
             return;
         }
 
-        $dbItems = NotifyCharacter::query()->whereDate('updated_at', '>', Carbon::now()->subDays(7))->select('id', 'notifyID', 'uniqueID', 'created_at', 'updated_at')->get();
-        $dbItemIds = $dbItems->pluck('notifyID')->toArray();
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+
+        $dbItems = NotifyCharacter::query()
+            ->select('notifyID', 'updated_at')
+            ->whereDate('updated_at', '>', $sevenDaysAgo)
+            ->cursor();
+
+        $dbItemIds = [];
+        foreach ($dbItems as $dbItem) {
+            $dbItemIds[] = $dbItem->notifyID;
+        }
+
         $cleanedArray = $this->compareAndRemove($dbItemIds, $notifyIDs);
 
         $this->processNotifyIDs($cleanedArray);
