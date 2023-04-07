@@ -41,7 +41,7 @@ class CharacterImageCommand extends Command
     {
         $totalCount = count($allAnime);
 
-        $this->info(PHP_EOL . '[!] Querying for Work...' . PHP_EOL);
+        $this->info(PHP_EOL.'[!] Querying for Work...'.PHP_EOL);
 
         $progressBar = $this->output->createProgressBar($totalCount);
         $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
