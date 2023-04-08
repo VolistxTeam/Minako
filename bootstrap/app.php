@@ -24,7 +24,6 @@ $app->register(Illuminate\Redis\RedisServiceProvider::class);
 
 $app->register(Irazasyed\Larasupport\Providers\ArtisanServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
-$app->register(Laravel\Tinker\TinkerServiceProvider::class);
 
 // Default providers of Lumen
 $app->register(App\Providers\AppServiceProvider::class);
@@ -32,9 +31,9 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
 // Additional libraries
-$app->register(Cryental\StackPath\TrustedProxyServiceProvider::class);
 $app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -49,6 +48,7 @@ $app->singleton(
 $app->configure('app');
 
 $app->middleware([
+    App\Http\Middleware\TrustProxies::class,
     App\Http\Middleware\CorsMiddleware::class,
 ]);
 

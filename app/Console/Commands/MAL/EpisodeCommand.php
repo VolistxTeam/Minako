@@ -27,7 +27,7 @@ class EpisodeCommand extends Command
 
         $this->info('[!] Getting all anime information...');
 
-        $allAnime = NotifyAnime::all()->toArray();
+        $allAnime = NotifyAnime::query()->cursor();
 
         $totalCount = count($allAnime);
         $remainingCount = 0;
@@ -59,7 +59,7 @@ class EpisodeCommand extends Command
             $allowCrawl = false;
 
             if (!empty($dbItem)) {
-                if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($item['created_at']))) {
+                if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($item['updated_at']))) {
                     $allowCrawl = true;
                 }
             } else {

@@ -2,100 +2,73 @@
 
 namespace App\Console\Commands\Notify;
 
+use App\Jobs\NotifyThumbnailJob;
 use App\Models\NotifyAnime;
+use App\Models\NotifyCharacter;
 use Exception;
-use Faker\Factory;
-use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManager;
 
 class ThumbnailCommand extends Command
 {
-    protected $signature = 'minako:notify:thumbnail';
+    protected $signature = 'minako:notify:character-images';
 
-    protected $description = 'Download poster images from notify.moe.';
+    protected $description = 'Download character images from notify.moe.';
 
     public function handle()
     {
-        set_time_limit(0);
-
-        $exists = Storage::disk('local')->exists('posters');
-
-        if (!$exists) {
-            Storage::disk('local')->makeDirectory('posters');
-        }
+        $this->setUnlimitedTimeLimit();
+        $this->createCharacterDirectoryIfNotExists();
 
         $allAnime = NotifyAnime::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->get()->toArray();
 
+        $this->processAllAnime($allAnime);
+    }
+
+    private function setUnlimitedTimeLimit()
+    {
+        $this->info('[Debug] Setting Time Limit To 0 (Unlimited)');
+        set_time_limit(0);
+    }
+
+    private function createCharacterDirectoryIfNotExists()
+    {
+        if (!Storage::disk('local')->exists('posters')) {
+            Storage::disk('local')->makeDirectory('posters');
+        }
+    }
+
+    private function processAllAnime($allAnime)
+    {
         $totalCount = count($allAnime);
-        $remainingCount = 0;
 
-        $faker = Factory::create();
+        $this->info(PHP_EOL.'[!] Querying for Work...'.PHP_EOL);
 
-        $headers = [
-            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control'   => 'max-age=0',
-            'Connection'      => 'keep-alive',
-            'Keep-Alive'      => '300',
-            'User-Agent'      => $faker->chrome,
-        ];
-
-        $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
+        $progressBar = $this->output->createProgressBar($totalCount);
+        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+        $progressBar->start();
 
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
-                try {
-                    $existsFile = Storage::disk('local')->exists('posters/'.$item['uniqueID'].'.jpg');
-
-                    if ($existsFile) {
-                        $this->error('[+] Thumbnail exists. ['.$remainingCount.'/'.$totalCount.']');
-                        $remainingCount++;
-                        continue;
-                    }
-
-                    $originalImage = 'https://media.notify.moe/images/anime/original/'.$item['notifyID'].$item['image_extension'];
-                    $largeImage = 'https://media.notify.moe/images/anime/large/'.$item['notifyID'].$item['image_extension'];
-
-                    $fp = tmpfile();
-                    $fpPath = stream_get_meta_data($fp)['uri'];
-
-                    $imageResponse = $client->request('GET', $originalImage, ['headers' => $headers, 'sink' => $fpPath]);
-
-                    if ($imageResponse->getStatusCode() != 200) {
-                        $imageResponse = $client->request('GET', $largeImage, ['headers' => $headers, 'sink' => $fpPath]);
-
-                        if ($imageResponse->getStatusCode() != 200) {
-                            $this->error('[+] Cannot find character image. Ignoring... ['.$remainingCount.'/'.$totalCount.']');
-                            $remainingCount++;
-                            fclose($fp);
-                            continue;
-                        }
-                    }
-
-                    $manager = new ImageManager(['driver' => config('image.module')]);
-
-                    $image = $manager->make($fpPath)->stream('jpg', 100);
-
-                    Storage::disk('local')->put('posters/'.$item['uniqueID'].'.jpg', $image);
-
-                    unset($fp);
-
-                    $this->info('[+] Thumbnail image uploaded for ID '.$item['notifyID'].' ['.$remainingCount.'/'.$totalCount.']');
-                    $remainingCount++;
-                    continue;
-                } catch (Exception $ex) {
-                    $this->error('[+] Exception ['.$ex.'[]'.$remainingCount.'/'.$totalCount.']');
-                    $remainingCount++;
+                if (Storage::disk('local')->exists('posters/'.$item['uniqueID'].'.jpg')) {
                     continue;
                 }
-            } else {
-                $this->error('[+] Thumbnail not found. ['.$remainingCount.'/'.$totalCount.']');
-                $remainingCount++;
+
+                $this->processAnimeItem($item);
             }
+
+            $progressBar->advance();
         }
 
-        return 0;
+        $progressBar->finish();
+    }
+
+    private function processAnimeItem($item)
+    {
+        try {
+            dispatch(new NotifyThumbnailJob($item['id'], $item['notifyID'], $item['uniqueID'], $item['image_extension']));
+        } catch (Exception $ex) {
+            // If there is an exception, continue with the next item
+        }
     }
 }

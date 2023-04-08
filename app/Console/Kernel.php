@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
         Commands\MAL\EpisodeCommand::class,
         Commands\Notify\AnimeCommand::class,
         Commands\Notify\CharacterCommand::class,
-        Commands\Notify\CharacterImageCommand::class,
+        Commands\Notify\ThumbnailCommand::class,
         Commands\Notify\CharacterRelationCommand::class,
         Commands\Notify\CompanyCommand::class,
         Commands\Notify\RelationCommand::class,

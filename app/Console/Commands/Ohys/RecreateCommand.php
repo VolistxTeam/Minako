@@ -20,6 +20,12 @@ class RecreateCommand extends Command
 
         $allFilesList = Storage::disk('local')->allFiles('torrents');
 
+        $totalCount = count($allFilesList);
+
+        $progressBar = $this->output->createProgressBar($totalCount);
+        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+        $progressBar->start();
+
         foreach ($allFilesList as $file) {
             $file = basename($file);
 
@@ -37,7 +43,6 @@ class RecreateCommand extends Command
 
             if (count($fileNameParsedArray) > 0) {
                 if (empty($fileNameParsedArray[2])) {
-                    $this->line('Not Found. Continue...');
                     continue;
                 }
 
@@ -85,13 +90,12 @@ class RecreateCommand extends Command
                     'metadata_audio_codec'      => $metadata_audio_codec,
                     'hidden_download_magnet'    => $hidden_download_magnet,
                 ]);
-
-                $this->info('[Debug] Done: '.$file);
-            } else {
-                $this->line('Not Found. Continue...');
             }
+
+            $progressBar->advance();
         }
 
+        $progressBar->finish();
         return 0;
     }
 

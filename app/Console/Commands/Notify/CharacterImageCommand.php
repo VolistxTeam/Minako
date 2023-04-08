@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Notify;
 
 use App\Jobs\NotifyCharacterImageJob;
+use App\Jobs\NotifyThumbnailJob;
 use App\Models\NotifyCharacter;
 use Exception;
 use Illuminate\Console\Command;
