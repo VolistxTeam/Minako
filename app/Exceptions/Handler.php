@@ -75,16 +75,12 @@ class Handler extends ExceptionHandler
             return response('', 429);
         }
 
-        if (config('app.debug', false)) {
-            $whoops = new Run();
-            $whoops->allowQuit(false);
-            $whoops->writeToOutput(false);
-            $whoops->pushHandler(new PrettyPageHandler());
-            $html = $whoops->handleException($exception);
+        $whoops = new Run();
+        $whoops->allowQuit(false);
+        $whoops->writeToOutput(false);
+        $whoops->pushHandler(new PrettyPageHandler());
+        $html = $whoops->handleException($exception);
 
-            return response($html, 500);
-        } else {
-            return response(File::get(resource_path('views/error.html')), 500)->header('Content-Type', 'text/html');
-        }
+        return response($html, 500);
     }
 }

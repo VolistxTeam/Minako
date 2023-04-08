@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ThumbnailCommand extends Command
 {
-    protected $signature = 'minako:notify:character-images';
+    protected $signature = 'minako:notify:thumbnails';
 
-    protected $description = 'Download character images from notify.moe.';
+    protected $description = 'Download anime poster images from notify.moe.';
 
     public function handle()
     {

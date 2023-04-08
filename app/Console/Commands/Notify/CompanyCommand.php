@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class CompanyCommand extends Command
 {
-    protected $signature = 'minako:notify:company';
+    protected $signature = 'minako:notify:companies';
 
     protected $description = 'Retrieve all company information from notify.moe.';
 

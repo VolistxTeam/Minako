@@ -27,10 +27,10 @@ Run commands:
 ```
 php artisan minako:notify:anime
 php artisan minako:notify:characters
-php artisan minako:notify:company
-php artisan minako:notify:relation
+php artisan minako:notify:companies
+php artisan minako:notify:relations
 php artisan minako:notify:character-relation
-php artisan minako:notify:thumbnail
+php artisan minako:notify:thumbnails
 php artisan minako:notify:character-images
 php artisan minako:mal:episodes
 php artisan minako:ohys:download

@@ -52,7 +52,7 @@ class AnimeSearch
             }
 
             if (!empty($result)) {
-                array_push($results, $result);
+                $results[] = $result;
             }
         }
 
