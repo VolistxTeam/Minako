@@ -9,7 +9,7 @@ class StringCompareJaroWinkler
         return $this->jaroWinkler($str1, $str2, 0.1);
     }
 
-    public  function jaroWinkler(string $string1, string $string2, float $boostThreshold, int $prefixLength = 4, float $prefixScale = 0.1): float
+    public function jaroWinkler(string $string1, string $string2, float $boostThreshold, int $prefixLength = 4, float $prefixScale = 0.1): float
     {
         $jaroDistance = $this->jaro($string1, $string2);
 
@@ -26,7 +26,7 @@ class StringCompareJaroWinkler
     {
         $str1_len = mb_strlen($string1);
         $str2_len = mb_strlen($string2);
-        $distance = (int)floor(min($str1_len, $str2_len) / 2.0);
+        $distance = (int) floor(min($str1_len, $str2_len) / 2.0);
 
         $commons1 = $this->getCommonCharacters($string1, $string2, $distance);
         $commons2 = $this->getCommonCharacters($string2, $string1, $distance);
@@ -39,6 +39,7 @@ class StringCompareJaroWinkler
         }
 
         $transpositions = $this->countTranspositions($commons1, $commons2);
+
         return ($commons1_len / $str1_len + $commons2_len / $str2_len + ($commons1_len - $transpositions) / $commons1_len) / 3.0;
     }
 
@@ -77,7 +78,7 @@ class StringCompareJaroWinkler
             }
         }
 
-        return (int)($transpositions / 2.0);
+        return (int) ($transpositions / 2.0);
     }
 
     private function getCommonPrefixLength(string $string1, string $string2, int $minPrefixLength = 4): int

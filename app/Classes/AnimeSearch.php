@@ -28,8 +28,8 @@ class AnimeSearch
 
             $titles = [
                 $titleCanonical => $item->title_canonical,
-                $titleEnglish => $item->title_english,
-                $titleRomaji => $item->title_romaji,
+                $titleEnglish   => $item->title_english,
+                $titleRomaji    => $item->title_romaji,
             ];
 
             foreach ($synonyms as $synonym) {
@@ -45,7 +45,7 @@ class AnimeSearch
                     $bestSimilarity = $similarity;
 
                     $result = (object) [
-                        'obj' => $item,
+                        'obj'        => $item,
                         'similarity' => $similarity,
                     ];
                 }
