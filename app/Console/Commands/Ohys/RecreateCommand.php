@@ -96,6 +96,7 @@ class RecreateCommand extends Command
         }
 
         $progressBar->finish();
+
         return 0;
     }
 

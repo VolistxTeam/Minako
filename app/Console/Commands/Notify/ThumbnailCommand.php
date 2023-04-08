@@ -4,7 +4,6 @@ namespace App\Console\Commands\Notify;
 
 use App\Jobs\NotifyThumbnailJob;
 use App\Models\NotifyAnime;
-use App\Models\NotifyCharacter;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;

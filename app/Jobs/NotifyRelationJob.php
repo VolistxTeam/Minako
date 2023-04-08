@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\NotifyCharacterRelation;
 use App\Models\NotifyRelation;
 use GuzzleHttp\Client;
 
