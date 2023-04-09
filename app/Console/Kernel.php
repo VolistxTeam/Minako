@@ -39,16 +39,16 @@ class Kernel extends ConsoleKernel
     {
         set_time_limit(0);
 
-        $schedule->command('minako:ohys:download')->hourly()->runInBackground()->withoutOverlapping(5000);
+        $schedule->command('minako:ohys:download')->hourly()->runInBackground()->withoutOverlapping();
 
-        $schedule->command('minako:notify:anime')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:notify:characters')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:notify:company')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:notify:relation')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:notify:character-relation')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:notify:thumbnail')->saturdays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
-        $schedule->command('minako:notify:character-image')->sundays()->at('00:00')->runInBackground()->withoutOverlapping(5000);
+        $schedule->command('minako:notify:anime')->saturdays()->at('00:00')->runInBackground()->withoutOverlapping();
+        $schedule->command('minako:notify:characters')->saturdays()->at('00:00')->runInBackground()->withoutOverlapping();
+        $schedule->command('minako:notify:companies')->saturdays()->at('00:00')->runInBackground()->withoutOverlapping();
+        $schedule->command('minako:notify:relations')->saturdays()->at('00:00')->runInBackground()->withoutOverlapping();
+        $schedule->command('minako:notify:character-relations')->saturdays()->at('00:00')->runInBackground()->withoutOverlapping();
+        $schedule->command('minako:notify:thumbnails')->sundays()->at('00:00')->runInBackground()->withoutOverlapping();
+        $schedule->command('minako:notify:character-images')->sundays()->at('00:00')->runInBackground()->withoutOverlapping();
 
-        $schedule->command('minako:mal:episodes')->weekly()->days([1, 4])->at('00:00')->runInBackground()->withoutOverlapping(10000);
+        $schedule->command('minako:mal:episodes --skip=13000')->weekly()->days([1, 4])->at('00:00')->runInBackground()->withoutOverlapping();
     }
 }
