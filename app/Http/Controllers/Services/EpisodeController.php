@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Services;
 
 use App\Models\MALAnime;
+use Illuminate\Http\JsonResponse;
 
 class EpisodeController extends Controller
 {
-    public function Search($name)
+    public function Search(string $name): JsonResponse
     {
         $name = urldecode($name);
 
@@ -19,26 +20,23 @@ class EpisodeController extends Controller
             ->take(100)
             ->paginate(50, ['*'], 'page', 1);
 
-        $buildResponse = [];
-
-        foreach ($searchQuery->items() as $item) {
-            $newArray = [];
-            $newArray['id'] = $item['id'];
-            $newArray['anime_id'] = $item['uniqueID'];
-            $newArray['title'] = $item['title'];
-
-            $buildResponse[] = $newArray;
-        }
+        $buildResponse = $searchQuery->getCollection()->map(function ($item) {
+            return [
+                'id' => $item['id'],
+                'anime_id' => $item['uniqueID'],
+                'title' => $item['title'],
+            ];
+        });
 
         return response()->json($buildResponse);
     }
 
-    public function GetEpisode($id)
+    public function GetEpisode(int $id): JsonResponse
     {
         $episodeQuery = MALAnime::query()->where('id', $id)->first();
 
         if (empty($episodeQuery)) {
-            return response('Episode not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response()->json(['error' => "Episode not found: {$id}"], 404);
         }
 
         $buildResponse = [

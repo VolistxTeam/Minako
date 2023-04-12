@@ -17,118 +17,140 @@ use Jikan\Request\Anime\AnimeEpisodesRequest;
 
 class AnimeController extends Controller
 {
+
     public function Search(Request $request, $name)
     {
         $requestType = $request->input('type');
-
         $name = urldecode($name);
-
         $name = $this->escapeElasticReservedChars($name);
 
-        if (empty($requestType)) {
-            $searchQuery = NotifyAnime::query()
-                ->where('title_canonical', 'LIKE', "%$name%")
-                ->orWhere('title_romaji', 'LIKE', "%$name%")
-                ->orWhere('title_english', 'LIKE', "%$name%")
-                ->orWhere('title_japanese', 'LIKE', "%$name%")
-                ->orWhere('title_hiragana', 'LIKE', "%$name%")
-                ->orWhereJsonContains('title_synonyms', $name)
-                ->take(100)
-                ->paginate(50, ['*'], 'page', 1);
-        } else {
-            $searchQuery = NotifyAnime::query()
-                ->where('type', strtolower($requestType))
-                ->where('title_canonical', 'LIKE', "%$name%")
-                ->orWhere('title_romaji', 'LIKE', "%$name%")
-                ->orWhere('title_english', 'LIKE', "%$name%")
-                ->orWhere('title_japanese', 'LIKE', "%$name%")
-                ->orWhere('title_hiragana', 'LIKE', "%$name%")
-                ->orWhereJsonContains('title_synonyms', $name)
-                ->take(100)
-                ->paginate(50, ['*'], 'page', 1);
-        }
+        $searchQuery = NotifyAnime::query()
+            ->when($requestType, fn ($query) => $query->where('type', strtolower($requestType)))
+            ->where(function ($query) use ($name) {
+                $query->where('title_canonical', 'LIKE', "%$name%")
+                    ->orWhere('title_romaji', 'LIKE', "%$name%")
+                    ->orWhere('title_english', 'LIKE', "%$name%")
+                    ->orWhere('title_japanese', 'LIKE', "%$name%")
+                    ->orWhere('title_hiragana', 'LIKE', "%$name%")
+                    ->orWhereJsonContains('title_synonyms', $name);
+            })
+            ->take(100)
+            ->paginate(50, ['*'], 'page', 1);
 
-        $buildResponse = [];
+        $buildResponse = $searchQuery->getCollection()->map(function ($item) {
+            $filteredMappingData = [['service' => 'notify/anime', 'service_id' => (string)$item->notifyID]];
+            $filteredMappingData = array_merge($filteredMappingData, array_map(function ($item) {
+                return ['service' => $item['service'], 'service_id' => $item['serviceId']];
+            }, $itemQuery->mappings ?? []));
 
-        foreach ($searchQuery->items() as $item) {
-            $newArray = [];
-            $newArray['id'] = $item['uniqueID'];
-            $newArray['type'] = $item['type'];
-            $newArray['title'] = $item['title_canonical'];
+            $filteredTrailersData = array_map(function ($item) {
+                return ['service' => $item['service'], 'service_id' => $item['serviceId']];
+            }, $itemQuery->trailers ?? []);
 
-            $buildResponse[] = $newArray;
-        }
+            return [
+                'id'     => $item['uniqueID'],
+                'type'   => $item['type'],
+                'titles' => [
+                    'english'  => $item['title_english'],
+                    'japanese' => $item['title_japanese'],
+                    'romaji'   => $item['title_romaji'],
+                    'synonyms' => $item['synonyms'],
+                ],
+                'canonical_title' => $item['title_canonical'],
+                'synopsis'        => $item['summary'],
+                'status'          => $item['status'],
+                'genres'          => $item['genres'],
+                'start_date'      => $item['startDate'],
+                'end_date'        => $item['endDate'],
+                'source'          => $item['source'],
+                'poster_image'    => [
+                    'width'  => $item['image_width'],
+                    'height' => $item['image_height'],
+                    'format' => 'jpg',
+                    'link'   => config('app.url', 'http://localhost').'/anime/'.$item['uniqueID'].'/image',
+                ],
+                'rating' => [
+                    'average'    => !empty($item['rating_overall']) ? round($item['rating_overall'] * 10, 2) : null,
+                    'story'      => !empty($item['rating_story']) ? round($item['rating_story'] * 10, 2) : null,
+                    'visuals'    => !empty($item['rating_visuals']) ? round($item['rating_visuals'] * 10, 2) : null,
+                    'soundtrack' => !empty($item['rating_soundtrack']) ? round($item['rating_soundtrack'] * 10, 2) : null,
+                ],
+                'first_broadcaster' => $item['firstChannel'],
+                'episode_info'      => [
+                    'total'  => $item['episodeCount'],
+                    'length' => $item['episodeLength'],
+                ],
+                'mappings'   => $filteredMappingData,
+                'trailers'   => $filteredTrailersData,
+                'created_at' => (string) $item['created_at'],
+                'updated_at' => (string) $item['updated_at'],
+            ];
+        })->all();
 
         return response()->json($buildResponse);
     }
 
     public function GetItem($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
+        $itemQuery = NotifyAnime::query()
+            ->where('uniqueID', $uniqueID)
+            ->first();
 
         if (empty($itemQuery)) {
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $filteredMappingData = [];
+        $filteredMappingData = [['service' => 'notify/anime', 'service_id' => (string)$itemQuery->notifyID]];
+        $filteredMappingData = array_merge($filteredMappingData, array_map(function ($item) {
+            return ['service' => $item['service'], 'service_id' => $item['serviceId']];
+        }, $itemQuery->mappings ?? []));
 
-        $filteredMappingData[] = ['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID];
-
-        if (is_array($itemQuery->mappings)) {
-            foreach ($itemQuery->mappings as $item) {
-                $filteredMappingData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
-            }
-        }
-
-        $filteredTrailersData = [];
-
-        if (is_array($itemQuery->trailers)) {
-            foreach ($itemQuery->trailers as $item) {
-                $filteredTrailersData[] = ['service' => $item['service'], 'service_id' => $item['serviceId']];
-            }
-        }
+        $filteredTrailersData = array_map(function ($item) {
+            return ['service' => $item['service'], 'service_id' => $item['serviceId']];
+        }, $itemQuery->trailers ?? []);
 
         $buildResponse = [
-            'id'     => $itemQuery['uniqueID'],
-            'type'   => $itemQuery['type'],
+            'id' => $itemQuery->uniqueID,
+            'type' => $itemQuery->type,
             'titles' => [
-                'english'  => $itemQuery['title_english'],
-                'japanese' => $itemQuery['title_japanese'],
-                'romaji'   => $itemQuery['title_romaji'],
-                'synonyms' => $itemQuery['synonyms'],
+                'english' => $itemQuery->title_english,
+                'japanese' => $itemQuery->title_japanese,
+                'romaji' => $itemQuery->title_romaji,
+                'synonyms' => $itemQuery->synonyms,
             ],
-            'canonical_title' => $itemQuery['title_canonical'],
-            'synopsis'        => $itemQuery['summary'],
-            'status'          => $itemQuery['status'],
-            'genres'          => $itemQuery['genres'],
-            'start_date'      => $itemQuery['startDate'],
-            'end_date'        => $itemQuery['endDate'],
-            'source'          => $itemQuery['source'],
-            'poster_image'    => [
-                'width'  => $itemQuery['image_width'],
-                'height' => $itemQuery['image_height'],
+            'canonical_title' => $itemQuery->title_canonical,
+            'synopsis' => $itemQuery->summary,
+            'status' => $itemQuery->status,
+            'genres' => $itemQuery->genres,
+            'start_date' => $itemQuery->startDate,
+            'end_date' => $itemQuery->endDate,
+            'source' => $itemQuery->source,
+            'poster_image' => [
+                'width' => $itemQuery->image_width,
+                'height' => $itemQuery->image_height,
                 'format' => 'jpg',
-                'link'   => config('app.url', 'http://localhost').'/anime/'.$itemQuery['uniqueID'].'/image',
+                'link' => config('app.url', 'http://localhost').'/anime/'.$itemQuery->uniqueID.'/image',
             ],
             'rating' => [
-                'average'    => !empty($itemQuery['rating_overall']) ? round($itemQuery['rating_overall'] * 10, 2) : null,
-                'story'      => !empty($itemQuery['rating_story']) ? round($itemQuery['rating_story'] * 10, 2) : null,
-                'visuals'    => !empty($itemQuery['rating_visuals']) ? round($itemQuery['rating_visuals'] * 10, 2) : null,
-                'soundtrack' => !empty($itemQuery['rating_soundtrack']) ? round($itemQuery['rating_soundtrack'] * 10, 2) : null,
+                'average' => !empty($itemQuery->rating_overall) ? round($itemQuery->rating_overall * 10, 2) : null,
+                'story' => !empty($itemQuery->rating_story) ? round($itemQuery->rating_story * 10, 2) : null,
+                'visuals' => !empty($itemQuery->rating_visuals) ? round($itemQuery->rating_visuals * 10, 2) : null,
+                'soundtrack' => !empty($itemQuery->rating_soundtrack) ? round($itemQuery->rating_soundtrack * 10, 2) : null,
             ],
-            'first_broadcaster' => $itemQuery['firstChannel'],
-            'episode_info'      => [
-                'total'  => $itemQuery['episodeCount'],
-                'length' => $itemQuery['episodeLength'],
+            'first_broadcaster' => $itemQuery->firstChannel,
+            'episode_info' => [
+                'total' => $itemQuery->episodeCount,
+                'length' => $itemQuery->episodeLength,
             ],
-            'mappings'   => $filteredMappingData,
-            'trailers'   => $filteredTrailersData,
-            'created_at' => (string) $itemQuery['created_at'],
-            'updated_at' => (string) $itemQuery['updated_at'],
+            'mappings' => $filteredMappingData,
+            'trailers' => $filteredTrailersData,
+            'created_at' => (string)$itemQuery->created_at,
+            'updated_at' => (string)$itemQuery->updated_at,
         ];
 
         return response()->json($buildResponse);
     }
+
 
     public function GetImage($uniqueID)
     {
@@ -250,19 +272,13 @@ class AnimeController extends Controller
         $item = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
-            return response('Not supported type: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Not supported type: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $malID = '';
-
-        foreach ($item['mappings'] as $value) {
-            if ($value['service'] == 'myanimelist/anime') {
-                $malID = $value['serviceId'];
-            }
-        }
+        $malID = collect($item['mappings'])->firstWhere('service', 'myanimelist/anime')['serviceId'];
 
         if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
-            return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('No MAL ID found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $pageNumber = 1;

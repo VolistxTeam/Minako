@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Services;
 
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +13,50 @@ use Suin\RSSWriter\Item;
 
 class OhysController extends Controller
 {
+    private function formatTorrentData($torrent)
+    {
+        $announcesRebuild = collect($torrent['info_torrent_announces'])->filter(function ($item) {
+            return count($item) > 0;
+        })->pluck(0)->toArray();
+
+        $appUrl = config('app.url', 'http://localhost');
+
+        return [
+            'id' => $torrent['uniqueID'],
+            'anime_id' => optional($torrent->anime)->uniqueID,
+            'release_group' => $torrent['releaseGroup'],
+            'broadcaster' => $torrent['broadcaster'],
+            'title' => $torrent['title'],
+            'episode' => $torrent['episode'],
+            'torrent_name' => $torrent['torrentName'],
+            'info' => [
+                'hash' => $torrent['info_totalHash'],
+                'size' => $torrent['info_totalSize'],
+                'created_at' => $torrent['info_createdDate'],
+                'announces' => $announcesRebuild,
+                'files' => $torrent['info_torrent_files'],
+            ],
+            'metadata' => [
+                'video' => [
+                    'codec' => $torrent['metadata_video_codec'],
+                    'resolution' => $torrent['metadata_video_resolution'],
+                ],
+                'audio' => [
+                    'codec' => $torrent['metadata_audio_codec'],
+                ],
+            ],
+            'download' => [
+                'official' => [
+                    'torrent' => 'https://ohys.nl/tt/disk/' . $torrent['torrentName'],
+                ],
+                'mirror' => [
+                    'torrent' => $appUrl . '/ohys/' . $torrent['uniqueID'] . '/download?type=torrent',
+                    'magnet' => $appUrl . '/ohys/' . $torrent['uniqueID'] . '/download?type=magnet',
+                ],
+            ],
+        ];
+    }
+
     public function Search(Request $request, $name)
     {
         $name = urldecode($name);
@@ -23,37 +66,15 @@ class OhysController extends Controller
             ->orWhere('torrentName', 'LIKE', "%$name%")
             ->paginate(50, ['*'], 'p');
 
-        $itemsFiltered = [];
-
-        foreach ($torrentQuery->items() as $torrent) {
-            $itemsFiltered[] = [
-                'id'            => $torrent['uniqueID'],
-                'release_group' => $torrent['releaseGroup'],
-                'broadcaster'   => $torrent['broadcaster'],
-                'title'         => $torrent['title'],
-                'episode'       => $torrent['episode'],
-                'torrent_name'  => $torrent['torrentName'],
-                'info'          => [
-                    'size'       => $torrent['info_totalSize'],
-                    'created_at' => $torrent['info_createdDate'],
-                ],
-                'metadata' => [
-                    'video' => [
-                        'codec'      => $torrent['metadata_video_codec'],
-                        'resolution' => $torrent['metadata_video_resolution'],
-                    ],
-                    'audio' => [
-                        'codec' => $torrent['metadata_audio_codec'],
-                    ],
-                ],
-            ];
-        }
+        $itemsFiltered = $torrentQuery->getCollection()->map(function ($torrent) {
+            return $this->formatTorrentData($torrent);
+        });
 
         $buildResponse = [
             'pagination' => [
                 'per_page' => $torrentQuery->perPage(),
-                'current'  => $torrentQuery->currentPage(),
-                'total'    => $torrentQuery->lastPage(),
+                'current' => $torrentQuery->currentPage(),
+                'total' => $torrentQuery->lastPage(),
             ],
             'items' => $itemsFiltered,
         ];
@@ -71,7 +92,7 @@ class OhysController extends Controller
             ->title('Anime Database')
             ->description('Anime Database RSS Service')
             ->url('https://cryental.dev/services/anime')
-            ->feedUrl('https://api.minako.moe/ohys/service/rss')
+            ->feedUrl(config('app.url', 'http://localhost') . '/ohys/service/rss')
             ->appendTo($feed);
 
         foreach ($torrentQuery as $torrentItem) {
@@ -79,11 +100,10 @@ class OhysController extends Controller
             $item = new Item();
             $item
                 ->title("{$torrentItem['title']}{$itemDescription}")
-                ->url("https://api.minako.moe/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
+                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
                 ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
                 ->appendTo($channel);
         }
-
         $rssString = $feed->render();
 
         return response($rssString)->withHeaders(['Content-Type' => 'application/rss+xml; charset=utf-8']);
@@ -93,37 +113,15 @@ class OhysController extends Controller
     {
         $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
 
-        $itemsFiltered = [];
-
-        foreach ($torrentQuery->items() as $torrent) {
-            $itemsFiltered[] = [
-                'id'            => $torrent['uniqueID'],
-                'release_group' => $torrent['releaseGroup'],
-                'broadcaster'   => $torrent['broadcaster'],
-                'title'         => $torrent['title'],
-                'episode'       => $torrent['episode'],
-                'torrent_name'  => $torrent['torrentName'],
-                'info'          => [
-                    'size'       => $torrent['info_totalSize'],
-                    'created_at' => $torrent['info_createdDate'],
-                ],
-                'metadata' => [
-                    'video' => [
-                        'codec'      => $torrent['metadata_video_codec'],
-                        'resolution' => $torrent['metadata_video_resolution'],
-                    ],
-                    'audio' => [
-                        'codec' => $torrent['metadata_audio_codec'],
-                    ],
-                ],
-            ];
-        }
+        $itemsFiltered = $torrentQuery->getCollection()->map(function ($torrent) {
+            return $this->formatTorrentData($torrent);
+        });
 
         $buildResponse = [
             'pagination' => [
                 'per_page' => $torrentQuery->perPage(),
-                'current'  => $torrentQuery->currentPage(),
-                'total'    => $torrentQuery->lastPage(),
+                'current' => $torrentQuery->currentPage(),
+                'total' => $torrentQuery->lastPage(),
             ],
             'items' => $itemsFiltered,
         ];
@@ -136,51 +134,10 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
-            return response('Torrent not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $announcesRebuild = [];
-
-        foreach ($torrentQuery['info_torrent_announces'] as $item) {
-            if (count($item) > 0) {
-                $announcesRebuild[] = $item[0];
-            }
-        }
-
-        $buildResponse = [
-            'id'            => $torrentQuery['uniqueID'],
-            'anime_id'      => !empty($torrentQuery->anime->uniqueID) ? $torrentQuery->anime->uniqueID : null,
-            'release_group' => $torrentQuery['releaseGroup'],
-            'broadcaster'   => $torrentQuery['broadcaster'],
-            'title'         => $torrentQuery['title'],
-            'episode'       => $torrentQuery['episode'],
-            'torrent_name'  => $torrentQuery['torrentName'],
-            'info'          => [
-                'hash'       => $torrentQuery['info_totalHash'],
-                'size'       => $torrentQuery['info_totalSize'],
-                'created_at' => $torrentQuery['info_createdDate'],
-                'announces'  => $announcesRebuild,
-                'files'      => $torrentQuery['info_torrent_files'],
-            ],
-            'metadata' => [
-                'video' => [
-                    'codec'      => $torrentQuery['metadata_video_codec'],
-                    'resolution' => $torrentQuery['metadata_video_resolution'],
-                ],
-                'audio' => [
-                    'codec' => $torrentQuery['metadata_audio_codec'],
-                ],
-            ],
-            'download' => [
-                'official' => [
-                    'torrent' => 'https://ohys.nl/tt/disk/'.$torrentQuery['torrentName'],
-                ],
-                'mirror' => [
-                    'torrent' => env('APP_URL', 'http://localhost').'/ohys/'.$torrentQuery['uniqueID'].'/download?type=torrent',
-                    'magnet'  => env('APP_URL', 'http://localhost').'/ohys/'.$torrentQuery['uniqueID'].'/download?type=magnet',
-                ],
-            ],
-        ];
+        $buildResponse = $this->formatTorrentData($torrentQuery);
 
         return response()->json($buildResponse);
     }
@@ -190,25 +147,21 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
-            return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
         $requestType = $request->input('type', 'magnet');
 
         if ($requestType == 'torrent') {
-            $contents = Storage::disk('local')->get('torrents/'.$torrentQuery->torrentName);
+            $contents = Storage::disk('local')->get('torrents/' . $torrentQuery->torrentName);
 
             if (empty($contents)) {
-                return response('Torrent file not found: '.$id, 404)->header('Content-Type', 'text/plain');
+                return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
             }
 
-            return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename='.$torrentQuery->uniqueID.'.torrent');
+            return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
         } else {
-            $redirect = new RedirectResponse($torrentQuery->hidden_download_magnet, 302, []);
-
-            $redirect->setRequest($request);
-
-            return $redirect;
+            return redirect()->to($torrentQuery->hidden_download_magnet);
         }
     }
 }

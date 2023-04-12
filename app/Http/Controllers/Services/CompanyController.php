@@ -6,10 +6,9 @@ use App\Models\NotifyCompany;
 
 class CompanyController extends Controller
 {
-    public function Search($name)
+    public function Search(string $name)
     {
         $name = urldecode($name);
-
         $name = $this->escapeElasticReservedChars($name);
 
         $searchQuery = NotifyCompany::query()
@@ -19,24 +18,30 @@ class CompanyController extends Controller
             ->take(100)
             ->paginate(50, ['*'], 'page', 1);
 
-        $buildResponse = [];
-
-        foreach ($searchQuery->items() as $item) {
-            $newArray = [];
-            $newArray['id'] = $item['uniqueID'];
-            $newArray['title'] = $item['name_english'];
-
-            $buildResponse[] = $newArray;
-        }
+        $buildResponse = $searchQuery->getCollection()->map(function ($item) {
+            return [
+                'id'    => $item->uniqueID,
+                'names' => [
+                    'english'  => $item->name_english,
+                    'japanese' => $item->name_japanese,
+                    'synonyms' => $item->name_synonyms,
+                ],
+                'description' => $item->description,
+                'email'       => $item->email,
+                'links'       => $item->links,
+                'created_at'  => (string) $item->created_at,
+                'updated_at'  => (string) $item->updated_at,
+            ];
+        });
 
         return response()->json($buildResponse);
     }
 
-    public function GetCompany($id)
+    public function GetCompany(string $id)
     {
         $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
 
-        if (empty($itemQuery)) {
+        if (!$itemQuery) {
             return response('Company not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 

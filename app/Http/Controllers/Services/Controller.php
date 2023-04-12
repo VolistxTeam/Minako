@@ -9,16 +9,16 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
-    public function escapeElasticReservedChars($string)
+    protected function escapeElasticReservedChars(string $string): string
     {
         $regex = '/[\\+\\-\\=\\&\\|\\!\\(\\)\\{\\}\\[\\]\\^\\"\\~\\*\\<\\>\\?\\:\\\\\\/]/';
 
         return preg_replace($regex, addslashes('\\$0'), $string);
     }
 
-    public function customPaginate($items, $perPage = 15, $page = null, $options = [])
+    protected function customPaginate($items, int $perPage = 15, ?int $page = null, array $options = []): LengthAwarePaginator
     {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $page = $page ?: Paginator::resolveCurrentPage() ?: 1;
 
         $items = $items instanceof Collection ? $items : Collection::make($items);
 
