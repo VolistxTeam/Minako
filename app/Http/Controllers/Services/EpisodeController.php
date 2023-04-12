@@ -22,9 +22,9 @@ class EpisodeController extends Controller
 
         $buildResponse = $searchQuery->getCollection()->map(function ($item) {
             return [
-                'id' => $item['id'],
+                'id'       => $item['id'],
                 'anime_id' => $item['uniqueID'],
-                'title' => $item['title'],
+                'title'    => $item['title'],
             ];
         });
 

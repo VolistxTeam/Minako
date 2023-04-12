@@ -22,7 +22,7 @@ class CharacterController extends Controller
             ->paginate(50, ['*'], 'page', 1);
 
         $buildResponse = $searchQuery->getCollection()->transform(function ($item) {
-            $filteredMappingData = [['service' => 'notify/character', 'service_id' => (string)$item->notifyID]];
+            $filteredMappingData = [['service' => 'notify/character', 'service_id' => (string) $item->notifyID]];
 
             if (is_array($item->mappings)) {
                 foreach ($item->mappings as $item2) {
@@ -31,24 +31,24 @@ class CharacterController extends Controller
             }
 
             return [
-                'id' => $item->uniqueID,
+                'id'    => $item->uniqueID,
                 'names' => [
                     'canonical' => $item->name_canonical,
-                    'english' => $item->name_english,
-                    'japanese' => $item->name_japanese,
-                    'synonyms' => $item->name_synonyms,
+                    'english'   => $item->name_english,
+                    'japanese'  => $item->name_japanese,
+                    'synonyms'  => $item->name_synonyms,
                 ],
                 'description' => $item->description,
-                'image' => [
-                    'width' => $item->image_width,
+                'image'       => [
+                    'width'  => $item->image_width,
                     'height' => $item->image_height,
                     'format' => 'jpg',
-                    'link' => config('app.url', 'http://localhost') . '/character/' . $item->uniqueID . '/image',
+                    'link'   => config('app.url', 'http://localhost').'/character/'.$item->uniqueID.'/image',
                 ],
                 'attributes' => $item->attributes,
-                'mappings' => $filteredMappingData,
-                'created_at' => (string)$item->created_at,
-                'updated_at' => (string)$item->updated_at,
+                'mappings'   => $filteredMappingData,
+                'created_at' => (string) $item->created_at,
+                'updated_at' => (string) $item->updated_at,
             ];
         });
 
@@ -60,17 +60,18 @@ class CharacterController extends Controller
         $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (!$itemQuery) {
-            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $id = $itemQuery->uniqueID;
-        $imagePath = 'characters/' . $id . '.jpg';
+        $imagePath = 'characters/'.$id.'.jpg';
 
         if (!Storage::disk('local')->exists($imagePath)) {
-            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $contents = Storage::disk('local')->get($imagePath);
+
         return Response::make($contents, 200)->header('Content-Type', 'image/jpeg');
     }
 
@@ -79,10 +80,10 @@ class CharacterController extends Controller
         $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
 
         if (!$itemQuery) {
-            return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            return response('Character not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $filteredMappingData = [['service' => 'notify/character', 'service_id' => (string)$itemQuery->notifyID]];
+        $filteredMappingData = [['service' => 'notify/character', 'service_id' => (string) $itemQuery->notifyID]];
 
         if (is_array($itemQuery->mappings)) {
             foreach ($itemQuery->mappings as $item) {
@@ -91,24 +92,24 @@ class CharacterController extends Controller
         }
 
         $buildResponse = [
-            'id' => $itemQuery->uniqueID,
+            'id'    => $itemQuery->uniqueID,
             'names' => [
                 'canonical' => $itemQuery->name_canonical,
-                'english' => $itemQuery->name_english,
-                'japanese' => $itemQuery->name_japanese,
-                'synonyms' => $itemQuery->name_synonyms,
+                'english'   => $itemQuery->name_english,
+                'japanese'  => $itemQuery->name_japanese,
+                'synonyms'  => $itemQuery->name_synonyms,
             ],
             'description' => $itemQuery->description,
-            'image' => [
-                'width' => $itemQuery->image_width,
+            'image'       => [
+                'width'  => $itemQuery->image_width,
                 'height' => $itemQuery->image_height,
                 'format' => 'jpg',
-                'link' => config('app.url', 'http://localhost') . '/character/' . $itemQuery->uniqueID . '/image',
+                'link'   => config('app.url', 'http://localhost').'/character/'.$itemQuery->uniqueID.'/image',
             ],
             'attributes' => $itemQuery->attributes,
-            'mappings' => $filteredMappingData,
-            'created_at' => (string)$itemQuery->created_at,
-            'updated_at' => (string)$itemQuery->updated_at,
+            'mappings'   => $filteredMappingData,
+            'created_at' => (string) $itemQuery->created_at,
+            'updated_at' => (string) $itemQuery->updated_at,
         ];
 
         return response()->json($buildResponse);
