@@ -15,8 +15,8 @@ class AnimeCommand extends Command
 
     protected $description = 'Retrieve all anime information from notify.moe.';
 
-    private $sitemapURL = 'https://notify.moe/sitemap/anime.txt';
-    private $notifyBaseURL = 'https://notify.moe/anime/';
+    private string $sitemapURL = 'https://notify.moe/sitemap/anime.txt';
+    private string $notifyBaseURL = 'https://notify.moe/anime/';
 
     public function handle()
     {

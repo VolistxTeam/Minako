@@ -17,7 +17,7 @@ class RelationCommand extends Command
     {
         $this->setUnlimitedTimeLimit();
 
-        $allTorrents = OhysTorrent::query()->cursor();
+        $allTorrents = OhysTorrent::query()->orderByDesc('updated_at')->cursor();
 
         $totalCount = $allTorrents->count();
 

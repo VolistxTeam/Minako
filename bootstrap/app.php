@@ -33,6 +33,7 @@ $app->register(App\Providers\EventServiceProvider::class);
 // Additional libraries
 $app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+$app->register(\Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -53,6 +54,7 @@ $app->middleware([
 
 $app->routeMiddleware([
     'throttle'      => ThrottleRequests::class,
+    'cacheResponse' => \Spatie\ResponseCache\Middlewares\CacheResponse::class,
 ]);
 
 $app->router->group([

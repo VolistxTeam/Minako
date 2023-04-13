@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -10,7 +11,7 @@ class NotifyAnime extends Model
 {
     use HasFactory;
     use HasRelationships;
-
+    use Searchable;
     /**
      * Indicates if the model should be timestamped.
      *

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Classes\AnimeSearch;
+use App\Models\NotifyAnime;
 use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
 
@@ -17,8 +17,7 @@ class OhysRelationJob extends Job
 
     public function handle()
     {
-        $animeSearchEngine = new AnimeSearch();
-        $searchArray = $animeSearchEngine->searchByTitle($this->torrent->title, 1);
+        $searchArray = NotifyAnime::searchByTitle($this->torrent->title, 1);
 
         if (!empty($searchArray)) {
             $animeUniqueID = $searchArray[0]->obj['uniqueID'];

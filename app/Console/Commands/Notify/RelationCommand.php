@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands\Notify;
 
+use App\Jobs\NotifyCharacterRelationJob;
 use App\Jobs\NotifyRelationJob;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacterRelation;
 use App\Models\NotifyRelation;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -31,13 +33,16 @@ class RelationCommand extends Command
         $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
         $progressBar->start();
 
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+
         foreach ($allAnime as $item) {
             try {
                 if (!NotifyRelation::query()
-                        ->select('notifyID')
+                        ->select('notifyID', 'updated_at')
                         ->where('notifyID', $item->notifyID)
-                        ->exists()) {
-                    dispatch(new NotifyRelationJob($item->toArray()));
+                        ->whereDate('updated_at', '<', $sevenDaysAgo)
+                        ->count() > 0) {
+                    dispatch(new NotifyCharacterRelationJob($item->toArray()));
                 }
             } catch (Exception $ex) {
                 continue;
