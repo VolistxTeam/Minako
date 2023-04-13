@@ -39,16 +39,16 @@ class Kernel extends ConsoleKernel
     {
         set_time_limit(0);
 
-        $schedule->command('minako:ohys:download')->hourly()->withoutOverlapping();
+        $schedule->command('minako:ohys:download')->hourly();
 
-        $schedule->command('minako:notify:anime')->saturdays()->at('00:00')->withoutOverlapping();
-        $schedule->command('minako:notify:characters')->saturdays()->at('00:00')->withoutOverlapping();
-        $schedule->command('minako:notify:companies')->saturdays()->at('00:00')->withoutOverlapping();
-        $schedule->command('minako:notify:relations')->saturdays()->at('00:00')->withoutOverlapping();
-        $schedule->command('minako:notify:character-relations')->saturdays()->at('00:00')->withoutOverlapping();
-        $schedule->command('minako:notify:thumbnails')->sundays()->at('00:00')->withoutOverlapping();
-        $schedule->command('minako:notify:character-images')->sundays()->at('00:00')->withoutOverlapping();
+        $schedule->command('minako:notify:anime')->saturdays()->at('00:00');
+        $schedule->command('minako:notify:characters')->saturdays()->at('00:00');
+        $schedule->command('minako:notify:companies')->saturdays()->at('00:00');
+        $schedule->command('minako:notify:relations')->saturdays()->at('00:00');
+        $schedule->command('minako:notify:character-relations')->saturdays()->at('00:00');
+        $schedule->command('minako:notify:thumbnails')->sundays()->at('00:00');
+        $schedule->command('minako:notify:character-images')->sundays()->at('00:00');
 
-        $schedule->command('minako:mal:episodes --skip=13000')->weekly()->days([1, 4])->at('00:00')->withoutOverlapping();
+        $schedule->command('minako:mal:episodes --skip=13000')->weekly()->days([1, 4])->at('00:00');
     }
 }

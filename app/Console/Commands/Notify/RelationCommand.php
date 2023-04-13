@@ -31,14 +31,11 @@ class RelationCommand extends Command
         $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
         $progressBar->start();
 
-        $sevenDaysAgo = Carbon::now()->subDays(7);
-
         foreach ($allAnime as $item) {
             try {
                 if (!NotifyCharacterRelation::query()
                         ->select('notifyID', 'updated_at')
                         ->where('notifyID', $item->notifyID)
-                        ->whereDate('updated_at', '<', $sevenDaysAgo)
                         ->count() > 0) {
                     dispatch(new NotifyRelationJob($item->toArray()));
                 }
