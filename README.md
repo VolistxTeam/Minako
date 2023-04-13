@@ -12,8 +12,6 @@ Run commands:
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan cloudflare:reload
-php artisan stackpath:reload
 php artisan migrate
 ```
 
