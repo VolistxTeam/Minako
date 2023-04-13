@@ -3,7 +3,6 @@
 namespace App\Console\Commands\Notify;
 
 use App\Jobs\NotifyCharacterRelationJob;
-use App\Jobs\NotifyRelationJob;
 use App\Models\NotifyAnime;
 use App\Models\NotifyRelation;
 use Carbon\Carbon;

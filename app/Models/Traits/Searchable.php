@@ -70,11 +70,13 @@ trait Searchable
             if ($a->exactMatch === $b->exactMatch) {
                 return $b->similarity <=> $a->similarity;
             }
+
             return $b->exactMatch <=> $a->exactMatch;
         });
 
         return array_slice($results, 0, $maxLength);
     }
+
     private static function normalizeTerm(string $term): string
     {
         return strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $term));
