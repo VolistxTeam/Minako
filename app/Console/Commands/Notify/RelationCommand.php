@@ -5,6 +5,7 @@ namespace App\Console\Commands\Notify;
 use App\Jobs\NotifyRelationJob;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacterRelation;
+use App\Models\NotifyRelation;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -32,10 +33,10 @@ class RelationCommand extends Command
 
         foreach ($allAnime as $item) {
             try {
-                if (!NotifyCharacterRelation::query()
+                if (!NotifyRelation::query()
                         ->select('notifyID')
                         ->where('notifyID', $item->notifyID)
-                        ->first()) {
+                        ->exists()) {
                     dispatch(new NotifyRelationJob($item->toArray()));
                 }
             } catch (Exception $ex) {
