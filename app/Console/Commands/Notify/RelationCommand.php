@@ -5,7 +5,6 @@ namespace App\Console\Commands\Notify;
 use App\Jobs\NotifyRelationJob;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacterRelation;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 
