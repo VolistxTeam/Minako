@@ -25,12 +25,13 @@ class Controller extends BaseController
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 
-    protected function checkTitleBlacklist($title) {
-        if (filesize(__DIR__ . "/../../../../resources/blacklist.txt") == 0) {
+    protected function checkTitleBlacklist($title)
+    {
+        if (filesize(__DIR__.'/../../../../resources/blacklist.txt') == 0) {
             return false;
         }
 
-        $blacklist = file_get_contents(__DIR__ . "/../../../../resources/blacklist.txt");
+        $blacklist = file_get_contents(__DIR__.'/../../../../resources/blacklist.txt');
         $blacklistArr = explode("\n", $blacklist);
         $lowercaseTitle = strtolower($title);
         foreach ($blacklistArr as $blacklistedTitle) {
@@ -38,6 +39,7 @@ class Controller extends BaseController
                 return true;
             }
         }
+
         return false;
     }
 }
