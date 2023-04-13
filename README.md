@@ -34,15 +34,6 @@ php artisan minako:notify:thumbnails
 php artisan minako:notify:character-images
 php artisan minako:mal:episodes
 php artisan minako:ohys:download
-
-php artisan scout:import "App\Models\MALAnime"
-php artisan scout:import "App\Models\NotifyAnime"
-php artisan scout:import "App\Models\NotifyCharacter"
-php artisan scout:import "App\Models\NotifyCharacterRelation"
-php artisan scout:import "App\Models\NotifyCompany"
-php artisan scout:import "App\Models\NotifyRelation"
-php artisan scout:import "App\Models\OhysRelation"
-php artisan scout:import "App\Models\OhysTorrent"
 ```
 
 ### Swoole Setup
