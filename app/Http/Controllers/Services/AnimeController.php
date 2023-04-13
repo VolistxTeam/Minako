@@ -27,7 +27,6 @@ class AnimeController extends Controller
         $searchQuery = NotifyAnime::searchByTitle($name, 50, $type ?? null);
 
         $buildResponse = array_map(function ($item) {
-
             $filteredMappingData = [['service' => 'notify/anime', 'service_id' => (string) $item->obj->uniqueID]];
             $filteredMappingData = array_merge($filteredMappingData, array_map(function ($mappingItem) {
                 return ['service' => $mappingItem['service'], 'service_id' => $mappingItem['serviceId']];
@@ -79,7 +78,6 @@ class AnimeController extends Controller
 
         return response()->json($buildResponse);
     }
-
 
     public function GetItem($uniqueID)
     {

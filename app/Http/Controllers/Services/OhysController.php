@@ -68,6 +68,8 @@ class OhysController extends Controller
 
         $itemsFiltered = $torrentQuery->getCollection()->map(function ($torrent) {
             return $this->formatTorrentData($torrent);
+        })->filter(function ($torrent) {
+            return !$this->checkTitleBlacklist($torrent['title']);
         });
 
         $buildResponse = [
@@ -76,7 +78,7 @@ class OhysController extends Controller
                 'current'  => $torrentQuery->currentPage(),
                 'total'    => $torrentQuery->lastPage(),
             ],
-            'items' => $itemsFiltered,
+            'items' => $itemsFiltered->values(),
         ];
 
         return response()->json($buildResponse);
@@ -84,7 +86,14 @@ class OhysController extends Controller
 
     public function GetRSS()
     {
-        $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->limit(100)->get()->toArray();
+        $torrentQuery = OhysTorrent::query()
+            ->orderBy('info_createdDate', 'DESC')
+            ->limit(100)
+            ->get()
+            ->filter(function ($torrent) {
+                return !$this->checkTitleBlacklist($torrent->title);
+            })
+            ->toArray();
 
         $feed = new Feed();
         $channel = new Channel();
@@ -144,9 +153,11 @@ class OhysController extends Controller
 
     public function DownloadTorrent(Request $request, $id)
     {
-        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
+        $torrentQuery = OhysTorrent::query()
+            ->where('uniqueID', $id)
+            ->first();
 
-        if (empty($torrentQuery)) {
+        if (empty($torrentQuery) || $this->checkTitleBlacklist($torrentQuery->title)) {
             return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 

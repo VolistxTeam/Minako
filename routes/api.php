@@ -19,7 +19,7 @@ $router->group(['prefix' => 'anime'], function () use ($router) {
     $router->get('/{uniqueID}/sync', 'Services\AnimeController@SyncEpisodes');
 });
 
-$router->group(['middleware' => ['cacheResponse']], function () use ($router) {
+$router->group(['middleware' => []], function () use ($router) {
     $router->group(['prefix' => 'anime'], function () use ($router) {
         $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
         $router->get('/{uniqueID}/image', 'Services\AnimeController@GetImage');
