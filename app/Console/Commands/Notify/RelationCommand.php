@@ -34,9 +34,9 @@ class RelationCommand extends Command
         foreach ($allAnime as $item) {
             try {
                 if (!NotifyCharacterRelation::query()
-                        ->select('notifyID', 'updated_at')
+                        ->select('notifyID')
                         ->where('notifyID', $item->notifyID)
-                        ->count() > 0) {
+                        ->first()) {
                     dispatch(new NotifyRelationJob($item->toArray()));
                 }
             } catch (Exception $ex) {
