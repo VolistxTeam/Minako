@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands\Auth;
 
-use Illuminate\Console\Command;
 use App\Repositories\AccessTokenRepository;
+use Illuminate\Console\Command;
 
 class AccessKeyDeleteCommand extends Command
 {

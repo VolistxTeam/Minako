@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
         Commands\Ohys\RelationCommand::class,
         Commands\Ohys\RecreateCommand::class,
 
-        Commands\Auth\AccessKeyGenerateCommand::class
+        Commands\Auth\AccessKeyGenerateCommand::class,
     ];
 
     /**
