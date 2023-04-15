@@ -14,7 +14,7 @@ class AccessTokenRepository
         return AccessToken::query()->create([
             'key'           => substr($inputs['key'], 0, 32),
             'secret'        => SHA256Hasher::make(substr($inputs['key'], 32), ['salt' => $inputs['salt']]),
-            'secret_salt'   => $inputs['salt']
+            'secret_salt'   => $inputs['salt'],
         ]);
     }
 

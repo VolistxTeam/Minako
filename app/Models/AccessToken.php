@@ -24,7 +24,7 @@ class AccessToken extends Model
     protected $fillable = [
         'key',
         'secret',
-        'secret_salt'
+        'secret_salt',
     ];
 
     protected $casts = [
