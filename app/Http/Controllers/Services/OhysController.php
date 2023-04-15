@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\Facades\OhysBlacklist;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -69,7 +70,7 @@ class OhysController extends Controller
         $itemsFiltered = $torrentQuery->getCollection()->map(function ($torrent) {
             return $this->formatTorrentData($torrent);
         })->filter(function ($torrent) {
-            return !$this->checkTitleBlacklist($torrent['title']);
+            return OhysBlacklist::isBlacklistedTitle($torrent['title']);
         });
 
         $buildResponse = [
@@ -91,7 +92,7 @@ class OhysController extends Controller
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
-                return !$this->checkTitleBlacklist($torrent->title);
+                return OhysBlacklist::isBlacklistedTitle($torrent->title);
             })
             ->toArray();
 
@@ -157,7 +158,7 @@ class OhysController extends Controller
             ->where('uniqueID', $id)
             ->first();
 
-        if (empty($torrentQuery) || $this->checkTitleBlacklist($torrentQuery->title)) {
+        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
             return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 

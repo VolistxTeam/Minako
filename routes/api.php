@@ -56,5 +56,15 @@ $router->group(['middleware' => []], function () use ($router) {
         $router->get('/{id}/download', 'Services\OhysController@DownloadTorrent');
         $router->get('/search/{name}', 'Services\OhysController@Search');
         $router->get('/service/rss', 'Services\OhysController@GetRSS');
+
+        $router->group(['prefix' => '/blacklist'], function () use ($router) {
+            $router->post('/', 'Auth\OhysBlacklistController@CreateOhysBlacklistTitle');
+            $router->patch('/{title_id}', 'Auth\OhysBlacklistController@UpdateOhysBlacklistTitle');
+            $router->get('/', 'Auth\OhysBlacklistController@GetOhysBlacklistTitles');
+            $router->get('/{title_id}}', 'Auth\OhysBlacklistController@GetOhysBlacklistTitle');
+            $router->delete('/{title_id}}', 'Auth\OhysBlacklistController@DeleteOhysBlacklistTitle');
+        });
     });
+
+
 });
