@@ -16,7 +16,7 @@ class OhysBlacklistTitleRepository
         return OhysBlacklistTitle::query()->create([
             'name'        => strtolower($inputs['name']),
             'is_active'   => true,
-            'reason'      => $inputs['reason']
+            'reason'      => $inputs['reason'] ?? "DMCA"
         ]);
     }
 
@@ -50,6 +50,10 @@ class OhysBlacklistTitleRepository
         return OhysBlacklistTitle::query()->where('id', $title_id)->first();
     }
 
+    public  function Contains(string $search):bool  {
+       return OhysBlacklistTitle::query()->where('name', 'LIKE', `%$search%`)->exists();
+    }
+
     public function Delete($title_id): ?bool
     {
         $toBeDeletedTitleBlacklist = $this->Find($title_id);
@@ -60,14 +64,13 @@ class OhysBlacklistTitleRepository
 
         try {
             $toBeDeletedTitleBlacklist->delete();
-
             return true;
         } catch (Exception $ex) {
             return false;
         }
     }
 
-    public function FindAll(): LengthAwarePaginator|null
+    public function FindAll(): \Illuminate\Database\Eloquent\Collection
     {
         return OhysBlacklistTitle::all();
     }

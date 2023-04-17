@@ -156,17 +156,15 @@ class OhysBlacklistController extends Controller
 
             $titles = $this->ohysBlacklistTitleRepository->FindAll();
 
-            if (!$titles) {
-                return response()->json('Invalid search column', 400);
-            }
-
             $items = [];
-            foreach ($titles->items() as $item) {
+
+            foreach ($titles as $item) {
                 $items[] = OhysBlacklistTitleDTO::fromModel($item)->GetDTO();
             }
 
             return response()->json($items);
         } catch (Exception $ex) {
+            ray($ex);
             return response()->json('An error has occurred', 500);
         }
     }
