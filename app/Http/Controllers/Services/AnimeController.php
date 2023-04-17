@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\DataTransferObjects\AnimeDTO;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
@@ -26,57 +27,13 @@ class AnimeController extends Controller
 
         $searchQuery = NotifyAnime::searchByTitle($name, 50, $type ?? null);
 
-        $buildResponse = array_map(function ($item) {
-            $filteredMappingData = [['service' => 'notify/anime', 'service_id' => (string) $item->obj->uniqueID]];
-            $filteredMappingData = array_merge($filteredMappingData, array_map(function ($mappingItem) {
-                return ['service' => $mappingItem['service'], 'service_id' => $mappingItem['serviceId']];
-            }, $item->obj->mappings ?? []));
+        $response = [];
 
-            $filteredTrailersData = array_map(function ($trailerItem) {
-                return ['service' => $trailerItem['service'], 'service_id' => $trailerItem['serviceId']];
-            }, $item->obj->trailers ?? []);
+        foreach ($searchQuery as $query) {
+            $response[] = AnimeDTO::fromModel($query->obj);
+        }
 
-            return [
-                'id'     => $item->obj->uniqueID,
-                'type'   => $item->obj->type,
-                'titles' => [
-                    'english'  => $item->obj->title_english,
-                    'japanese' => $item->obj->title_japanese,
-                    'romaji'   => $item->obj->title_romaji,
-                    'synonyms' => $item->obj->synonyms,
-                ],
-                'canonical_title' => $item->obj->title_canonical,
-                'synopsis'        => $item->obj->summary,
-                'status'          => $item->obj->status,
-                'genres'          => $item->obj->genres,
-                'start_date'      => $item->obj->startDate,
-                'end_date'        => $item->obj->endDate,
-                'source'          => $item->obj->source,
-                'poster_image'    => [
-                    'width'  => $item->obj->image_width,
-                    'height' => $item->obj->image_height,
-                    'format' => 'jpg',
-                    'link'   => config('app.url', 'http://localhost').'/anime/'.$item->obj->uniqueID.'/image',
-                ],
-                'rating' => [
-                    'average'    => !empty($item->obj->rating_overall) ? round($item->obj->rating_overall * 10, 2) : null,
-                    'story'      => !empty($item->obj->rating_story) ? round($item->obj->rating_story * 10, 2) : null,
-                    'visuals'    => !empty($item->obj->rating_visuals) ? round($item->obj->rating_visuals * 10, 2) : null,
-                    'soundtrack' => !empty($item->obj->rating_soundtrack) ? round($item->obj->rating_soundtrack * 10, 2) : null,
-                ],
-                'first_broadcaster' => $item->obj->firstChannel,
-                'episode_info'      => [
-                    'total'  => $item->obj->episodeCount,
-                    'length' => $item->obj->episodeLength,
-                ],
-                'mappings'   => $filteredMappingData,
-                'trailers'   => $filteredTrailersData,
-                'created_at' => (string) $item->obj->created_at,
-                'updated_at' => (string) $item->obj->updated_at,
-            ];
-        }, $searchQuery);
-
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 
     public function GetItem($uniqueID)
@@ -89,55 +46,9 @@ class AnimeController extends Controller
             return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $filteredMappingData = [['service' => 'notify/anime', 'service_id' => (string) $itemQuery->notifyID]];
-        $filteredMappingData = array_merge($filteredMappingData, array_map(function ($item) {
-            return ['service' => $item['service'], 'service_id' => $item['serviceId']];
-        }, $itemQuery->mappings ?? []));
+        $response = AnimeDTO::fromModel($itemQuery);
 
-        $filteredTrailersData = array_map(function ($item) {
-            return ['service' => $item['service'], 'service_id' => $item['serviceId']];
-        }, $itemQuery->trailers ?? []);
-
-        $buildResponse = [
-            'id'     => $itemQuery->uniqueID,
-            'type'   => $itemQuery->type,
-            'titles' => [
-                'english'  => $itemQuery->title_english,
-                'japanese' => $itemQuery->title_japanese,
-                'romaji'   => $itemQuery->title_romaji,
-                'synonyms' => $itemQuery->synonyms,
-            ],
-            'canonical_title' => $itemQuery->title_canonical,
-            'synopsis'        => $itemQuery->summary,
-            'status'          => $itemQuery->status,
-            'genres'          => $itemQuery->genres,
-            'start_date'      => $itemQuery->startDate,
-            'end_date'        => $itemQuery->endDate,
-            'source'          => $itemQuery->source,
-            'poster_image'    => [
-                'width'  => $itemQuery->image_width,
-                'height' => $itemQuery->image_height,
-                'format' => 'jpg',
-                'link'   => config('app.url', 'http://localhost').'/anime/'.$itemQuery->uniqueID.'/image',
-            ],
-            'rating' => [
-                'average'    => !empty($itemQuery->rating_overall) ? round($itemQuery->rating_overall * 10, 2) : null,
-                'story'      => !empty($itemQuery->rating_story) ? round($itemQuery->rating_story * 10, 2) : null,
-                'visuals'    => !empty($itemQuery->rating_visuals) ? round($itemQuery->rating_visuals * 10, 2) : null,
-                'soundtrack' => !empty($itemQuery->rating_soundtrack) ? round($itemQuery->rating_soundtrack * 10, 2) : null,
-            ],
-            'first_broadcaster' => $itemQuery->firstChannel,
-            'episode_info'      => [
-                'total'  => $itemQuery->episodeCount,
-                'length' => $itemQuery->episodeLength,
-            ],
-            'mappings'   => $filteredMappingData,
-            'trailers'   => $filteredTrailersData,
-            'created_at' => (string) $itemQuery->created_at,
-            'updated_at' => (string) $itemQuery->updated_at,
-        ];
-
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 
     public function GetImage($uniqueID)
