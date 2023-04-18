@@ -18,29 +18,29 @@ class CharacterDTO extends DataTransferObjectBase
             ]
         ];
 
-        foreach ($this->entity->mappings as $item) {
+        foreach ($this->entity->mappings ?? [] as $item) {
             $filteredMappingData[] = MappingDTO::fromModel($item)->GetDTO();
         }
 
         return [
             'id' => $this->entity->uniqueID,
             'names' => [
-                'canonical' =>  $this->entity->name_canonical,
-                'english' =>  $this->entity->name_english,
-                'japanese' =>  $this->entity->name_japanese,
-                'synonyms' =>  $this->entity->name_synonyms,
+                'canonical' => $this->entity->name_canonical,
+                'english' => $this->entity->name_english,
+                'japanese' => $this->entity->name_japanese,
+                'synonyms' => $this->entity->name_synonyms,
             ],
-            'description' =>  $this->entity->description,
+            'description' => $this->entity->description,
             'image' => [
-                'width' =>  $this->entity->image_width,
-                'height' =>  $this->entity->image_height,
+                'width' => $this->entity->image_width,
+                'height' => $this->entity->image_height,
                 'format' => 'jpg',
-                'link' => config('app.url', 'http://localhost') . '/character/' .  $this->entity->uniqueID . '/image',
+                'link' => config('app.url', 'http://localhost') . '/character/' . $this->entity->uniqueID . '/image',
             ],
-            'attributes' =>  $this->entity->attributes,
+            'attributes' => $this->entity->attributes,
             'mappings' => $filteredMappingData,
-            'created_at' => (string) $this->entity->created_at,
-            'updated_at' => (string) $this->entity->updated_at,
+            'created_at' => (string)$this->entity->created_at,
+            'updated_at' => (string)$this->entity->updated_at,
         ];
     }
 
