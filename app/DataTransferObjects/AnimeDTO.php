@@ -18,16 +18,17 @@ class AnimeDTO extends DataTransferObjectBase
                 'service_id' => (string)$this->entity->uniqueID
             ]
         ];
+
         //append extra mappings
         foreach ($this->entity->mappings ?? [] as $mapping) {
-            $filteredMappingData[] = $this->getServiceDetails($mapping);
+            $filteredMappingData[] = MappingDTO::fromModel($mapping)->GetDTO();
         }
 
         //initial filtered trailer data
         $filteredTrailersData = [];
         //append extra trailers
         foreach ($this->entity->trailers ?? [] as $trailer) {
-            $filteredTrailersData[] = $this->getServiceDetails($trailer);
+            $filteredTrailersData[] = MappingDTO::fromModel($trailer)->GetDTO();
         }
 
         return [
@@ -67,14 +68,6 @@ class AnimeDTO extends DataTransferObjectBase
             'trailers' => $filteredTrailersData,
             'created_at' => (string)$this->entity->created_at,
             'updated_at' => (string)$this->entity->updated_at,
-        ];
-    }
-
-    private function getServiceDetails($service_entity): array
-    {
-        return [
-            'service' => $service_entity['service'],
-            'service_id' => $service_entity['serviceId']
         ];
     }
 }
