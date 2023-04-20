@@ -33,8 +33,8 @@ class OhysController extends Controller
         $buildResponse = [
             'pagination' => [
                 'per_page' => $torrentQuery->perPage(),
-                'current'  => $torrentQuery->currentPage(),
-                'total'    => $torrentQuery->lastPage(),
+                'current' => $torrentQuery->currentPage(),
+                'total' => $torrentQuery->lastPage(),
             ],
             'items' => $itemsFiltered->values(),
         ];
@@ -59,7 +59,7 @@ class OhysController extends Controller
             ->title('Anime Database')
             ->description('Anime Database RSS Service')
             ->url('https://cryental.dev/services/anime')
-            ->feedUrl(config('app.url', 'http://localhost').'/ohys/service/rss')
+            ->feedUrl(config('app.url', 'http://localhost') . '/ohys/service/rss')
             ->appendTo($feed);
 
         foreach ($torrentQuery as $torrentItem) {
@@ -67,7 +67,7 @@ class OhysController extends Controller
             $item = new Item();
             $item
                 ->title("{$torrentItem['title']}{$itemDescription}")
-                ->url(config('app.url', 'http://localhost')."/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
+                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
                 ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
                 ->appendTo($channel);
         }
@@ -87,8 +87,8 @@ class OhysController extends Controller
         $buildResponse = [
             'pagination' => [
                 'per_page' => $torrentQuery->perPage(),
-                'current'  => $torrentQuery->currentPage(),
-                'total'    => $torrentQuery->lastPage(),
+                'current' => $torrentQuery->currentPage(),
+                'total' => $torrentQuery->lastPage(),
             ],
             'items' => $itemsFiltered,
         ];
@@ -101,7 +101,7 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery)) {
-            return response('Torrent not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
         $buildResponse = $this->formatTorrentData($torrentQuery);
@@ -116,19 +116,19 @@ class OhysController extends Controller
             ->first();
 
         if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
-            return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
         $requestType = $request->input('type', 'magnet');
 
         if ($requestType == 'torrent') {
-            $contents = Storage::disk('local')->get('torrents/'.$torrentQuery->torrentName);
+            $contents = Storage::disk('local')->get('torrents/' . $torrentQuery->torrentName);
 
             if (empty($contents)) {
-                return response('Torrent file not found: '.$id, 404)->header('Content-Type', 'text/plain');
+                return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
             }
 
-            return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename='.$torrentQuery->uniqueID.'.torrent');
+            return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
         } else {
             return redirect()->to($torrentQuery->hidden_download_magnet);
         }

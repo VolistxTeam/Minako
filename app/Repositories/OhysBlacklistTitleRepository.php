@@ -50,8 +50,8 @@ class OhysBlacklistTitleRepository
         return OhysBlacklistTitle::query()->where('id', $title_id)->first();
     }
 
-    public  function Contains(string $search):bool  {
-       return OhysBlacklistTitle::query()->where('name', 'LIKE', `%$search%`)->exists();
+    public function Contains(string $search):bool  {
+       return OhysBlacklistTitle::query()->where('name', "%$search%")->exists();
     }
 
     public function Delete($title_id): ?bool
