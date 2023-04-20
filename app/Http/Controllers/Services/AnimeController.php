@@ -37,7 +37,7 @@ class AnimeController extends Controller
         $response = [];
 
         foreach ($searchQuery as $query) {
-            $response[] = AnimeDTO::fromModel($query->obj);
+            $response[] = AnimeDTO::fromModel($query->obj)->GetDTO();
         }
 
         return response()->json($response);
@@ -53,7 +53,7 @@ class AnimeController extends Controller
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response = AnimeDTO::fromModel($itemQuery);
+        $response = AnimeDTO::fromModel($itemQuery)->GetDTO();
 
         return response()->json($response);
     }

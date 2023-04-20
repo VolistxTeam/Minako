@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\DataTransferObjects\CompanyDTO;
 use App\Models\NotifyCompany;
 
 class CompanyController extends Controller
@@ -18,23 +19,11 @@ class CompanyController extends Controller
             ->take(100)
             ->paginate(50, ['*'], 'page', 1);
 
-        $buildResponse = $searchQuery->getCollection()->map(function ($item) {
-            return [
-                'id'    => $item->uniqueID,
-                'names' => [
-                    'english'  => $item->name_english,
-                    'japanese' => $item->name_japanese,
-                    'synonyms' => $item->name_synonyms,
-                ],
-                'description' => $item->description,
-                'email'       => $item->email,
-                'links'       => $item->links,
-                'created_at'  => (string) $item->created_at,
-                'updated_at'  => (string) $item->updated_at,
-            ];
+        $response = $searchQuery->getCollection()->map(function ($item) {
+            return CompanyDTO::fromModel($item)->GetDTO();
         });
 
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 
     public function GetCompany(string $id)
@@ -45,20 +34,8 @@ class CompanyController extends Controller
             return response('Company not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $buildResponse = [
-            'id'    => $itemQuery->uniqueID,
-            'names' => [
-                'english'  => $itemQuery->name_english,
-                'japanese' => $itemQuery->name_japanese,
-                'synonyms' => $itemQuery->name_synonyms,
-            ],
-            'description' => $itemQuery->description,
-            'email'       => $itemQuery->email,
-            'links'       => $itemQuery->links,
-            'created_at'  => (string) $itemQuery->created_at,
-            'updated_at'  => (string) $itemQuery->updated_at,
-        ];
+        $response = CompanyDTO::fromModel($itemQuery)->GetDTO();
 
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 }

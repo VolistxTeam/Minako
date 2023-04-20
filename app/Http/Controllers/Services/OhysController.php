@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\DataTransferObjects\TorrentDTO;
 use App\Facades\OhysBlacklist;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
@@ -14,50 +15,6 @@ use Suin\RSSWriter\Item;
 
 class OhysController extends Controller
 {
-    private function formatTorrentData($torrent)
-    {
-        $announcesRebuild = collect($torrent['info_torrent_announces'])->filter(function ($item) {
-            return count($item) > 0;
-        })->pluck(0)->toArray();
-
-        $appUrl = config('app.url', 'http://localhost');
-
-        return [
-            'id'            => $torrent['uniqueID'],
-            'anime_id'      => optional($torrent->anime)->uniqueID,
-            'release_group' => $torrent['releaseGroup'],
-            'broadcaster'   => $torrent['broadcaster'],
-            'title'         => $torrent['title'],
-            'episode'       => $torrent['episode'],
-            'torrent_name'  => $torrent['torrentName'],
-            'info'          => [
-                'hash'       => $torrent['info_totalHash'],
-                'size'       => $torrent['info_totalSize'],
-                'created_at' => $torrent['info_createdDate'],
-                'announces'  => $announcesRebuild,
-                'files'      => $torrent['info_torrent_files'],
-            ],
-            'metadata' => [
-                'video' => [
-                    'codec'      => $torrent['metadata_video_codec'],
-                    'resolution' => $torrent['metadata_video_resolution'],
-                ],
-                'audio' => [
-                    'codec' => $torrent['metadata_audio_codec'],
-                ],
-            ],
-            'download' => [
-                'official' => [
-                    'torrent' => 'https://ohys.nl/tt/disk/'.$torrent['torrentName'],
-                ],
-                'mirror' => [
-                    'torrent' => $appUrl.'/ohys/'.$torrent['uniqueID'].'/download?type=torrent',
-                    'magnet'  => $appUrl.'/ohys/'.$torrent['uniqueID'].'/download?type=magnet',
-                ],
-            ],
-        ];
-    }
-
     public function Search(Request $request, $name)
     {
         $name = urldecode($name);
@@ -67,10 +24,10 @@ class OhysController extends Controller
             ->orWhere('torrentName', 'LIKE', "%$name%")
             ->paginate(50, ['*'], 'p');
 
-        $itemsFiltered = $torrentQuery->getCollection()->map(function ($torrent) {
-            return $this->formatTorrentData($torrent);
-        })->filter(function ($torrent) {
-            return OhysBlacklist::isBlacklistedTitle($torrent['title']);
+        $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
+            return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
+        })->map(function ($torrent) {
+            return TorrentDTO::fromModel($torrent)->GetDTO();
         });
 
         $buildResponse = [
