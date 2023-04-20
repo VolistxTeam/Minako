@@ -32,6 +32,8 @@ php artisan minako:notify:thumbnails
 php artisan minako:notify:character-images
 php artisan minako:mal:episodes
 php artisan minako:ohys:download
+php artisan minako:ohys:relations
+
 ```
 
 ### Swoole Setup
