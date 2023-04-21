@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Services;
 
 use App\DataTransferObjects\AnimeDTO;
 use App\DataTransferObjects\CharacterDTO;
+use App\DataTransferObjects\CompanyDTO;
 use App\DataTransferObjects\EpisodeDTO;
-use App\DataTransferObjects\LicensorDTO;
 use App\DataTransferObjects\MappingDTO;
 use App\DataTransferObjects\ProducerDTO;
 use App\DataTransferObjects\RelationDTO;
@@ -306,7 +306,7 @@ class AnimeController extends Controller
             $licensorQuery = NotifyCompany::query()->where('notifyID', $item)->first();
 
             if (!empty($licensorQuery)) {
-                $filteredLicensorData[] = LicensorDTO::fromModel($licensorQuery)->GetDTO();
+                $filteredLicensorData[] = CompanyDTO::fromModel($licensorQuery)->GetDTO();
             }
         }
 
