@@ -49,7 +49,7 @@ class OhysController extends Controller
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
-                return OhysBlacklist::isBlacklistedTitle($torrent->title);
+                return OhysBlacklist::isBlacklistedTitle($torrent['title']);
             })
             ->toArray();
 
@@ -80,8 +80,10 @@ class OhysController extends Controller
     {
         $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
 
-        $itemsFiltered = $torrentQuery->getCollection()->map(function ($torrent) {
-            return $this->formatTorrentData($torrent);
+        $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
+            return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
+        })->map(function ($torrent) {
+            return TorrentDTO::fromModel($torrent)->GetDTO();
         });
 
         $buildResponse = [
@@ -104,7 +106,7 @@ class OhysController extends Controller
             return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $buildResponse = $this->formatTorrentData($torrentQuery);
+        $buildResponse =  TorrentDTO::fromModel($torrentQuery)->GetDTO();
 
         return response()->json($buildResponse);
     }

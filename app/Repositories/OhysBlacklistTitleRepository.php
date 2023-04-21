@@ -50,10 +50,6 @@ class OhysBlacklistTitleRepository
         return OhysBlacklistTitle::query()->where('id', $title_id)->first();
     }
 
-    public function Contains(string $search):bool  {
-       return OhysBlacklistTitle::query()->where('name', "%$search%")->exists();
-    }
-
     public function Delete($title_id): ?bool
     {
         $toBeDeletedTitleBlacklist = $this->Find($title_id);
@@ -68,6 +64,10 @@ class OhysBlacklistTitleRepository
         } catch (Exception $ex) {
             return false;
         }
+    }
+
+    public function FindTitles() {
+        return OhysBlacklistTitle::query()->pluck('name')->toArray();
     }
 
     public function FindAll(): \Illuminate\Database\Eloquent\Collection
