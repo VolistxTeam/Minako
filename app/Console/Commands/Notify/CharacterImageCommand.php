@@ -71,3 +71,4 @@ class CharacterImageCommand extends Command
         }
     }
 }
+// this is minako refactor

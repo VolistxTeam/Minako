@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Services;
 
+use App\DataTransferObjects\EpisodeDTO;
+use App\DataTransferObjects\EpisodeInformationDTO;
 use App\Models\MALAnime;
 use Illuminate\Http\JsonResponse;
 
@@ -21,11 +23,7 @@ class EpisodeController extends Controller
             ->paginate(50, ['*'], 'page', 1);
 
         $buildResponse = $searchQuery->getCollection()->map(function ($item) {
-            return [
-                'id'       => $item['id'],
-                'anime_id' => $item['uniqueID'],
-                'title'    => $item['title'],
-            ];
+            return EpisodeInformationDTO::fromModel($item)->GetDTO();
         });
 
         return response()->json($buildResponse);
@@ -39,19 +37,8 @@ class EpisodeController extends Controller
             return response()->json(['error' => "Episode not found: {$id}"], 404);
         }
 
-        $buildResponse = [
-            'id'             => $episodeQuery['uniqueID'],
-            'episode_number' => $episodeQuery['episode_id'],
-            'titles'         => [
-                'english'  => !empty($episodeQuery['title']) ? trim($episodeQuery['title'], chr(0xC2).chr(0xA0)) : null,
-                'japanese' => !empty($episodeQuery['title_japanese']) ? trim($episodeQuery['title_japanese'], chr(0xC2).chr(0xA0)) : null,
-                'romaji'   => !empty($episodeQuery['title_romanji']) ? trim($episodeQuery['title_romanji'], chr(0xC2).chr(0xA0)) : null,
-            ],
-            'aired'      => $episodeQuery['aired'],
-            'created_at' => (string) $episodeQuery['created_at'],
-            'updated_at' => (string) $episodeQuery['updated_at'],
-        ];
+        $response = EpisodeDTO::fromModel($episodeQuery)->GetDTO();
 
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 }

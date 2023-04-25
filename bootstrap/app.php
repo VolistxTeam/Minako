@@ -35,6 +35,10 @@ $app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(\Spatie\ResponseCache\ResponseCacheServiceProvider::class);
 
+//Facades providers
+$app->register(\App\Providers\KeysServiceProvider::class);
+$app->register(\App\Providers\OhysBlacklistServiceProvider::class);
+
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
