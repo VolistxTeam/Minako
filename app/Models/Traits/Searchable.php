@@ -25,15 +25,6 @@ trait Searchable
             $notifyQuery->where('type', $type);
         }
 
-        $notifyQuery->where(function ($query) use ($term) {
-            $query->where('title_canonical', 'like', "%{$term}%")
-                ->orWhere('title_english', 'like', "%{$term}%")
-                ->orWhere('title_romaji', 'like', "%{$term}%")
-                ->orWhere('title_japanese', 'like', "%{$term}%")
-                ->orWhere('title_hiragana', 'like', "%{$term}%")
-                ->orWhereJsonContains('title_synonyms', $term);
-        });
-
         foreach ($notifyQuery->cursor() as $item) {
             $titles = self::getNormalizedTitles($item);
             $bestSimilarity = -1;
