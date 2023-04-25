@@ -92,7 +92,7 @@ class OhysController extends Controller
                 'current' => $torrentQuery->currentPage(),
                 'total' => $torrentQuery->lastPage(),
             ],
-            'items' => $itemsFiltered,
+            'items' => $itemsFiltered->values(),
         ];
 
         return response()->json($buildResponse);
