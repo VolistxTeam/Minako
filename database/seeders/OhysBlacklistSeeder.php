@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Repositories\OhysBlacklistTitleRepository;
+use App\Models\OhysBlacklistTitle;
 use Illuminate\Database\Seeder;
 
 class OhysBlacklistSeeder extends Seeder
@@ -12,53 +12,23 @@ class OhysBlacklistSeeder extends Seeder
      *
      * @return void
      */
-    public function run(OhysBlacklistTitleRepository $repository)
+    public function run()
     {
-        $repository->Create([
-            'name' => 'Angel Beats'
-        ]);
-        $repository->Create([
-            'name' => 'Black Clover'
-        ]);
-        $repository->Create([
-            'name' => 'Code Geass'
-        ]);
-        $repository->Create([
-            'name' => 'Dr. Stone'
-        ]);
-        $repository->Create([
-            'name' => 'Fairy Tail'
-        ]);
-        $repository->Create([
-            'name' => 'Fruits Basket'
-        ]);
-        $repository->Create([
-            'name' => 'Goblin Slayer'
-        ]);
-        $repository->Create([
-            'name' => 'Jujutsu Kaisen'
-        ]);
-        $repository->Create([
-            'name' => 'Noragami'
-        ]);
+        $filename = __DIR__ . '/../../blacklist_anime.txt';
+        $names = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-        $repository->Create([
-            'name' => 'Overlord'
-        ]);
-        $repository->Create([
-            'name' => 'Spy X Family'
-        ]);
-        $repository->Create([
-            'name' => 'Steins;Gate'
-        ]);
-        $repository->Create([
-            'name' => 'Tokyo Ghoul'
-        ]);
-        $repository->Create([
-            'name' => 'Toradora!'
-        ]);
-        $repository->Create([
-            'name' => 'My Hero Academia'
-        ]);
+        $titles = [];
+        foreach ($names as $name) {
+            $titles[] = [
+                'id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+                'name' => strtolower($name),
+                'is_active' => true,
+                'reason' => 'DMCA',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        OhysBlacklistTitle::query()->insert($titles);
     }
 }

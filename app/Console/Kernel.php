@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
         Commands\Ohys\RecreateCommand::class,
 
         Commands\Auth\AccessKeyGenerateCommand::class,
+        Commands\Auth\AccessKeyDeleteCommand::class,
     ];
 
     /**

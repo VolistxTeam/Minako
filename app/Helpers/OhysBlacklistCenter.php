@@ -2,18 +2,15 @@
 
 namespace App\Helpers;
 
-use App\Repositories\OhysBlacklistTitleRepository;
-use Illuminate\Container\Container;
+use App\Models\OhysBlacklistTitle;
 
 class OhysBlacklistCenter
 {
-    private OhysBlacklistTitleRepository $ohysBlacklistTitleRepository;
     private array $titles;
 
     public function __construct()
     {
-        $this->ohysBlacklistTitleRepository = Container::getInstance()->make(OhysBlacklistTitleRepository::class);
-        $this->titles = $this->ohysBlacklistTitleRepository->FindTitles();
+        $this->titles = OhysBlacklistTitle::query()->pluck('name')->toArray();
     }
 
     public function isBlacklistedTitle(string $title): string

@@ -3,18 +3,12 @@
 namespace App\Console\Commands\Auth;
 
 use App\Facades\Keys;
-use App\Repositories\AccessTokenRepository;
+use App\Helpers\SHA256Hasher;
+use App\Models\AccessToken;
 use Illuminate\Console\Command;
 
 class AccessKeyGenerateCommand extends Command
 {
-    private AccessTokenRepository $accessTokenRepository;
-
-    public function __construct(AccessTokenRepository $accessTokenRepository)
-    {
-        parent::__construct();
-        $this->accessTokenRepository = $accessTokenRepository;
-    }
     protected $signature = 'access-key:generate';
 
     protected $description = 'Create an access key';
@@ -23,9 +17,10 @@ class AccessKeyGenerateCommand extends Command
     {
         $saltedKey = Keys::randomSaltedKey();
 
-        $this->accessTokenRepository->Create([
-            'key'             => $saltedKey['key'],
-            'salt'            => $saltedKey['salt'],
+        AccessToken::query()->create([
+            'key'           => substr($saltedKey['key'], 0, 32),
+            'secret'        => SHA256Hasher::make(substr($saltedKey['key'], 32), ['salt' => $saltedKey['salt']]),
+            'secret_salt'   => $saltedKey['salt'],
         ]);
 
         $this->components->info('Your access key is created: "'.$saltedKey['key'].'"');
