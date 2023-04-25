@@ -63,10 +63,9 @@ class OhysController extends Controller
             ->appendTo($feed);
 
         foreach ($torrentQuery as $torrentItem) {
-            $itemDescription = !empty($torrentItem['episode']) ? " - Episode {$torrentItem['episode']}" : '';
             $item = new Item();
             $item
-                ->title("{$torrentItem['title']}{$itemDescription}")
+                ->title("{$torrentItem['torrentName']}")
                 ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
                 ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
                 ->appendTo($channel);
