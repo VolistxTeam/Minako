@@ -20,6 +20,11 @@ Do not forget to set a cronjob for production:
 * * * * * php /path/to/artisan schedule:run
 ```
 
+Generate an admin access key to access blacklist API using this command:
+```
+php artisan access-key:generate
+```
+
 ### Build Database
 Run commands:
 ```
@@ -33,7 +38,6 @@ php artisan minako:notify:character-images
 php artisan minako:mal:episodes
 php artisan minako:ohys:download
 php artisan minako:ohys:relations
-
 ```
 
 ### Swoole Setup
