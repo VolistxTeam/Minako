@@ -11,7 +11,7 @@ trait Searchable
     {
         $minStringSimilarity = 0.89;
         $term = self::normalizeTerm($originalTerm);
-        $cacheKey = "search_by_title_{$term}_{$maxLength}_{$type}";
+        $cacheKey = "minako_search_by_title_{$term}_{$maxLength}_{$type}";
 
         // Return cached results if available
         if (Cache::has($cacheKey)) {

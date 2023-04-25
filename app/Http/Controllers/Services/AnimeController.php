@@ -7,9 +7,7 @@ use App\DataTransferObjects\CharacterDTO;
 use App\DataTransferObjects\CompanyDTO;
 use App\DataTransferObjects\EpisodeDTO;
 use App\DataTransferObjects\MappingDTO;
-use App\DataTransferObjects\ProducerDTO;
 use App\DataTransferObjects\RelationDTO;
-use App\DataTransferObjects\StudioDTO;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
@@ -255,7 +253,7 @@ class AnimeController extends Controller
         foreach ($itemQuery->studios as $item) {
             $studioQuery = NotifyCompany::query()->where('notifyID', $item)->first();
             if (!empty($studioQuery)) {
-                $filteredStudioData[] = StudioDTO::fromModel($studioQuery)->GetDTO();
+                $filteredStudioData[] = CompanyDTO::fromModel($studioQuery)->GetDTO();
             }
         }
 
@@ -280,7 +278,7 @@ class AnimeController extends Controller
         foreach ($itemQuery->producers ?? [] as $item) {
             $producerQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
             if (!empty($producerQuery)) {
-                $filteredProducerData[] = ProducerDTO::fromModel($producerQuery)->GetDTO();
+                $filteredProducerData[] = CompanyDTO::fromModel($producerQuery)->GetDTO();
             }
         }
 

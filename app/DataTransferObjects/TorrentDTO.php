@@ -52,6 +52,4 @@ class TorrentDTO extends DataTransferObjectBase
             ],
         ];
     }
-
-
 }

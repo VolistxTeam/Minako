@@ -27,7 +27,20 @@ class EpisodeCommand extends Command
 
         $this->info('[!] Getting all anime information...');
 
-        $allAnime = NotifyAnime::query()->cursor();
+        $oneMonthAgo = Carbon::now()->subMonth();
+
+        $allAnime = NotifyAnime::query()
+            ->where('status', 'current')
+            ->where('type', '!=', 'movie')
+            ->orWhere(function ($query) use ($oneMonthAgo) {
+                $query->where('status', 'finished')
+                    ->whereRaw("(
+                (LENGTH(endDate) = 10 AND STR_TO_DATE(endDate, '%Y-%m-%d') > ?) OR
+                (LENGTH(endDate) = 7 AND STR_TO_DATE(CONCAT(endDate, '-01'), '%Y-%m-%d') > ?) OR
+                (LENGTH(endDate) = 4 AND STR_TO_DATE(CONCAT(endDate, '-01-01'), '%Y-%m-%d') > ?)
+            )", [$oneMonthAgo, $oneMonthAgo, $oneMonthAgo]);
+            })
+            ->cursor();
 
         $totalCount = count($allAnime);
         $remainingCount = 0;
@@ -52,8 +65,8 @@ class EpisodeCommand extends Command
 
             if ($countdownCount > 10) {
                 $countdownCount = 0;
-                $this->info('[+] Waiting for 25 seconds...');
-                sleep(25);
+                $this->info('[+] Waiting for 20 seconds...');
+                sleep(20);
             }
 
             $allowCrawl = false;

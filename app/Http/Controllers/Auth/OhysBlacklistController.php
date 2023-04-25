@@ -33,8 +33,8 @@ class OhysBlacklistController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => ['bail', 'required', 'string'],
-                'is_active' => ['bail', 'sometimes', 'boolean'],
                 'reason' => ['bail', 'sometimes', 'string'],
+                'is_active' => ['bail', 'sometimes', 'boolean'],
             ]);
 
             if ($validator->fails()) {
@@ -63,8 +63,8 @@ class OhysBlacklistController extends Controller
             ]), [
                 'title_id' => ['bail', 'required', 'exists:ohys_blacklist,id'],
                 'name' => ['bail', 'sometimes', 'string'],
-                'is_active' => ['bail', 'sometimes', 'boolean'],
                 'reason' => ['bail', 'sometimes', 'string'],
+                'is_active' => ['bail', 'sometimes', 'boolean'],
             ]);
 
             if ($validator->fails()) {
@@ -164,7 +164,6 @@ class OhysBlacklistController extends Controller
 
             return response()->json($items);
         } catch (Exception $ex) {
-            ray($ex);
             return response()->json('An error has occurred', 500);
         }
     }

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\DataTransferObjects\EpisodeDTO;
-use App\DataTransferObjects\EpisodeInformationDTO;
 use App\Models\MALAnime;
 use Illuminate\Http\JsonResponse;
 
@@ -23,7 +22,7 @@ class EpisodeController extends Controller
             ->paginate(50, ['*'], 'page', 1);
 
         $buildResponse = $searchQuery->getCollection()->map(function ($item) {
-            return EpisodeInformationDTO::fromModel($item)->GetDTO();
+            return EpisodeDTO::fromModel($item)->GetDTO();
         });
 
         return response()->json($buildResponse);

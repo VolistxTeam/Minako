@@ -16,6 +16,4 @@ class RelationDTO extends DataTransferObjectBase
            'type' => $this->entity['type']
        ];
     }
-
-
 }

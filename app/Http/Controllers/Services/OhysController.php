@@ -102,11 +102,11 @@ class OhysController extends Controller
     {
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
-        if (empty($torrentQuery)) {
-            return response('Torrent not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
+            return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $buildResponse =  TorrentDTO::fromModel($torrentQuery)->GetDTO();
+        $buildResponse = TorrentDTO::fromModel($torrentQuery)->GetDTO();
 
         return response()->json($buildResponse);
     }

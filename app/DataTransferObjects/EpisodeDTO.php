@@ -24,6 +24,4 @@ class EpisodeDTO extends DataTransferObjectBase
             'updated_at' => (string) $this->entity['updated_at'],
         ];
     }
-
-
 }
