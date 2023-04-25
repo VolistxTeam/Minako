@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\DataTransferObjects\OhysBlacklistTitleDTO;
-use App\Helpers\SHA256Hasher;
+use App\Facades\Keys;
 use App\Http\Controllers\Services\Controller;
-use App\Models\AccessToken;
 use App\Models\OhysBlacklistTitle;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +16,7 @@ class OhysBlacklistController extends Controller
     public function CreateOhysBlacklistTitle(Request $request): JsonResponse
     {
         try {
-            $token = $this->AuthAccessToken($request->bearerToken());
+            $token = Keys::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -48,7 +47,7 @@ class OhysBlacklistController extends Controller
     public function UpdateOhysBlacklistTitle(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = $this->AuthAccessToken($request->bearerToken());
+            $token = Keys::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -96,7 +95,7 @@ class OhysBlacklistController extends Controller
     public function DeleteOhysBlacklistTitle(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = $this->accessTokenRepository->AuthAccessToken($request->bearerToken());
+            $token = Keys::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -129,7 +128,7 @@ class OhysBlacklistController extends Controller
     public function GetOhysBlacklistTitle(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = $this->AuthAccessToken($request->bearerToken());
+            $token = Keys::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -160,7 +159,7 @@ class OhysBlacklistController extends Controller
     public function GetOhysBlacklistTitles(Request $request): JsonResponse
     {
         try {
-            $token = $this->accessTokenRepository->AuthAccessToken($request->bearerToken());
+            $token = Keys::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -178,13 +177,5 @@ class OhysBlacklistController extends Controller
         } catch (Exception $ex) {
             return response()->json('An error has occurred', 500);
         }
-    }
-
-    private function AuthAccessToken($token): ?object
-    {
-        return AccessToken::query()->where('key', substr($token, 0, 32))
-            ->get()->filter(function ($v) use ($token) {
-                return SHA256Hasher::check(substr($token, 32), $v->secret, ['salt' => $v->secret_salt]);
-            })->first();
     }
 }

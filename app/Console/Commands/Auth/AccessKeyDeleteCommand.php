@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Auth;
 
+use App\Facades\Keys;
 use App\Helpers\SHA256Hasher;
 use App\Models\AccessToken;
 use Illuminate\Console\Command;
@@ -25,7 +26,7 @@ class AccessKeyDeleteCommand extends Command
             return;
         }
 
-        $accessToken = $this->AuthAccessToken($token);
+        $accessToken = Keys::authAccessToken($token);
 
         if (!$accessToken) {
             $this->components->error('The specified access key is invalid.');
@@ -42,13 +43,5 @@ class AccessKeyDeleteCommand extends Command
         $toBeDeletedToken->delete();
 
         $this->components->info('Your access key is deleted: '.$token);
-    }
-
-    private function AuthAccessToken($token): ?object
-    {
-        return AccessToken::query()->where('key', substr($token, 0, 32))
-            ->get()->filter(function ($v) use ($token) {
-                return SHA256Hasher::check(substr($token, 32), $v->secret, ['salt' => $v->secret_salt]);
-            })->first();
     }
 }

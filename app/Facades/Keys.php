@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static randomSaltedKey()
+ * @method static randomKey()
+ * @method static authAccessToken($token)
  */
 class Keys extends Facade
 {
