@@ -26,7 +26,7 @@ $router->group(['prefix' => 'anime'], function () use ($router) {
     $router->get('/{uniqueID}/sync', 'Services\AnimeController@SyncEpisodes');
 });
 
-$router->group(['middleware' => []], function () use ($router) {
+$router->group(['middleware' => ['cacheResponse']], function () use ($router) {
     $router->group(['prefix' => 'anime'], function () use ($router) {
         $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
         $router->get('/{uniqueID}/image', 'Services\AnimeController@GetImage');
@@ -64,12 +64,12 @@ $router->group(['middleware' => []], function () use ($router) {
         $router->get('/search/{name}', 'Services\OhysController@Search');
         $router->get('/service/rss', 'Services\OhysController@GetRSS');
     });
+});
 
-    $router->group(['prefix' => 'blacklist'], function () use ($router) {
-        $router->get('/', 'Auth\OhysBlacklistController@GetOhysBlacklistTitles');
-        $router->post('/', 'Auth\OhysBlacklistController@CreateOhysBlacklistTitle');
-        $router->get('/{title_id}', 'Auth\OhysBlacklistController@GetOhysBlacklistTitle');
-        $router->delete('/{title_id}', 'Auth\OhysBlacklistController@DeleteOhysBlacklistTitle');
-        $router->patch('/{title_id}', 'Auth\OhysBlacklistController@UpdateOhysBlacklistTitle');
-    });
+$router->group(['prefix' => 'blacklist'], function () use ($router) {
+    $router->get('/', 'Auth\OhysBlacklistController@GetOhysBlacklistTitles');
+    $router->post('/', 'Auth\OhysBlacklistController@CreateOhysBlacklistTitle');
+    $router->get('/{title_id}', 'Auth\OhysBlacklistController@GetOhysBlacklistTitle');
+    $router->delete('/{title_id}', 'Auth\OhysBlacklistController@DeleteOhysBlacklistTitle');
+    $router->patch('/{title_id}', 'Auth\OhysBlacklistController@UpdateOhysBlacklistTitle');
 });
