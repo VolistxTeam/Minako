@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Ohys;
 
 use App\Classes\Torrent;
+use App\Jobs\OhysRelationJob;
 use App\Models\OhysTorrent;
 use Faker\Factory;
 use GuzzleHttp\Client;
@@ -130,11 +131,16 @@ class DownloadCommand extends Command
 
     private function storeTorrentData($torrentData, $torrent)
     {
-        OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
+        $torrent = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
+        $this->dispatchRelationJob($torrent);
 
         $filePath = 'torrents/'.$torrentData['torrentName'];
         if (Storage::disk('local')->missing($filePath)) {
             Storage::disk('local')->put($filePath, (string) $torrent->__toString());
         }
+    }
+
+    private function dispatchRelationJob($torrent) {
+        dispatch(new OhysRelationJob($torrent));
     }
 }

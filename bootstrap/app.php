@@ -34,6 +34,7 @@ $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(\Spatie\ResponseCache\ResponseCacheServiceProvider::class);
+$app->register(\Cryental\StackPath\TrustedProxyServiceProvider::class);
 
 //Facades providers
 $app->register(\App\Providers\KeysServiceProvider::class);
@@ -52,7 +53,7 @@ $app->singleton(
 $app->configure('app');
 
 $app->middleware([
-    App\Http\Middleware\TrustProxies::class,
+    \Cryental\StackPath\Http\Middleware\TrustProxies::class,
     App\Http\Middleware\CorsMiddleware::class,
 ]);
 
