@@ -49,7 +49,7 @@ class OhysController extends Controller
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
-                return OhysBlacklist::isBlacklistedTitle($torrent['title']);
+                return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
             })
             ->toArray();
 
