@@ -88,7 +88,9 @@ class DownloadCommand extends Command
         $tempFile = new \SplTempFileObject();
         $tempFile->fwrite($response->getBody());
 
-        return new Torrent($tempFile);
+        $tempFile->rewind();
+
+        return $tempFile;
     }
 
     private function parseFileName($file)
@@ -101,6 +103,8 @@ class DownloadCommand extends Command
 
     private function extractTorrentData($torrent, $file, $fileNameParsedArray)
     {
+        $torrent = new Torrent($torrent);
+
         $itemID = Str::random(10);
         $episode = empty($fileNameParsedArray[3]) ? null : preg_replace('/[^0-9]/', '', $fileNameParsedArray[3]);
         $episode = empty($episode) ? null : $episode;
@@ -131,16 +135,20 @@ class DownloadCommand extends Command
 
     private function storeTorrentData($torrentData, $torrent)
     {
-        $torrent = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
-        $this->dispatchRelationJob($torrent);
+        $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
+        dispatch(new OhysRelationJob($createdInfo));
 
-        $filePath = 'torrents/'.$torrentData['torrentName'];
-        if (Storage::disk('local')->missing($filePath)) {
-            Storage::disk('local')->put($filePath, (string) $torrent->__toString());
+        $filePath = __DIR__. '/../../../../storage/app/torrents/'.$torrentData['torrentName'];
+
+        $newFile = fopen($filePath, 'w');
+
+        $torrent->rewind();
+
+        while (!$torrent->eof()) {
+            $buffer = $torrent->fgets();
+            fwrite($newFile, $buffer); // Replace $torrent with $newFile
         }
-    }
 
-    private function dispatchRelationJob($torrent) {
-        dispatch(new OhysRelationJob($torrent));
+        fclose($newFile);
     }
 }
