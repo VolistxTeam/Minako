@@ -15,7 +15,7 @@ class CreateOhysBlacklistTable extends Migration
     {
         Schema::create('ohys_blacklist', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name', 32);
+            $table->text('name');
             $table->boolean('is_active')->default(true);
             $table->text('reason')->default('');
             $table->dateTime('created_at');

@@ -23,7 +23,7 @@ class OhysBlacklistSeeder extends Seeder
                 'id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
                 'name' => strtolower($name),
                 'is_active' => true,
-                'reason' => 'DMCA',
+                'reason' => 'Copyright Infringement',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
