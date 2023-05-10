@@ -7,6 +7,7 @@ use App\Facades\OhysBlacklist;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Suin\RSSWriter\Channel;
@@ -131,7 +132,7 @@ class OhysController extends Controller
 
             return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
         } else {
-            return redirect()->to($torrentQuery->hidden_download_magnet);
+            return response('', 302, ['Location' => $torrentQuery->hidden_download_magnet]);
         }
     }
 }
