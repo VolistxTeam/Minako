@@ -46,8 +46,8 @@ class TorrentDTO extends DataTransferObjectBase
                     'torrent' => 'https://ohys.nl/tt/disk/'.$this->entity['torrentName'],
                 ],
                 'mirror' => [
-                    'torrent' => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download/torrent',
-                    'magnet'  => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download/magnet',
+                    'torrent' => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download?type=torrent',
+                    'magnet'  => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download?type=magnet',
                 ],
             ],
         ];

@@ -67,7 +67,7 @@ class OhysController extends Controller
             $item = new Item();
             $item
                 ->title("{$torrentItem['torrentName']}")
-                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download/torrent")
+                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
                 ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
                 ->appendTo($channel);
         }
@@ -121,25 +121,18 @@ class OhysController extends Controller
             return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $contents = Storage::disk('local')->get('torrents/' . $torrentQuery->torrentName);
+        $requestType = $request->input('type', 'magnet');
 
-        if (empty($contents)) {
-            return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        if ($requestType == 'torrent') {
+            $contents = Storage::disk('local')->get('torrents/' . $torrentQuery->torrentName);
+
+            if (empty($contents)) {
+                return response('Torrent file not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+            }
+
+            return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
+        } else {
+            return response('', 302, ['Location' => $torrentQuery->hidden_download_magnet]);
         }
-
-        return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename=' . $torrentQuery->uniqueID . '.torrent');
-    }
-
-    public function DownloadMagnet(Request $request, $id)
-    {
-        $torrentQuery = OhysTorrent::query()
-            ->where('uniqueID', $id)
-            ->first();
-
-        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
-            return response('Item not found: ' . $id, 404)->header('Content-Type', 'text/plain');
-        }
-
-        return response('', 302, ['Location' => $torrentQuery->hidden_download_magnet]);
     }
 }
