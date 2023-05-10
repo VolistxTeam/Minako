@@ -67,7 +67,7 @@ class OhysController extends Controller
             $item = new Item();
             $item
                 ->title("{$torrentItem['torrentName']}")
-                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
+                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download/torrent")
                 ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
                 ->appendTo($channel);
         }
