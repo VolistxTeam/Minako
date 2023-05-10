@@ -128,22 +128,6 @@ class OhysBlacklistController extends Controller
     public function GetOhysBlacklistTitle(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = Keys::authAccessToken($request->bearerToken());
-
-            if (!$token) {
-                return response()->json('Unauthorized', 401);
-            }
-
-            $validator = Validator::make([
-                'title_id' => $title_id
-            ], [
-                'title_id' => ['bail', 'required', 'exists:ohys_blacklist,id'],
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json($validator->errors()->first(), 400);
-            }
-
             $title = OhysBlacklistTitle::query()->where('id', $title_id)->first();
 
             if (!$title) {
@@ -159,12 +143,6 @@ class OhysBlacklistController extends Controller
     public function GetOhysBlacklistTitles(Request $request): JsonResponse
     {
         try {
-            $token = Keys::authAccessToken($request->bearerToken());
-
-            if (!$token) {
-                return response()->json('Unauthorized', 401);
-            }
-
             $titles = OhysBlacklistTitle::all();
 
             $items = [];
