@@ -8,6 +8,8 @@ use App\DataTransferObjects\CompanyDTO;
 use App\DataTransferObjects\EpisodeDTO;
 use App\DataTransferObjects\MappingDTO;
 use App\DataTransferObjects\RelationDTO;
+use App\DataTransferObjects\TorrentDTO;
+use App\Facades\OhysBlacklist;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyCharacter;
@@ -92,6 +94,21 @@ class AnimeController extends Controller
         $response = EpisodeDTO::fromModel($episodeQuery)->GetDTO();
 
         return response()->json($response);
+    }
+
+    public function GetTorrents($uniqueID)
+    {
+        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+
+        if (empty($itemQuery)) {
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
+        }
+
+        $itemsFiltered = $itemQuery->torrents->map(function ($torrent) {
+            return TorrentDTO::fromModel($torrent)->GetDTO();
+        });
+
+        return response()->json($itemsFiltered);
     }
 
     public function GetEpisodes(Request $request, $uniqueID)

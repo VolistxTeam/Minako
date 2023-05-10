@@ -39,6 +39,7 @@ $router->group(['prefix' => 'minako'], function () use ($router) {
             $router->get('/{uniqueID}/licensors', 'Services\AnimeController@GetLicensors');
             $router->get('/{uniqueID}/characters', 'Services\AnimeController@GetCharacters');
             $router->get('/{uniqueID}/relations', 'Services\AnimeController@GetRelations');
+            $router->get('/{uniqueID}/torrents', 'Services\AnimeController@GetTorrents');
             $router->get('/search/{name}', 'Services\AnimeController@Search');
         });
 
