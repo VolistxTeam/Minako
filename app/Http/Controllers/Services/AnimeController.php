@@ -104,7 +104,9 @@ class AnimeController extends Controller
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $itemsFiltered = $itemQuery->torrents->map(function ($torrent) {
+        $itemsFiltered = $itemQuery->torrents->filter(function ($torrent) use ($itemQuery) {
+            return !OhysBlacklist::isBlacklistedTitle($itemQuery->title_canonical ?? '') || !OhysBlacklist::isBlacklistedTitle($itemQuery->title_romaji ?? '');
+        })->map(function ($torrent) {
             return TorrentDTO::fromModel($torrent)->GetDTO();
         });
 
