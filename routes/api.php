@@ -60,7 +60,8 @@ $router->group(['middleware' => ['cacheResponse']], function () use ($router) {
     $router->group(['prefix' => 'ohys'], function () use ($router) {
         $router->get('/', 'Services\OhysController@GetRecentTorrents');
         $router->get('/{id}', 'Services\OhysController@GetTorrent');
-        $router->get('/{id}/download', 'Services\OhysController@DownloadTorrent');
+        $router->get('/{id}/download/torrent', 'Services\OhysController@DownloadTorrent');
+        $router->get('/{id}/download/magnet', 'Services\OhysController@DownloadMagnet');
         $router->get('/search/{name}', 'Services\OhysController@Search');
         $router->get('/service/rss', 'Services\OhysController@GetRSS');
     });
