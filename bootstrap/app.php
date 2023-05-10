@@ -53,6 +53,7 @@ $app->singleton(
 $app->configure('app');
 
 $app->middleware([
+    App\Http\Middleware\AdjustRoutesMiddleware::class,
     \Cryental\StackPath\Http\Middleware\TrustProxies::class,
     App\Http\Middleware\CorsMiddleware::class,
 ]);
