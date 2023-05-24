@@ -7,9 +7,11 @@ use App\Jobs\OhysRelationJob;
 use App\Models\OhysTorrent;
 use Faker\Factory;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 class DownloadCommand extends Command
 {
@@ -22,6 +24,8 @@ class DownloadCommand extends Command
 
         $headers = $this->getHeaders();
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+
         $response = $client->get('https://ohys.nl/tt/json.php?dir=disk&p=0', ['headers' => $headers]);
 
         if ($response->getStatusCode() != 200) {
@@ -37,8 +41,12 @@ class DownloadCommand extends Command
                 return 0;
             }
 
-            $torrent = $this->downloadTorrent($client, $headers, $file);
-            if (!$torrent) {
+            $tempFile = $temporaryDirectory->path($file['t']);
+
+            try {
+                $response = $client->request('GET', 'https://ohys.nl/tt/' . $file['a'], ['headers' => $headers, 'sink' => $tempFile]);
+            } catch (GuzzleException $e) {
+                $this->line('Not Found. Continue...');
                 continue;
             }
 
@@ -48,10 +56,19 @@ class DownloadCommand extends Command
                 continue;
             }
 
-            $torrentData = $this->extractTorrentData($torrent, $file, $fileNameParsedArray);
-            $this->storeTorrentData($torrentData, $torrent);
+            $torrentData = $this->extractTorrentData($tempFile, $file, $fileNameParsedArray);
+
+            File::copy($tempFile, __DIR__. '/../../../../storage/app/torrents/'.$torrentData['torrentName']);
+            $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
+
+            $createdInfo->touch();
+
+            dispatch(new OhysRelationJob($createdInfo));
+
             $this->info('[Debug] Done: '.$file['t']);
         }
+
+        $temporaryDirectory->delete();
 
         return 0;
     }
@@ -75,22 +92,6 @@ class DownloadCommand extends Command
         $responseBody = (string) $response->getBody();
 
         return json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $responseBody), true);
-    }
-
-    private function downloadTorrent($client, $headers, $file)
-    {
-        $response = $client->request('GET', 'https://ohys.nl/tt/'.$file['a'], ['headers' => $headers, 'stream' => true]);
-
-        if ($response->getStatusCode() != 200) {
-            return null;
-        }
-
-        $tempFile = new \SplTempFileObject();
-        $tempFile->fwrite($response->getBody());
-
-        $tempFile->rewind();
-
-        return $tempFile;
     }
 
     private function parseFileName($file)
@@ -131,24 +132,5 @@ class DownloadCommand extends Command
             'metadata_audio_codec'      => $metadataCodecParsed[1] ?? null,
             'hidden_download_magnet'    => $torrent->magnet(false),
         ];
-    }
-
-    private function storeTorrentData($torrentData, $torrent)
-    {
-        $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
-        dispatch(new OhysRelationJob($createdInfo));
-
-        $filePath = __DIR__. '/../../../../storage/app/torrents/'.$torrentData['torrentName'];
-
-        $newFile = fopen($filePath, 'w');
-
-        $torrent->rewind();
-
-        while (!$torrent->eof()) {
-            $buffer = $torrent->fgets();
-            fwrite($newFile, $buffer); // Replace $torrent with $newFile
-        }
-
-        fclose($newFile);
     }
 }
