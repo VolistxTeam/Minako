@@ -109,7 +109,12 @@ class DownloadCommand extends Command
         $itemID = Str::random(10);
         $episode = empty($fileNameParsedArray[3]) ? null : preg_replace('/[^0-9]/', '', $fileNameParsedArray[3]);
         $episode = empty($episode) ? null : $episode;
+
         $metadataCodecParsed = empty($fileNameParsedArray[6]) ? [] : explode(' ', $fileNameParsedArray[6]);
+
+        if ($metadataCodecParsed[0] == '2x') {
+            array_shift($metadataCodecParsed);
+        }
 
         if ($metadataCodecParsed[0] == '264') {
             $metadataCodecParsed[0] = 'x264';
