@@ -24,18 +24,18 @@ class EpisodeCommand extends Command
 
         $oneMonthAgo = Carbon::now()->subMonth();
 
-//        $allAnime = NotifyAnime::query()
-//            ->where('status', 'current')
-//            ->where('type', '!=', 'movie')
-//            ->orWhere(function ($query) use ($oneMonthAgo) {
-//                $query->where('status', 'finished')
-//                    ->whereRaw("(
-//                (LENGTH(endDate) = 10 AND STR_TO_DATE(endDate, '%Y-%m-%d') > ?) OR
-//                (LENGTH(endDate) = 7 AND STR_TO_DATE(CONCAT(endDate, '-01'), '%Y-%m-%d') > ?) OR
-//                (LENGTH(endDate) = 4 AND STR_TO_DATE(CONCAT(endDate, '-01-01'), '%Y-%m-%d') > ?)
-//            )", [$oneMonthAgo, $oneMonthAgo, $oneMonthAgo]);
-//            })
-//            ->cursor();
+        $allAnime = NotifyAnime::query()
+            ->where('status', 'current')
+            ->where('type', '!=', 'movie')
+            ->orWhere(function ($query) use ($oneMonthAgo) {
+                $query->where('status', 'finished')
+                    ->whereRaw("(
+                (LENGTH(endDate) = 10 AND STR_TO_DATE(endDate, '%Y-%m-%d') > ?) OR
+                (LENGTH(endDate) = 7 AND STR_TO_DATE(CONCAT(endDate, '-01'), '%Y-%m-%d') > ?) OR
+                (LENGTH(endDate) = 4 AND STR_TO_DATE(CONCAT(endDate, '-01-01'), '%Y-%m-%d') > ?)
+            )", [$oneMonthAgo, $oneMonthAgo, $oneMonthAgo]);
+            })
+            ->cursor();
 
         $allAnime = NotifyAnime::query()->where('type', '!=', 'movie')->cursor();
         $totalCount = count($allAnime);

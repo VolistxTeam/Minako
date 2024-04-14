@@ -83,8 +83,6 @@ class DownloadCommand extends Command
         $nyaaCrawler = new NyaaCrawler();
         $allTorrents = $nyaaCrawler->getTorrents();
 
-        ray(count($allTorrents));
-
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
             if (OhysTorrent::query()->where('torrentName', $torrent['title'] . '.torrent')->exists()) {
