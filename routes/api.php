@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Services\AnimeController;
 use App\Http\Controllers\Services\CharacterController;
+use App\Http\Controllers\Services\CompanyController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
@@ -40,10 +41,10 @@ Route::prefix('minako')->group(function () {
 //            Route::get('/search/{name}', [EpisodeController::class, 'Search']);
 //        });
 //
-//        Route::prefix('company')->group(function () {
-//            Route::get('/{id}', [CompanyController::class, 'GetCompany']);
-//            Route::get('/search/{name}', [CompanyController::class, 'Search']);
-//        });
+        Route::prefix('company')->group(function () {
+            Route::get('/{id}', [CompanyController::class, 'GetCompany']);
+            Route::get('/search/{name}', [CompanyController::class, 'Search']);
+        });
 //
         Route::prefix('character')->group(function () {
             Route::get('/{id}', [CharacterController::class, 'GetCharacter']);

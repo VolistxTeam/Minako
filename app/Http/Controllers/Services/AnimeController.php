@@ -14,6 +14,7 @@ use App\Helpers\OhysBlacklistChecker;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyAnimeCharacter;
+use App\Models\NotifyCharacter;
 use App\Models\NotifyCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -335,16 +336,16 @@ class AnimeController extends Controller
 
     public function GetCharacters($uniqueID)
     {
-        $characterRelationQuery = NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
+        $animeCharacter = NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
 
-        if (empty($characterRelationQuery)) {
+        if (empty($animeCharacter)) {
             return response('Character not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredCharacterData = [];
 
-        foreach ($characterRelationQuery->items ?? [] as $item) {
-            $characterQuery = NotifyAnimeCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
+        foreach ($animeCharacter->items ?? [] as $item) {
+            $characterQuery = NotifyCharacter::query()->where('notifyID', $item['characterId'])->first();
 
             if (!empty($characterQuery)) {
                 $filteredCharacterData[] = Character::fromModel($characterQuery)->GetDTO();

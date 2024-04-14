@@ -16,6 +16,9 @@ class JikanAPI
     public function getAnimeEpisodes($malID) {
         $allData = [];
         $page = 1;
+        $attempts = 0;
+        $hasNextPage = false;
+
         do {
             try {
                 $response = $this->client->get("anime/{$malID}/episodes?page={$page}");
@@ -25,16 +28,26 @@ class JikanAPI
                     $allData = array_merge($allData, $data['data']);
                     $hasNextPage = $data['pagination']['has_next_page'] ?? false;
                     $page++;
+                    $attempts = 0; // Reset attempts after a successful request
                 } else {
                     $hasNextPage = false;
                 }
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-                return null;
+                if ($e->getCode() == 429) { // HTTP 429 Too Many Requests
+                    $attempts++;
+                    if ($attempts < 5) { // Allow a few retries
+                        sleep(10); // Wait for 10 seconds before retrying
+                        continue; // Retry the loop
+                    }
+                    return null; // Stop retrying after several attempts
+                }
+                return null; // Other Guzzle exceptions result in termination of the loop
             }
         } while ($hasNextPage);
 
         return $allData;
     }
+
 
     private function createHttpClient(): Client
     {
