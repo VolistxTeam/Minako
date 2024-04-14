@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Traits\UuidForKey;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class AccessToken extends Model
 {
-    use UuidForKey;
+    use HasUuids;
 
     /**
      * Indicates if the model should be timestamped.

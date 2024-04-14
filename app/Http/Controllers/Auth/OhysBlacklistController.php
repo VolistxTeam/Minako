@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\DataTransferObjects\OhysBlacklistTitleDTO;
-use App\Facades\Keys;
-use App\Http\Controllers\Services\Controller;
+use App\DataTransferObjects\OhysBlacklist;
+use App\Helpers\Key;
+use App\Http\Controllers\Controller;
 use App\Models\OhysBlacklistTitle;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Validator;
 
 class OhysBlacklistController extends Controller
 {
-    public function CreateOhysBlacklistTitle(Request $request): JsonResponse
+    public function Create(Request $request): JsonResponse
     {
         try {
-            $token = Keys::authAccessToken($request->bearerToken());
+            $token = Key::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -39,16 +39,16 @@ class OhysBlacklistController extends Controller
                 'reason'      => $request->input('reason') ?? "DMCA"
             ]);
 
-            return response()->json(OhysBlacklistTitleDTO::fromModel($newTitle)->GetDTO(), 201);
+            return response()->json(OhysBlacklist::fromModel($newTitle)->GetDTO(), 201);
         } catch (Exception $ex) {
             return response()->json('An error has occurred', 500);
         }
     }
 
-    public function UpdateOhysBlacklistTitle(Request $request, $title_id): JsonResponse
+    public function Update(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = Keys::authAccessToken($request->bearerToken());
+            $token = Key::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -87,16 +87,16 @@ class OhysBlacklistController extends Controller
 
             $title->save();
 
-            return response()->json(OhysBlacklistTitleDTO::fromModel($title)->GetDTO(), 201);
+            return response()->json(OhysBlacklist::fromModel($title)->GetDTO(), 201);
         } catch (Exception $ex) {
             return response()->json('An error has occurred', 500);
         }
     }
 
-    public function DeleteOhysBlacklistTitle(Request $request, $title_id): JsonResponse
+    public function Delete(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = Keys::authAccessToken($request->bearerToken());
+            $token = Key::authAccessToken($request->bearerToken());
 
             if (!$token) {
                 return response()->json('Unauthorized', 401);
@@ -126,7 +126,7 @@ class OhysBlacklistController extends Controller
         }
     }
 
-    public function GetOhysBlacklistTitle(Request $request, $title_id): JsonResponse
+    public function GetFromID(Request $request, $title_id): JsonResponse
     {
         try {
             $title = OhysBlacklistTitle::query()->where('id', $title_id)->first();
@@ -135,13 +135,13 @@ class OhysBlacklistController extends Controller
                 return response()->json('Not found', 404);
             }
 
-            return response()->json(OhysBlacklistTitleDTO::fromModel($title)->GetDTO(), 201);
+            return response()->json(OhysBlacklist::fromModel($title)->GetDTO(), 201);
         } catch (Exception $ex) {
             return response()->json('An error has occurred', 500);
         }
     }
 
-    public function GetOhysBlacklistTitles(Request $request): JsonResponse
+    public function Get(Request $request): JsonResponse
     {
         try {
             $titles = OhysBlacklistTitle::all();
@@ -149,7 +149,7 @@ class OhysBlacklistController extends Controller
             $items = [];
 
             foreach ($titles as $item) {
-                $items[] = OhysBlacklistTitleDTO::fromModel($item)->GetDTO();
+                $items[] = OhysBlacklist::fromModel($item)->GetDTO();
             }
 
             return response()->json($items);

@@ -7,45 +7,42 @@ use App\Models\NotifyCharacter;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+use function Laravel\Prompts\progress;
 
 class CharacterImageCommand extends Command
 {
-    protected $signature = 'minako:notify:character-images';
+    protected $signature = 'minako:notify:character-image';
 
-    protected $description = 'Download character images from notify.moe.';
+    protected $description = 'Download character images from media.notify.moe.';
 
-    public function handle()
+    public function handle(): void
     {
         $this->setUnlimitedTimeLimit();
         $this->createCharacterDirectoryIfNotExists();
 
-        $allAnime = NotifyCharacter::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->get()->toArray();
+        $characters = NotifyCharacter::query()->select('id', 'notifyID', 'uniqueID', 'image_extension')->cursor();
 
-        $this->processAllAnime($allAnime);
+        $this->processAllAnime($characters);
     }
 
-    private function setUnlimitedTimeLimit()
+    private function setUnlimitedTimeLimit(): void
     {
-        $this->info('[Debug] Setting Time Limit To 0 (Unlimited)');
         set_time_limit(0);
     }
 
-    private function createCharacterDirectoryIfNotExists()
+    private function createCharacterDirectoryIfNotExists(): void
     {
-        if (!Storage::disk('local')->exists('characters')) {
-            Storage::disk('local')->makeDirectory('characters');
+        if (!Storage::disk('local')->exists('posters')) {
+            Storage::disk('local')->makeDirectory('posters');
         }
     }
 
-    private function processAllAnime($allAnime)
+    private function processAllAnime($allAnime): void
     {
         $totalCount = count($allAnime);
 
-        $this->info(PHP_EOL.'[!] Querying for Work...'.PHP_EOL);
-
-        $progressBar = $this->output->createProgressBar($totalCount);
-        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
-        $progressBar->start();
+        $progress = progress(label: 'Dispatching Jobs for Character Images', steps: $totalCount);
+        $progress->start();
 
         foreach ($allAnime as $item) {
             if (!empty($item['image_extension'])) {
@@ -56,13 +53,13 @@ class CharacterImageCommand extends Command
                 $this->processAnimeItem($item);
             }
 
-            $progressBar->advance();
+            $progress->advance();
         }
 
-        $progressBar->finish();
+        $progress->finish();
     }
 
-    private function processAnimeItem($item)
+    private function processAnimeItem($item): void
     {
         try {
             dispatch(new NotifyCharacterImageJob($item['id'], $item['notifyID'], $item['uniqueID'], $item['image_extension']));
@@ -71,4 +68,3 @@ class CharacterImageCommand extends Command
         }
     }
 }
-// this is minako refactor

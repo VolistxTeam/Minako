@@ -2,59 +2,117 @@
 
 namespace App\Console\Commands\Notify;
 
-use App\Jobs\NotifyCharacterJob;
 use App\Models\NotifyCharacter;
 use Carbon\Carbon;
 use Faker\Factory;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
+use function Laravel\Prompts\progress;
 
 class CharacterCommand extends Command
 {
-    protected $signature = 'minako:notify:characters';
-
+    protected $signature = 'minako:notify:character';
     protected $description = 'Retrieve all character information from notify.moe.';
 
-    private string $sitemapURL = 'https://notify.moe/sitemap/character.txt';
-    private string $notifyBaseURL = 'https://notify.moe/character/';
+    private string $dataSource = 'https://notify.moe/api/types/Character/download';
+    private string $tempFilePath;
 
     public function handle()
     {
-        $this->setUnlimitedTimeLimit();
-        $this->info('[!] Downloading ID lists from the server...');
+        set_time_limit(0);
+
         $headers = $this->getHeaders();
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
-
-        $notifyIDs = $this->getNotifyIDs($client, $headers);
-
-        if (!$notifyIDs) {
+        $this->tempFilePath = $this->downloadData($client, $headers);
+        if (!$this->tempFilePath) {
+            $this->components->error('Failed to download data.');
             return;
         }
 
-        $sevenDaysAgo = Carbon::now()->subDays(7);
+        $dbItems = $this->getRecentDBItems();
 
-        $dbItems = NotifyCharacter::query()
-            ->select('notifyID', 'updated_at')
-            ->whereDate('updated_at', '>', $sevenDaysAgo)
-            ->cursor();
+        $this->parseAndProcessData($this->tempFilePath, $dbItems);
 
-        $dbItemIds = [];
-        foreach ($dbItems as $dbItem) {
-            $dbItemIds[] = $dbItem->notifyID;
+        unlink($this->tempFilePath);
+    }
+
+    private function downloadData(Client $client, array $headers): ?string
+    {
+        $response = $client->get($this->dataSource, ['headers' => $headers]);
+        if ($response->getStatusCode() != 200) {
+            return null;
         }
 
-        $cleanedArray = $this->compareAndRemove($dbItemIds, $notifyIDs);
-
-        $this->processNotifyIDs($cleanedArray);
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'CharacterData');
+        file_put_contents($tempFilePath, $response->getBody()->getContents());
+        return $tempFilePath;
     }
 
-    private function setUnlimitedTimeLimit()
+    private function getRecentDBItems(): array
     {
-        $this->info('[Debug] Setting Time Limit To 0 (Unlimited)');
-        set_time_limit(0);
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+        return NotifyCharacter::query()
+            ->whereDate('updated_at', '>', $sevenDaysAgo)
+            ->pluck('notifyID')
+            ->toArray();
     }
 
-    private function getHeaders()
+    private function parseAndProcessData(string $filePath, array $dbItems): void
+    {
+        $handle = fopen($filePath, 'r');
+        if (!$handle) {
+            return;
+        }
+
+        // Estimate the number of lines - this could be improved with a more accurate measure
+        $fileSize = filesize($filePath);
+        $progress = progress(label: 'Saving Character Data', steps: $fileSize);
+        $progress->start();
+
+        $processedBytes = 0;
+        while (!feof($handle)) {
+            $linePosition = ftell($handle);
+            $line = fgets($handle);
+            $trimmedLine = trim($line);
+            if (empty($trimmedLine)) continue;
+
+            if (preg_match('/^[a-zA-Z0-9]+$/', $trimmedLine)) {
+                $currentId = $trimmedLine;
+                $line = fgets($handle); // Assume the next line is the JSON data
+                $animeData = json_decode(trim($line), true);
+                if (!in_array($currentId, $dbItems)) {
+                    $this->processData($animeData);
+                }
+            }
+            $processedBytes = ftell($handle) - $linePosition;
+            $progress->advance($processedBytes);
+        }
+
+        $progress->finish();
+        fclose($handle);
+    }
+
+    private function processData(array $animeData)
+    {
+        $uniqueId = Str::random(8);
+        $notifyCharacter = NotifyCharacter::query()->where('notifyID', $animeData['id'])->first();
+
+        if ($notifyCharacter) {
+            $this->assignCharacterData($notifyCharacter, $animeData);
+            $notifyCharacter->touch();
+            $notifyCharacter->save();
+        } else {
+            $newNotifyCharacter = new NotifyCharacter([
+                'uniqueID' => $uniqueId,
+                'notifyID' => $animeData['id'],
+            ]);
+            $this->assignCharacterData($newNotifyCharacter, $animeData);
+            $newNotifyCharacter->save();
+        }
+    }
+
+    private function getHeaders(): array
     {
         $faker = Factory::create();
 
@@ -68,60 +126,32 @@ class CharacterCommand extends Command
         ];
     }
 
-    private function getNotifyIDs($client, $headers)
+    private function assignCharacterData($notifyCharacter, array $downloadedData): void
     {
-        $sitemapResponse = $client->get($this->sitemapURL, ['headers' => $headers]);
+        $keys = [
+            'name_canonical'  => ['name', 'canonical'],
+            'name_english'    => ['name', 'english'],
+            'name_japanese'   => ['name', 'japanese'],
+            'name_synonyms'   => ['name', 'synonyms'],
+            'image_extension' => ['image', 'extension'],
+            'image_width'     => ['image', 'width'],
+            'image_height'    => ['image', 'height'],
+            'description'     => ['description'],
+            'spoilers'        => ['spoilers'],
+            'attributes'      => ['attributes'],
+            'mappings'        => ['mappings'],
+        ];
 
-        if ($sitemapResponse->getStatusCode() != 200) {
-            $this->error('[-] The sitemap does not found.');
-
-            return false;
-        }
-
-        $rawNotifyIDs = explode("\n", (string) $sitemapResponse->getBody());
-
-        return array_map(function ($item) {
-            return str_replace($this->notifyBaseURL, '', $item);
-        }, $rawNotifyIDs);
-    }
-
-    private function compareAndRemove(array $array1, array $array2)
-    {
-        foreach ($array1 as $key1 => $value1) {
-            if (($key2 = array_search($value1, $array2)) !== false) {
-                unset($array1[$key1]);
-                unset($array2[$key2]);
+        foreach ($keys as $key => $path) {
+            $value = $downloadedData;
+            foreach ($path as $p) {
+                $value = $value[$p] ?? null;
+                if ($value === null) {
+                    break;
+                }
             }
+            $notifyCharacter->$key = $value;
         }
-
-        $result = array_merge($array1, $array2);
-
-        return array_filter($result, function ($value) {
-            return $value !== null && $value !== '';
-        });
-    }
-
-    private function processNotifyIDs($notifyIDs)
-    {
-        $totalCount = count($notifyIDs);
-
-        if ($totalCount == 0) {
-            $this->info('[!] No new character found.');
-
-            return;
-        }
-
-        $this->info(PHP_EOL.'[!] Querying for Work...'.PHP_EOL);
-
-        $progressBar = $this->output->createProgressBar($totalCount);
-        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
-        $progressBar->start();
-
-        foreach ($notifyIDs as $item) {
-            dispatch(new NotifyCharacterJob($item));
-            $progressBar->advance();
-        }
-
-        $progressBar->finish();
     }
 }
+

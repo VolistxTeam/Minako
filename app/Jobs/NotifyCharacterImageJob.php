@@ -3,11 +3,20 @@
 namespace App\Jobs;
 
 use GuzzleHttp\Client;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Laravel\Facades\Image;
 
-class NotifyCharacterImageJob extends Job
+class NotifyCharacterImageJob implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     protected int $id;
     protected string $notifyID;
     protected string $uniqueID;
@@ -75,10 +84,9 @@ class NotifyCharacterImageJob extends Job
         return $response->getBody()->getContents();
     }
 
-    private function storeImage($imageData)
+    private function storeImage($imageData): void
     {
-        $manager = new ImageManager(['driver' => config('image.driver')]);
-        $image = $manager->make($imageData)->encode('jpg', 100);
+        $image = Image::read($imageData)->encode(new JpegEncoder(quality: 100));
         Storage::disk('local')->put('characters/'.$this->uniqueID.'.jpg', $image);
     }
 }

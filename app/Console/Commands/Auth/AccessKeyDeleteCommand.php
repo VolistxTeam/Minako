@@ -2,23 +2,35 @@
 
 namespace App\Console\Commands\Auth;
 
-use App\Facades\Keys;
-use App\Helpers\SHA256Hasher;
-use App\Models\AccessToken;
 use Illuminate\Console\Command;
+use function Laravel\Prompts\text;
 
 class AccessKeyDeleteCommand extends Command
 {
-    protected $signature = 'access-key:delete {--key=}';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'access-key:delete';
 
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'Delete an access key';
 
     /**
-     * @return void
+     * Execute the console command.
      */
     public function handle()
     {
-        $token = $this->option('key');
+        $token = text(
+            label: 'Please specify your access key to delete.',
+            default: '',
+            required: true
+        );
 
         if (empty($token)) {
             $this->components->error('Please specify your access key to delete.');

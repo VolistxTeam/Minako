@@ -2,26 +2,23 @@
 
 namespace App\Http\Controllers\Services;
 
-use App\DataTransferObjects\AnimeDTO;
-use App\DataTransferObjects\CharacterDTO;
-use App\DataTransferObjects\CompanyDTO;
-use App\DataTransferObjects\EpisodeDTO;
-use App\DataTransferObjects\MappingDTO;
-use App\DataTransferObjects\RelationDTO;
-use App\DataTransferObjects\TorrentDTO;
-use App\Facades\OhysBlacklist;
+use App\DataTransferObjects\Anime;
+use App\DataTransferObjects\Character;
+use App\DataTransferObjects\Company;
+use App\DataTransferObjects\Episode;
+use App\DataTransferObjects\Mapping;
+use App\DataTransferObjects\Relation;
+use App\DataTransferObjects\Torrent;
+use App\Helpers\JikanAPI;
+use App\Helpers\OhysBlacklistChecker;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
-use App\Models\NotifyCharacter;
-use App\Models\NotifyCharacterRelation;
+use App\Models\NotifyAnimeCharacter;
 use App\Models\NotifyCompany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
-use Jikan\Exception\BadResponseException;
-use Jikan\Exception\ParserException;
-use Jikan\MyAnimeList\MalClient;
-use Jikan\Request\Anime\AnimeEpisodesRequest;
 
 class AnimeController extends Controller
 {
@@ -37,7 +34,7 @@ class AnimeController extends Controller
         $response = [];
 
         foreach ($searchQuery as $query) {
-            $response[] = AnimeDTO::fromModel($query->obj)->GetDTO();
+            $response[] = Anime::fromModel($query->obj)->GetDTO();
         }
 
         return response()->json($response);
@@ -53,7 +50,7 @@ class AnimeController extends Controller
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response = AnimeDTO::fromModel($itemQuery)->GetDTO();
+        $response = Anime::fromModel($itemQuery)->GetDTO();
 
         return response()->json($response);
     }
@@ -91,7 +88,7 @@ class AnimeController extends Controller
             return response('Episode not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response = EpisodeDTO::fromModel($episodeQuery)->GetDTO();
+        $response = Episode::fromModel($episodeQuery)->GetDTO();
 
         return response()->json($response);
     }
@@ -105,9 +102,9 @@ class AnimeController extends Controller
         }
 
         $itemsFiltered = $itemQuery->torrents->filter(function ($torrent) use ($itemQuery) {
-            return !OhysBlacklist::isBlacklistedTitle($itemQuery->title_canonical ?? '') || !OhysBlacklist::isBlacklistedTitle($itemQuery->title_romaji ?? '');
+            return !OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_canonical ?? '') || !OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_romaji ?? '');
         })->map(function ($torrent) {
-            return TorrentDTO::fromModel($torrent)->GetDTO();
+            return Torrent::fromModel($torrent)->GetDTO();
         });
 
         return response()->json($itemsFiltered);
@@ -135,7 +132,7 @@ class AnimeController extends Controller
 
         $items = [];
         foreach ($episodesQuery as $episodeQuery) {
-            $items[] = EpisodeDTO::fromModel($episodeQuery)->GetDTO();
+            $items[] = Episode::fromModel($episodeQuery)->GetDTO();
         }
 
         $buildResponse = [
@@ -167,7 +164,7 @@ class AnimeController extends Controller
 
     public function SyncEpisodes(Request $request, $uniqueID)
     {
-        $jikan = new MalClient();
+        $jikan = new JikanAPI();
 
         $item = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
@@ -181,54 +178,28 @@ class AnimeController extends Controller
             return response('No MAL ID found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $pageNumber = 1;
-        $currentLoop = 1;
-        $errorDetected = false;
-        $errorMessage = '';
+        $data = $jikan->getAnimeEpisodes($malID);
 
-        while ($currentLoop <= $pageNumber) {
-            $s_continue = false;
+        if ($data != null) {
+            foreach ($data as $episodeItem) {
+                $malItem = MALAnime::query()->updateOrCreate([
+                    'uniqueID' => $item['uniqueID'],
+                    'notifyID' => $item['notifyID'],
+                    'episode_id' => $episodeItem['mal_id'],
+                ], [
+                    'title' => !empty($episodeItem['title']) ? $episodeItem['title'] : null,
+                    'title_japanese' => !empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
+                    'title_romanji' => !empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
+                    'aired' => !empty($episodeItem['aired']) ? Carbon::parse($episodeItem['aired']) : null,
+                    'filler' => (int)$episodeItem['filler'],
+                    'recap' => (int)$episodeItem['recap'],
+                ]);
 
-            while (!$s_continue) {
-                try {
-                    $episodesResponse = $jikan->getAnimeEpisodes(new AnimeEpisodesRequest((int)$malID, $currentLoop));
-
-                    foreach ($episodesResponse->getResults() as $episodeItem) {
-                        $malItem = MALAnime::query()->updateOrCreate([
-                            'uniqueID' => $item['uniqueID'],
-                            'notifyID' => $item['notifyID'],
-                            'episode_id' => $episodeItem->getMalId(),
-                        ], [
-                            'title' => !empty($episodeItem->getTitle()) ? $episodeItem->getTitle() : null,
-                            'title_japanese' => !empty($episodeItem->getTitleJapanese()) ? $episodeItem->getTitleJapanese() : null,
-                            'title_romanji' => !empty($episodeItem->getTitleRomanji()) ? $episodeItem->getTitleRomanji() : null,
-                            'aired' => !empty($episodeItem->getAired()) ? $episodeItem->getAired() : null,
-                            'filler' => (int)$episodeItem->isFiller(),
-                            'recap' => (int)$episodeItem->isRecap(),
-                        ]);
-
-                        $malItem->touch();
-                    }
-                } catch (BadResponseException|ParserException $e) {
-                    $errorDetected = true;
-                    $errorMessage = $e->getMessage();
-                }
-
-                $currentLoop++;
-
-                $s_continue = true;
-            }
-
-            if ($errorDetected) {
-                break;
+                $malItem->touch();
             }
         }
 
-        if ($errorDetected) {
-            return response('Error occurred: ' . $uniqueID, 500)->header('Content-Type', 'text/plain');
-        } else {
-            return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
-        }
+        return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
     }
 
     public function GetMappings($uniqueID)
@@ -247,7 +218,7 @@ class AnimeController extends Controller
         ];
 
         foreach ($itemQuery->mappings ?? [] as $item) {
-            $filteredMappingData[] = MappingDTO::fromModel($item)->GetDTO();
+            $filteredMappingData[] = Mapping::fromModel($item)->GetDTO();
         }
 
 
@@ -272,7 +243,7 @@ class AnimeController extends Controller
         foreach ($itemQuery->studios as $item) {
             $studioQuery = NotifyCompany::query()->where('notifyID', $item)->first();
             if (!empty($studioQuery)) {
-                $filteredStudioData[] = CompanyDTO::fromModel($studioQuery)->GetDTO();
+                $filteredStudioData[] = Company::fromModel($studioQuery)->GetDTO();
             }
         }
 
@@ -297,7 +268,7 @@ class AnimeController extends Controller
         foreach ($itemQuery->producers ?? [] as $item) {
             $producerQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
             if (!empty($producerQuery)) {
-                $filteredProducerData[] = CompanyDTO::fromModel($producerQuery)->GetDTO();
+                $filteredProducerData[] = Company::fromModel($producerQuery)->GetDTO();
             }
         }
 
@@ -323,7 +294,7 @@ class AnimeController extends Controller
             $licensorQuery = NotifyCompany::query()->where('notifyID', $item)->first();
 
             if (!empty($licensorQuery)) {
-                $filteredLicensorData[] = CompanyDTO::fromModel($licensorQuery)->GetDTO();
+                $filteredLicensorData[] = Company::fromModel($licensorQuery)->GetDTO();
             }
         }
 
@@ -350,7 +321,7 @@ class AnimeController extends Controller
 
         if (!empty($itemArray) && !empty($itemArray['items'])) {
             foreach ($itemArray['items'] as $item) {
-                $filteredRelationData[] = RelationDTO::fromModel($item)->GetDTO();
+                $filteredRelationData[] = Relation::fromModel($item)->GetDTO();
             }
         }
 
@@ -364,7 +335,7 @@ class AnimeController extends Controller
 
     public function GetCharacters($uniqueID)
     {
-        $characterRelationQuery = NotifyCharacterRelation::query()->where('uniqueID', $uniqueID)->first();
+        $characterRelationQuery = NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($characterRelationQuery)) {
             return response('Character not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
@@ -373,10 +344,10 @@ class AnimeController extends Controller
         $filteredCharacterData = [];
 
         foreach ($characterRelationQuery->items ?? [] as $item) {
-            $characterQuery = NotifyCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
+            $characterQuery = NotifyAnimeCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
 
             if (!empty($characterQuery)) {
-                $filteredCharacterData[] = CharacterDTO::fromModel($characterQuery)->GetDTO();
+                $filteredCharacterData[] = Character::fromModel($characterQuery)->GetDTO();
             }
         }
 

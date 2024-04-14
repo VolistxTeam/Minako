@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OhysRelation extends Model
 {
     use HasFactory;
+    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
@@ -15,12 +17,14 @@ class OhysRelation extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'ohys_relation';
+
     protected $fillable = [
         'uniqueID',
         'matchingID',

@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\Traits\UuidForKey;
+use App\Traits\ClearsResponseCache;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OhysBlacklistTitle extends Model
 {
-    use UuidForKey;
+    use HasUuids;
+    use HasFactory;
+    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
