@@ -13,9 +13,37 @@ class NyaaCrawler
         $this->client = $this->createHttpClient();
     }
 
+    public function getAllTorrents(): array
+    {
+        $allTorrents = [];
+        $page = 0;
+        $isEmpty = false;
+        $maxPages = 15; // Set a limit to prevent endless requests
+        $previousTorrents = null; // To store data from the previous page
+
+        while (!$isEmpty && $page < $maxPages) {
+            $torrents = $this->getTorrents($page);
+
+            if (empty($torrents)) {
+                $isEmpty = true;
+            } else {
+                // Check if the current page torrents are the same as the previous page torrents
+                if ($previousTorrents !== null && $torrents === $previousTorrents) {
+                    break; // If they are the same, break the loop
+                }
+
+                $allTorrents = array_merge($allTorrents, $torrents);
+                $previousTorrents = $torrents; // Update the previous torrents
+                $page++;
+            }
+        }
+
+        return $allTorrents;
+    }
+
     public function getTorrents($page = 0): array
     {
-        $response = $this->client->get('/?f=' . $page . '&c=0_0&q=' . urlencode('[Ohys-Raws]'));
+        $response = $this->client->get('/?f=0&c=0_0&q=' . urlencode('[Ohys-Raws]') . '&p=' . $page);
 
         $crawler = new Crawler($response->getBody()->getContents());
         return $crawler->filter('div.table-responsive table tbody tr.default')->each(function (Crawler $node) {
