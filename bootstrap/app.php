@@ -1,74 +1,32 @@
 <?php
 
-use LumenRateLimiting\ThrottleRequests;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-require_once __DIR__.'/../vendor/autoload.php';
-
-(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
-    dirname(__DIR__)
-))->bootstrap();
-
-date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
-
-$app = new Laravel\Lumen\Application(
-    dirname(__DIR__)
-);
-
-$app->register(Chuckrincon\LumenConfigDiscover\DiscoverServiceProvider::class);
-
-$app->withFacades();
-$app->withEloquent();
-
-// Packages to provide compatibility with Laravel and Redis support
-$app->register(Illuminate\Redis\RedisServiceProvider::class);
-
-$app->register(Irazasyed\Larasupport\Providers\ArtisanServiceProvider::class);
-$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
-
-// Default providers of Lumen
-$app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\AuthServiceProvider::class);
-$app->register(App\Providers\EventServiceProvider::class);
-
-// Additional libraries
-$app->register(Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class);
-$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
-$app->register(\Spatie\ResponseCache\ResponseCacheServiceProvider::class);
-$app->register(\Cryental\StackPath\TrustedProxyServiceProvider::class);
-
-//Facades providers
-$app->register(\App\Providers\KeysServiceProvider::class);
-$app->register(\App\Providers\OhysBlacklistServiceProvider::class);
-
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
-
-$app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
-);
-
-$app->configure('app');
-
-$app->middleware([
-    \Cryental\StackPath\Http\Middleware\TrustProxies::class,
-    App\Http\Middleware\CorsMiddleware::class,
-]);
-
-$app->routeMiddleware([
-    'throttle'      => ThrottleRequests::class,
-    'cacheResponse' => \Spatie\ResponseCache\Middlewares\CacheResponse::class,
-]);
-
-$app->router->group([
-    'namespace'  => 'App\Http\Controllers',
-    'middleware' => 'throttle:api',
-], function ($router) {
-    require __DIR__.'/../routes/api.php';
-});
-
-$app->instance('path.config', app()->basePath().DIRECTORY_SEPARATOR.'config');
-
-return $app;
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/api.php'
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(remove: [
+            StartSession::class,
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            ShareErrorsFromSession::class,
+            ValidateCsrfToken::class,
+            SubstituteBindings::class
+        ]);
+        $middleware->alias([
+            'CacheResponse' => \Spatie\ResponseCache\Middlewares\DoNotCacheResponse::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();

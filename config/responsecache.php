@@ -20,7 +20,7 @@ return [
      *  This can be useful to monitor the performance of your application.
      */
     'cache_bypass_header' => [
-        'name'  => env('CACHE_BYPASS_HEADER_NAME', null),
+        'name' => env('CACHE_BYPASS_HEADER_NAME', null),
         'value' => env('CACHE_BYPASS_HEADER_VALUE', null),
     ],
 
@@ -28,20 +28,20 @@ return [
      * When using the default CacheRequestFilter this setting controls the
      * default number of seconds responses must be cached.
      */
-    'cache_lifetime_in_seconds' => env('RESPONSE_CACHE_LIFETIME', 60 * 60),
+    'cache_lifetime_in_seconds' => (int) env('RESPONSE_CACHE_LIFETIME', 60 * 60 * 24 * 7),
 
     /*
      * This setting determines if a http header named with the cache time
      * should be added to a cached response. This can be handy when
      * debugging.
      */
-    'add_cache_time_header' => env('APP_DEBUG', true),
+    'add_cache_time_header' => env('APP_DEBUG', false),
 
     /*
      * This setting determines the name of the http header that contains
      * the time at which the response was cached
      */
-    'cache_time_header_name' => env('RESPONSE_CACHE_HEADER_NAME', 'minako'),
+    'cache_time_header_name' => env('RESPONSE_CACHE_HEADER_NAME', 'Minako-CachedItem'),
 
     /*
      * This setting determines if a http header named with the cache age
@@ -55,21 +55,20 @@ return [
      * This setting determines the name of the http header that contains
      * the age of cache
      */
-    'cache_age_header_name' => env('RESPONSE_CACHE_AGE_HEADER_NAME', 'laravel-responsecache-age'),
+    'cache_age_header_name' => env('RESPONSE_CACHE_AGE_HEADER_NAME', 'Minako-CacheAge'),
 
     /*
      * Here you may define the cache store that should be used to store
      * requests. This can be the name of any store that is
      * configured in app/config/cache.php
      */
-    'cache_store' => env('RESPONSE_CACHE_DRIVER', 'apc'),
+    'cache_store' => env('RESPONSE_CACHE_DRIVER', 'file'),
 
     /*
      * Here you may define replacers that dynamically replace content from the response.
      * Each replacer must implement the Replacer interface.
      */
     'replacers' => [
-
     ],
 
     /*

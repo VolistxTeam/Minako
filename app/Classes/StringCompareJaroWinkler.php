@@ -35,7 +35,7 @@ class StringCompareJaroWinkler
         $commons2_len = mb_strlen($commons2);
 
         if ($commons1_len === 0 || $commons2_len === 0) {
-            return 0;
+            return 0.0;
         }
 
         $transpositions = $this->countTranspositions($commons1, $commons2);
@@ -43,12 +43,13 @@ class StringCompareJaroWinkler
         return ($commons1_len / $str1_len + $commons2_len / $str2_len + ($commons1_len - $transpositions) / $commons1_len) / 3.0;
     }
 
+
     private function getCommonCharacters(string $string1, string $string2, int $allowedDistance): string
     {
         $str1_len = mb_strlen($string1);
         $str2_len = mb_strlen($string2);
-        $temp_string2 = $string2;
         $commonCharacters = '';
+        $matchedPositions = array_fill(0, $str2_len, false);
 
         for ($i = 0; $i < $str1_len; $i++) {
             $char1 = $string1[$i];
@@ -56,9 +57,9 @@ class StringCompareJaroWinkler
             $end = min($i + $allowedDistance + 1, $str2_len);
 
             for ($j = $start; $j < $end; $j++) {
-                if ($temp_string2[$j] === $char1) {
+                if (!$matchedPositions[$j] && $string2[$j] === $char1) {
                     $commonCharacters .= $char1;
-                    $temp_string2[$j] = ' ';
+                    $matchedPositions[$j] = true;
                     break;
                 }
             }

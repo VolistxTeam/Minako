@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NotifyCompany extends Model
 {
     use HasFactory;
+    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
@@ -21,6 +23,7 @@ class NotifyCompany extends Model
      * @var string
      */
     protected $table = 'notify_company';
+
     protected $fillable = [
         'uniqueID',
         'notifyID',

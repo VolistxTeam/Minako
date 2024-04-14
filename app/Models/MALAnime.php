@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MALAnime extends Model
 {
     use HasFactory;
+    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
@@ -15,12 +17,14 @@ class MALAnime extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'mal_anime';
+
     protected $fillable = [
         'uniqueID',
         'notifyID',

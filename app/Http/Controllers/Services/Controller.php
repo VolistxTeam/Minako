@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Services;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Laravel\Lumen\Routing\Controller as BaseController;
 
-class Controller extends BaseController
+abstract class Controller
 {
     protected function escapeElasticReservedChars(string $string): string
     {
-        $regex = '/[\\+\\-\\=\\&\\|\\!\\(\\)\\{\\}\\[\\]\\^\\"\\~\\*\\<\\>\\?\\:\\\\\\/]/';
+        $regex = '/[+\\-=&|!(){}\\[\\]^"~*<>?:\\\\\\/]/';
 
         return preg_replace($regex, addslashes('\\$0'), $string);
     }

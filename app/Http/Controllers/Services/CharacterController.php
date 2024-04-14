@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Services;
 
-use App\DataTransferObjects\CharacterDTO;
+use App\DataTransferObjects\Anime;
+use App\DataTransferObjects\Character;
 use App\Models\NotifyCharacter;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -14,17 +15,12 @@ class CharacterController extends Controller
         $name = urldecode($name);
         $name = $this->escapeElasticReservedChars($name);
 
-        $searchQuery = NotifyCharacter::query()
-            ->where('name_canonical', 'LIKE', "%$name%")
-            ->orWhere('name_english', 'LIKE', "%$name%")
-            ->orWhere('name_japanese', 'LIKE', "%$name%")
-            ->orWhereJsonContains('name_synonyms', $name)
-            ->take(100)
-            ->paginate(50, ['*'], 'page', 1);
+        $searchQuery = NotifyCharacter::searchByName($name, 50);
+        $response = [];
 
-        $response = $searchQuery->getCollection()->transform(function ($item) {
-            return CharacterDTO::fromModel($item)->GetDTO();
-        });
+        foreach ($searchQuery as $query) {
+            $response[] = Character::fromModel($query->obj)->GetDTO();
+        }
 
         return response()->json($response);
     }
@@ -57,7 +53,7 @@ class CharacterController extends Controller
             return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response =  CharacterDTO::fromModel($itemQuery)->GetDTO();
+        $response =  Character::fromModel($itemQuery)->GetDTO();
 
         return response()->json($response);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -10,6 +11,7 @@ class OhysTorrent extends Model
 {
     use HasFactory;
     use HasRelationships;
+    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
@@ -17,12 +19,14 @@ class OhysTorrent extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'ohys_torrent';
+
     protected $fillable = [
         'uniqueID',
         'releaseGroup',

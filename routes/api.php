@@ -1,78 +1,70 @@
 <?php
 
-/** @var Router $router */
+use App\Http\Controllers\Services\AnimeController;
+use App\Http\Controllers\Services\CharacterController;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
+Route::get('/test', [\App\Http\Controllers\TestController::class, 'Test']);
 
-use Laravel\Lumen\Routing\Router;
-
-$router->group(['prefix' => 'minako'], function () use ($router) {
-    $router->group(['prefix' => 'cache'], function () use ($router) {
-        $router->get('/flush', function () {
-            \Illuminate\Support\Facades\Cache::flush();
+Route::prefix('minako')->group(function () {
+    Route::prefix('cache')->group(function () {
+        Route::get('/flush', function () {
+            Cache::flush();
             return response()->json(['message' => 'All caches are flushed.']);
         });
     });
 
-    $router->group(['prefix' => 'anime'], function () use ($router) {
-        $router->get('/{uniqueID}/sync', 'Services\AnimeController@SyncEpisodes');
+    Route::prefix('anime')->group(function () {
+        Route::get('/{uniqueID}/sync', [AnimeController::class, 'SyncEpisodes']);
     });
 
-    $router->group(['middleware' => ['cacheResponse']], function () use ($router) {
-        $router->group(['prefix' => 'anime'], function () use ($router) {
-            $router->get('/{uniqueID}', 'Services\AnimeController@GetItem');
-            $router->get('/{uniqueID}/image', 'Services\AnimeController@GetImage');
-            $router->get('/{uniqueID}/episodes/{episodeNumber}', 'Services\AnimeController@GetEpisode');
-            $router->get('/{uniqueID}/episodes', 'Services\AnimeController@GetEpisodes');
-            $router->get('/{uniqueID}/mappings', 'Services\AnimeController@GetMappings');
-            $router->get('/{uniqueID}/studios', 'Services\AnimeController@GetStudios');
-            $router->get('/{uniqueID}/producers', 'Services\AnimeController@GetProducers');
-            $router->get('/{uniqueID}/licensors', 'Services\AnimeController@GetLicensors');
-            $router->get('/{uniqueID}/characters', 'Services\AnimeController@GetCharacters');
-            $router->get('/{uniqueID}/relations', 'Services\AnimeController@GetRelations');
-            $router->get('/{uniqueID}/torrents', 'Services\AnimeController@GetTorrents');
-            $router->get('/search/{name}', 'Services\AnimeController@Search');
+    Route::middleware(['CacheResponse'])->group(function () {
+        Route::prefix('anime')->group(function () {
+            Route::get('/{uniqueID}', [AnimeController::class, 'GetItem']);
+            Route::get('/{uniqueID}/image', [AnimeController::class, 'GetImage']);
+            Route::get('/{uniqueID}/episodes/{episodeNumber}', [AnimeController::class, 'GetEpisode']);
+            Route::get('/{uniqueID}/episodes', [AnimeController::class, 'GetEpisodes']);
+            Route::get('/{uniqueID}/mappings', [AnimeController::class, 'GetMappings']);
+            Route::get('/{uniqueID}/studios', [AnimeController::class, 'GetStudios']);
+            Route::get('/{uniqueID}/producers', [AnimeController::class, 'GetProducers']);
+            Route::get('/{uniqueID}/licensors', [AnimeController::class, 'GetLicensors']);
+            Route::get('/{uniqueID}/characters', [AnimeController::class, 'GetCharacters']);
+            Route::get('/{uniqueID}/relations', [AnimeController::class, 'GetRelations']);
+            Route::get('/{uniqueID}/torrents', [AnimeController::class, 'GetTorrents']);
+            Route::get('/search/{name}', [AnimeController::class, 'Search']);
         });
 
-        $router->group(['prefix' => 'episode'], function () use ($router) {
-            $router->get('/{id}', 'Services\EpisodeController@GetEpisode');
-            $router->get('/search/{name}', 'Services\EpisodeController@Search');
+//        Route::prefix('episode')->group(function () {
+//            Route::get('/{id}', [EpisodeController::class, 'GetEpisode']);
+//            Route::get('/search/{name}', [EpisodeController::class, 'Search']);
+//        });
+//
+//        Route::prefix('company')->group(function () {
+//            Route::get('/{id}', [CompanyController::class, 'GetCompany']);
+//            Route::get('/search/{name}', [CompanyController::class, 'Search']);
+//        });
+//
+        Route::prefix('character')->group(function () {
+            Route::get('/{id}', [CharacterController::class, 'GetCharacter']);
+            Route::get('/{id}/image', [CharacterController::class, 'GetImage']);
+            Route::get('/search/{name}', [CharacterController::class, 'Search']);
         });
-
-        $router->group(['prefix' => 'company'], function () use ($router) {
-            $router->get('/{id}', 'Services\CompanyController@GetCompany');
-            $router->get('/search/{name}', 'Services\CompanyController@Search');
-        });
-
-        $router->group(['prefix' => 'character'], function () use ($router) {
-            $router->get('/{id}', 'Services\CharacterController@GetCharacter');
-            $router->get('/{id}/image', 'Services\CharacterController@GetImage');
-            $router->get('/search/{name}', 'Services\CharacterController@Search');
-        });
-
-        $router->group(['prefix' => 'ohys'], function () use ($router) {
-            $router->get('/', 'Services\OhysController@GetRecentTorrents');
-            $router->get('/{id}', 'Services\OhysController@GetTorrent');
-            $router->get('/{id}/download', 'Services\OhysController@DownloadTorrent');
-            $router->get('/search/{name}', 'Services\OhysController@Search');
-            $router->get('/service/rss', 'Services\OhysController@GetRSS');
-        });
-    });
-
-    $router->group(['prefix' => 'blacklist'], function () use ($router) {
-        $router->get('/', 'Auth\OhysBlacklistController@GetOhysBlacklistTitles');
-        $router->post('/', 'Auth\OhysBlacklistController@CreateOhysBlacklistTitle');
-        $router->get('/{title_id}', 'Auth\OhysBlacklistController@GetOhysBlacklistTitle');
-        $router->delete('/{title_id}', 'Auth\OhysBlacklistController@DeleteOhysBlacklistTitle');
-        $router->patch('/{title_id}', 'Auth\OhysBlacklistController@UpdateOhysBlacklistTitle');
+//
+//        Route::prefix('ohys')->group(function () {
+//            Route::get('/', [OhysController::class, 'GetRecentTorrents']);
+//            Route::get('/{id}', [OhysController::class, 'GetTorrent']);
+//            Route::get('/{id}/download', [OhysController::class, 'DownloadTorrent']);
+//            Route::get('/search/{name}', [OhysController::class, 'Search']);
+//            Route::get('/service/rss', [OhysController::class, 'GetRSS']);
+//        });
+//    });
+//
+//    Route::prefix('blacklist')->group(function () {
+//        Route::get('/', [OhysBlacklistController::class, 'GetOhysBlacklistTitles']);
+//        Route::post('/', [OhysBlacklistController::class, 'CreateOhysBlacklistTitle']);
+//        Route::get('/{title_id}', [OhysBlacklistController::class, 'GetOhysBlacklistTitle']);
+//        Route::delete('/{title_id}', [OhysBlacklistController::class, 'DeleteOhysBlacklistTitle']);
+//        Route::patch('/{title_id}', [OhysBlacklistController::class, 'UpdateOhysBlacklistTitle']);
     });
 });
