@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: ''
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->replace(
+            \Illuminate\Http\Middleware\TrustProxies::class,
+            \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
+        );
         $middleware->api(remove: [
             StartSession::class,
             EncryptCookies::class,
