@@ -43,6 +43,10 @@ class DownloadCommand extends Command
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
+            if (OhysTorrent::query()->where('torrentName', $torrent['title'].'.torrent')->first()) {
+                break;
+            }
+
             $tempFile = $temporaryDirectory->path(Str::random(15) . '.torrent');
 
             try {
@@ -87,6 +91,45 @@ class DownloadCommand extends Command
         return 0;
     }
 
+//    public function handle()
+//    {
+//        set_time_limit(0);
+//
+//        $directoryPath = 'torrents'; // Specify your directory containing torrent files
+//        $files = Storage::disk('local')->files($directoryPath); // Get all files in the directory
+//
+//        $this->components->info('Processing Torrents from local folder...');
+//
+//        foreach ($files as $file) {
+//            $tempFile = storage_path('app/' . $file); // Adjust path according to your storage configuration
+//
+//            if (!file_exists($tempFile) || !is_readable($tempFile)) {
+//                $this->line("Temporary file $tempFile not found or not readable. Continue...");
+//                continue;
+//            }
+//
+//            $fileName = basename($file); // Get the filename from path
+//            $fileNameParsedArray = $this->parseFileName($fileName);
+//
+//            if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
+//                $this->line('Filename parsing failed for ' . $fileName . '. Continue...');
+//                continue;
+//            }
+//
+//            $fileContents = file_get_contents($tempFile);
+//            $torrentData = $this->extractTorrentData($fileContents, $fileNameParsedArray[0], $fileNameParsedArray);
+//
+//            // If uniqueID and other required data are handled in extractTorrentData
+//            $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
+//            $createdInfo->touch();
+//
+//            $this->info('[Debug] Done: ' . $fileName);
+//        }
+//
+//        return 0;
+//    }
+
+
     private function getHeaders()
     {
         $faker = Factory::create();
@@ -120,7 +163,8 @@ class DownloadCommand extends Command
     {
         $torrent = new Torrent($torrent);
 
-        $itemID = Str::random(8);
+        $itemID = substr(sha1($torrent), 0, 8);
+        ray($itemID);
         $episode = empty($fileNameParsedArray[3]) ? null : preg_replace('/[^0-9]/', '', $fileNameParsedArray[3]);
         $episode = empty($episode) ? null : $episode;
 
@@ -151,7 +195,7 @@ class DownloadCommand extends Command
             'broadcaster' => $fileNameParsedArray[4] ?? null,
             'title' => $fileNameParsedArray[2],
             'episode' => $episode,
-            'torrentName' => $file.'.torrent',
+            'torrentName' => $file . '.torrent',
             'info_totalHash' => $torrent->hash_info(),
             'info_totalSize' => $torrent->size(2),
             'info_createdDate' => date('Y-m-d H:i:s', $torrent->creation_date()),
