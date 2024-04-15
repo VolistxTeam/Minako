@@ -3,9 +3,11 @@
 # Define the lockfile and website URL
 LOCKFILE="/tmp/minako_octane.lock"
 URL="https://api.cryental.dev/minako/ohys"
+GIT_REPO_PATH="/home/u721179272/domains/cryental.dev/public_html/api/production/minako"
 
 # Change to the directory where your Laravel application is located
-cd /home/u721179272/domains/cryental.dev/public_html/api/production/minako
+# shellcheck disable=SC2164
+cd "$GIT_REPO_PATH"
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
@@ -33,6 +35,35 @@ ensure_octane_running() {
     fi
 }
 
+# Function to check if Git repository is up-to-date
+check_git_updates() {
+    echo "Checking for local uncommitted changes..."
+    if ! git diff-index --quiet HEAD --; then
+        echo "There are uncommitted changes in the repository."
+        return
+    fi
+
+    echo "Fetching latest changes from remote..."
+    git fetch
+
+    LOCAL=$(git rev-parse @)
+    REMOTE=$(git rev-parse @{u})
+    BASE=$(git merge-base @ @{u})
+
+    if [ $LOCAL = $REMOTE ]; then
+        echo "Git repository is up-to-date."
+    elif [ $LOCAL = $BASE ]; then
+        echo "Need to pull, the repository is not up-to-date."
+        git pull
+        echo "Pulled successfully. Updating composer dependencies..."
+        composer_update
+    elif [ $REMOTE = $BASE ]; then
+        echo "Need to push local changes."
+    else
+        echo "Repository has diverged from remote, manual intervention required."
+    fi
+}
+
 # Function to check the website's health
 check_website_health() {
     # Use curl to check if the website is accessible
@@ -47,6 +78,15 @@ check_website_health() {
     fi
 }
 
+# Function to update Composer dependencies
+composer_update() {
+    if composer2 update; then
+        echo "Composer dependencies updated successfully."
+    else
+        echo "Failed to update Composer dependencies."
+    fi
+}
+
 # Main execution block
 # Check if another instance of the script is running
 if [ -f "$LOCKFILE" ]; then
@@ -55,6 +95,9 @@ if [ -f "$LOCKFILE" ]; then
 else
     # Create a lock file
     touch "$LOCKFILE"
+
+    # Check Git repository updates
+    check_git_updates
 
     # Ensure Octane is running
     ensure_octane_running
