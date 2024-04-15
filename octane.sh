@@ -34,24 +34,27 @@ ensure_octane_running() {
         if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
             echo "Port 27195 on 127.0.0.1 is in use. Attempting to free the port..."
             # Extract PID of the process using the port, also printing the line for debugging
-            PID_LINE=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
-            echo "Debug: PID line - $PID_LINE"
-            PID=$(echo "$PID_LINE" | awk '{print $9}' | cut -d':' -f1)
-            echo "Debug: Extracted PID - $PID"
-            # Check if PID is not empty and is a valid hexadecimal number
-            if [[ ! -z "$PID" && "$PID" =~ ^[0-9A-Fa-f]+$ ]]; then
-                # Convert PID from hexadecimal to decimal
-                PID_DEC=$(printf "%d" "0x$PID")
-                echo "Debug: Decimal PID - $PID_DEC"
-                if [[ ! -z "$PID_DEC" && "$PID_DEC" != "0" ]]; then
-                    kill -9 "$PID_DEC"
-                    echo "Port has been freed."
+            PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
+            echo "Debug: PID lines - $PID_LINES"
+            # Process each line to find a valid inode and map it to a PID
+            echo "$PID_LINES" | while IFS= read -r line; do
+                INODE=$(echo "$line" | awk '{print $10}')
+                echo "Debug: Extracted inode - $INODE"
+                if [[ "$INODE" != "0" ]]; then
+                    # Map inode to PID
+                    PID=$(awk -v inode="$INODE" '$10 == inode {print $1}' /proc/*/fdinfo/* 2>/dev/null | cut -d '/' -f3 | uniq)
+                    echo "Debug: Mapped PID - $PID"
+                    if [[ ! -z "$PID" ]]; then
+                        kill -9 "$PID"
+                        echo "Process with PID $PID using port 27195 has been killed."
+                        break  # Stop after killing the first found process
+                    else
+                        echo "Could not map inode to PID."
+                    fi
                 else
-                    echo "Failed to convert PID or invalid PID."
+                    echo "Invalid inode."
                 fi
-            else
-                echo "Could not find a valid process to kill that's using the port."
-            fi
+            done
         else
             echo "Port 27195 on 127.0.0.1 is not in use."
         fi
