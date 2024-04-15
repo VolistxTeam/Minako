@@ -29,28 +29,26 @@ ensure_octane_running() {
         # Hexadecimal IP address for 127.0.0.1
         HEX_IP="0100007F"
         # Check if the port is in use by searching /proc/net/tcp
-        # We search for the local address entries where the port might be used
-        # Local address entries are of the form IP:PORT
         if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
             echo "Port 27195 on 127.0.0.1 is in use. Attempting to free the port..."
-            # Extract PID of the process using the port, also printing the line for debugging
+            # Extract lines from /proc/net/tcp that include the port
             PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
-            echo "Debug: PID lines - $PID_LINES"
             # Process each line to find a valid inode and map it to a PID
             echo "$PID_LINES" | while IFS= read -r line; do
                 INODE=$(echo "$line" | awk '{print $10}')
-                echo "Debug: Extracted inode - $INODE"
-                if [[ "$INODE" != "0" ]]; then
-                    # Map inode to PID
-                    PID=$(awk -v inode="$INODE" '$10 == inode {print $1}' /proc/*/fdinfo/* 2>/dev/null | cut -d '/' -f3 | uniq)
-                    echo "Debug: Mapped PID - $PID"
-                    if [[ ! -z "$PID" ]]; then
-                        kill -9 "$PID"
-                        echo "Process with PID $PID using port 27195 has been killed."
-                        break  # Stop after killing the first found process
-                    else
-                        echo "Could not map inode to PID."
-                    fi
+                if [[ "$INODE" != "0" && "$INODE" != "" ]]; then
+                    # Iterate through all /proc/*/fd to find the matching inode
+                    for FD in /proc/[0-9]*/fd/*; do
+                        if [[ "$(readlink $FD)" == "socket:[$INODE]" ]]; then
+                            PID=$(echo "$FD" | cut -d'/' -f3)
+                            if [[ ! -z "$PID" ]]; then
+                                kill -9 "$PID"
+                                echo "Process with PID $PID using port 27195 has been killed."
+                                # Continue to next inode rather than breaking, to kill all matching processes
+                            fi
+                        fi
+                    done
+                    echo "Could not map inode to PID or kill process."
                 else
                     echo "Invalid inode."
                 fi
