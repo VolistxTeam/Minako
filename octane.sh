@@ -20,7 +20,7 @@ trap 'rmdir "$LOCKFILE"' INT TERM EXIT
 # Function to ensure the Octane server is running
 ensure_octane_running() {
     # First, check if Octane is running
-    if php artisan octane:status | grep -q 'Server is running'; then
+    if php artisan octane:status | grep -q 'Octane server is running'; then
         echo "Octane server is running smoothly."
     else
         echo "Octane server is not running, attempting to start..."
@@ -29,13 +29,13 @@ ensure_octane_running() {
         sleep 2  # Wait for a few seconds to allow the server to start
 
         # Check again if Octane has started successfully
-        if php artisan octane:status | grep -q 'Server is running'; then
+        if php artisan octane:status | grep -q 'Octane server is running'; then
             echo "Octane server started successfully."
         else
             echo "Failed to start Octane server, attempting to restart..."
             # Attempt to restart Octane in the background
             nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &
-            if php artisan octane:status | grep -q 'Server is running'; then
+            if php artisan octane:status | grep -q 'Octane server is running'; then
                 echo "Octane server restarted successfully."
             else
                 echo "Failed to restart Octane server."
@@ -69,6 +69,13 @@ check_git_updates() {
         if git pull; then
             echo "Pulled successfully. Updating composer dependencies..."
             composer_update
+            echo "Reloading Octane server..."
+            if php artisan octane:reload; then
+                echo "Octane server reloaded successfully."
+            else
+                echo "Failed to reload Octane server."
+                return 1
+            fi
         else
             echo "Failed to pull changes."
             return 1
