@@ -34,7 +34,7 @@ ensure_octane_running() {
         else
             echo "Failed to start Octane server, attempting to restart..."
             # Attempt to restart Octane in the background
-            nohup php artisan octane:restart --server=swoole --port=27195 > octane.log 2>&1 &
+            nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &
             if php artisan octane:status | grep -q 'Server is running'; then
                 echo "Octane server restarted successfully."
             else
