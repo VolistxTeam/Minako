@@ -122,7 +122,7 @@ composer_update() {
 }
 
 restart_octane_server() {
-    if php artisan octane:stop && php artisan octane:start --server=swoole --port=27195; then
+    if php artisan octane:stop && nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &; then
         echo "Octane server restarted successfully."
     else
         echo "Failed to restart Octane server."
