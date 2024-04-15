@@ -33,12 +33,16 @@ ensure_octane_running() {
         # Local address entries are of the form IP:PORT
         if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
             echo "Port 27195 on 127.0.0.1 is in use. Attempting to free the port..."
-            # Extract PID of the process using the port
-            PID=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp | awk '{print $9}' | cut -d':' -f1)
+            # Extract PID of the process using the port, also printing the line for debugging
+            PID_LINE=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
+            echo "Debug: PID line - $PID_LINE"
+            PID=$(echo "$PID_LINE" | awk '{print $9}' | cut -d':' -f1)
+            echo "Debug: Extracted PID - $PID"
             # Check if PID is not empty and is a valid hexadecimal number
             if [[ ! -z "$PID" && "$PID" =~ ^[0-9A-Fa-f]+$ ]]; then
                 # Convert PID from hexadecimal to decimal
                 PID_DEC=$(printf "%d" "0x$PID")
+                echo "Debug: Decimal PID - $PID_DEC"
                 if [[ ! -z "$PID_DEC" && "$PID_DEC" != "0" ]]; then
                     kill -9 "$PID_DEC"
                     echo "Port has been freed."
