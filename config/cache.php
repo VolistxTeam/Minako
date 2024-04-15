@@ -38,6 +38,10 @@ return [
             'serialize' => false,
         ],
 
+        'apc' => [
+            'driver' => 'apc',
+        ],
+
         'database' => [
             'driver' => 'database',
             'table' => env('DB_CACHE_TABLE', 'cache'),

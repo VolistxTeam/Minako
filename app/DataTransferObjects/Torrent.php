@@ -18,23 +18,23 @@ class Torrent extends DataTransferObjectBase
         $appUrl = config('app.url', 'http://localhost');
 
         return [
-            'id'            => $this->entity['uniqueID'],
-            'anime_id'      => optional($this->entity->anime)->uniqueID,
+            'id' => $this->entity['uniqueID'],
+            'anime_id' => optional($this->entity->anime)->uniqueID,
             'release_group' => $this->entity['releaseGroup'],
-            'broadcaster'   => $this->entity['broadcaster'],
-            'title'         => $this->entity['title'],
-            'episode'       => $this->entity['episode'],
-            'torrent_name'  => $this->entity['torrentName'],
-            'info'          => [
-                'hash'       => $this->entity['info_totalHash'],
-                'size'       => $this->entity['info_totalSize'],
+            'broadcaster' => $this->entity['broadcaster'],
+            'title' => $this->entity['title'],
+            'episode' => $this->entity['episode'],
+            'torrent_name' => $this->entity['torrentName'],
+            'info' => [
+                'hash' => $this->entity['info_totalHash'],
+                'size' => $this->entity['info_totalSize'],
                 'created_at' => $this->entity['info_createdDate'],
-                'announces'  => $announcesRebuild,
-                'files'      => $this->entity['info_torrent_files'],
+                'announces' => $announcesRebuild,
+                'files' => $this->entity['info_torrent_files'],
             ],
             'metadata' => [
                 'video' => [
-                    'codec'      => $this->entity['metadata_video_codec'],
+                    'codec' => $this->entity['metadata_video_codec'],
                     'resolution' => $this->entity['metadata_video_resolution'],
                 ],
                 'audio' => [
@@ -47,7 +47,7 @@ class Torrent extends DataTransferObjectBase
                 ],
                 'mirror' => [
                     'torrent' => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download?type=torrent',
-                    'magnet'  => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download?type=magnet',
+                    'magnet' => $appUrl.'/ohys/'.$this->entity['uniqueID'].'/download?type=magnet',
                 ],
             ],
         ];

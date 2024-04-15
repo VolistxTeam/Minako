@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class OhysRelation extends Model
 {
-    use HasFactory;
     use ClearsResponseCache;
+    use HasFactory;
 
     /**
      * Indicates if the model should be timestamped.

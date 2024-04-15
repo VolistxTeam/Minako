@@ -7,13 +7,12 @@ use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
-use App\Models\Traits\Searchable;
 
 class NotifyAnime extends Model
 {
+    use ClearsResponseCache;
     use HasFactory;
     use HasRelationships;
-    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
@@ -21,6 +20,7 @@ class NotifyAnime extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The table associated with the model.
      *
@@ -65,16 +65,16 @@ class NotifyAnime extends Model
 
     protected $casts = [
         'title_synonyms' => 'array',
-        'genres'         => 'array',
-        'trailers'       => 'array',
-        'n_episodes'     => 'array',
-        'mappings'       => 'array',
-        'studios'        => 'array',
-        'producers'      => 'array',
-        'licensors'      => 'array',
-        'isHidden'       => 'boolean',
-        'created_at'     => 'datetime:Y-m-d H:i:s',
-        'updated_at'     => 'datetime:Y-m-d H:i:s',
+        'genres' => 'array',
+        'trailers' => 'array',
+        'n_episodes' => 'array',
+        'mappings' => 'array',
+        'studios' => 'array',
+        'producers' => 'array',
+        'licensors' => 'array',
+        'isHidden' => 'boolean',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function torrents()
@@ -108,18 +108,18 @@ class NotifyAnime extends Model
         $term = self::normalizeTerm($originalTerm);
         $cacheKey = "minako_search_anime_by_title_{$term}_{$maxLength}_{$type}";
 
-//        // Return cached results if available
-//        if (Cache::has($cacheKey)) {
-//            return Cache::get($cacheKey);
-//        }
+        //        // Return cached results if available
+        //        if (Cache::has($cacheKey)) {
+        //            return Cache::get($cacheKey);
+        //        }
 
         $results = [];
         $notifyQuery = self::query();
 
         // Apply full-text search
-        $notifyQuery->whereRaw("MATCH(title_canonical, title_english, title_romaji, title_japanese, title_hiragana, title_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)", [$term]);
+        $notifyQuery->whereRaw('MATCH(title_canonical, title_english, title_romaji, title_japanese, title_hiragana, title_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)', [$term]);
 
-        if (!empty($type)) {
+        if (! empty($type)) {
             $notifyQuery->where('type', $type);
         }
 
@@ -143,7 +143,7 @@ class NotifyAnime extends Model
             }
 
             if ($bestSimilarity >= $minStringSimilarity) {
-                $results[] = (object)[
+                $results[] = (object) [
                     'obj' => $item,
                     'similarity' => $bestSimilarity,
                     'exactMatch' => $exactMatch,
@@ -155,17 +155,17 @@ class NotifyAnime extends Model
             if ($a->exactMatch !== $b->exactMatch) {
                 return $b->exactMatch - $a->exactMatch;
             }
+
             return $b->similarity <=> $a->similarity;
         });
 
         $results = array_slice($results, 0, $maxLength);
 
         // Cache the results for 1 hour
-//        Cache::put($cacheKey, $results, 3600);
+        //        Cache::put($cacheKey, $results, 3600);
 
         return $results;
     }
-
 
     private static function normalizeTerm(string $term): string
     {
@@ -198,7 +198,7 @@ class NotifyAnime extends Model
     private static function advancedStringSimilarity(string $term, string $from): float
     {
         static $comparator = null;
-        if (!$comparator) {
+        if (! $comparator) {
             $comparator = new StringCompareJaroWinkler();
         }
 

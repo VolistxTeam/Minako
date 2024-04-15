@@ -9,7 +9,6 @@ use App\Models\OhysBlacklistTitle;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class OhysBlacklistController extends Controller
@@ -19,7 +18,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Key::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -34,9 +33,9 @@ class OhysBlacklistController extends Controller
             }
 
             $newTitle = OhysBlacklistTitle::query()->create([
-                'name'        => strtolower($request->input('name')),
-                'is_active'   => true,
-                'reason'      => $request->input('reason') ?? "DMCA"
+                'name' => strtolower($request->input('name')),
+                'is_active' => true,
+                'reason' => $request->input('reason') ?? 'DMCA',
             ]);
 
             return response()->json(OhysBlacklist::fromModel($newTitle)->GetDTO(), 201);
@@ -50,12 +49,12 @@ class OhysBlacklistController extends Controller
         try {
             $token = Key::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
             $validator = Validator::make(array_merge($request->all(), [
-                'title_id' => $title_id
+                'title_id' => $title_id,
             ]), [
                 'title_id' => ['bail', 'required', 'exists:ohys_blacklist,id'],
                 'name' => ['bail', 'sometimes', 'string'],
@@ -69,19 +68,19 @@ class OhysBlacklistController extends Controller
 
             $title = OhysBlacklistTitle::query()->Find($title_id);
 
-            if (!$title_id) {
+            if (! $title_id) {
                 return response()->json('Not found', 404);
             }
 
-            if (!empty($request->input('name'))) {
+            if (! empty($request->input('name'))) {
                 $title->name = $request->input('name');
             }
 
-            if (!empty($request->input('is_active'))) {
+            if (! empty($request->input('is_active'))) {
                 $title->is_active = $request->input('is_active');
             }
 
-            if (!empty($request->input('reason'))) {
+            if (! empty($request->input('reason'))) {
                 $title->reason = $request->input('reason');
             }
 
@@ -98,12 +97,12 @@ class OhysBlacklistController extends Controller
         try {
             $token = Key::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
             $validator = Validator::make([
-                'title_id' => $title_id
+                'title_id' => $title_id,
             ], [
                 'title_id' => ['bail', 'required', 'exists:ohys_blacklist,id'],
             ]);
@@ -114,7 +113,7 @@ class OhysBlacklistController extends Controller
 
             $toBeDeletedTitleBlacklist = OhysBlacklistTitle::query()->Find($title_id);
 
-            if (!$title_id) {
+            if (! $title_id) {
                 return response()->json('Not found', 404);
             }
 
@@ -131,7 +130,7 @@ class OhysBlacklistController extends Controller
         try {
             $title = OhysBlacklistTitle::query()->where('id', $title_id)->first();
 
-            if (!$title) {
+            if (! $title) {
                 return response()->json('Not found', 404);
             }
 

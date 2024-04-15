@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class NotifyCharacter extends Model
 {
-    use HasFactory;
     use ClearsResponseCache;
+    use HasFactory;
 
     /**
      * Indicates if the model should be timestamped.
@@ -45,12 +45,12 @@ class NotifyCharacter extends Model
 
     protected $casts = [
         'name_synonyms' => 'array',
-        'spoilers'      => 'array',
-        'attributes'    => 'array',
-        'mappings'      => 'array',
-        'isHidden'      => 'boolean',
-        'created_at'    => 'datetime:Y-m-d H:i:s',
-        'updated_at'    => 'datetime:Y-m-d H:i:s',
+        'spoilers' => 'array',
+        'attributes' => 'array',
+        'mappings' => 'array',
+        'isHidden' => 'boolean',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public static function searchByName(string $originalTerm, int $maxLength, $type = null): array
@@ -59,16 +59,16 @@ class NotifyCharacter extends Model
         $term = self::normalizeTerm($originalTerm);
         $cacheKey = "minako_search_character_by_name_{$term}_{$maxLength}_{$type}";
 
-//        // Return cached results if available
-//        if (Cache::has($cacheKey)) {
-//            return Cache::get($cacheKey);
-//        }
+        //        // Return cached results if available
+        //        if (Cache::has($cacheKey)) {
+        //            return Cache::get($cacheKey);
+        //        }
 
         $results = [];
         $notifyQuery = self::query();
 
         // Apply full-text search
-        $notifyQuery->whereRaw("MATCH(name_canonical, name_english, name_japanese, name_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)", [$term]);
+        $notifyQuery->whereRaw('MATCH(name_canonical, name_english, name_japanese, name_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)', [$term]);
 
         // Consider implementing pagination or batch processing if still too slow
         foreach ($notifyQuery->limit(1000)->cursor() as $item) {
@@ -90,7 +90,7 @@ class NotifyCharacter extends Model
             }
 
             if ($bestSimilarity >= $minStringSimilarity) {
-                $results[] = (object)[
+                $results[] = (object) [
                     'obj' => $item,
                     'similarity' => $bestSimilarity,
                     'exactMatch' => $exactMatch,
@@ -102,17 +102,17 @@ class NotifyCharacter extends Model
             if ($a->exactMatch !== $b->exactMatch) {
                 return $b->exactMatch - $a->exactMatch;
             }
+
             return $b->similarity <=> $a->similarity;
         });
 
         $results = array_slice($results, 0, $maxLength);
 
         // Cache the results for 1 hour
-//        Cache::put($cacheKey, $results, 3600);
+        //        Cache::put($cacheKey, $results, 3600);
 
         return $results;
     }
-
 
     private static function normalizeTerm(string $term): string
     {
@@ -145,7 +145,7 @@ class NotifyCharacter extends Model
     private static function advancedStringSimilarity(string $term, string $from): float
     {
         static $comparator = null;
-        if (!$comparator) {
+        if (! $comparator) {
             $comparator = new StringCompareJaroWinkler();
         }
 

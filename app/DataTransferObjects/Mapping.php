@@ -13,7 +13,7 @@ class Mapping extends DataTransferObjectBase
     {
         return [
             'service' => $this->entity['service'],
-            'service_id' => $this->entity['serviceId']
+            'service_id' => $this->entity['serviceId'],
         ];
     }
 }

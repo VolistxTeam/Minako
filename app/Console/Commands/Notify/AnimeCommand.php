@@ -8,14 +8,17 @@ use Faker\Factory;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+
 use function Laravel\Prompts\progress;
 
 class AnimeCommand extends Command
 {
     protected $signature = 'minako:notify:anime';
+
     protected $description = 'Retrieve all anime information from notify.moe.';
 
     private string $dataSource = 'https://notify.moe/api/types/Anime/download';
+
     private string $tempFilePath;
 
     public function handle()
@@ -25,8 +28,9 @@ class AnimeCommand extends Command
         $headers = $this->getHeaders();
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
         $this->tempFilePath = $this->downloadData($client, $headers);
-        if (!$this->tempFilePath) {
+        if (! $this->tempFilePath) {
             $this->components->error('Failed to download data.');
+
             return;
         }
 
@@ -46,12 +50,14 @@ class AnimeCommand extends Command
 
         $tempFilePath = tempnam(sys_get_temp_dir(), 'AnimeData');
         file_put_contents($tempFilePath, $response->getBody()->getContents());
+
         return $tempFilePath;
     }
 
     private function getRecentDBItems(): array
     {
         $sevenDaysAgo = Carbon::now()->subDays(7);
+
         return NotifyAnime::query()
             ->whereDate('updated_at', '>', $sevenDaysAgo)
             ->pluck('notifyID')
@@ -61,7 +67,7 @@ class AnimeCommand extends Command
     private function parseAndProcessData(string $filePath, array $dbItems)
     {
         $handle = fopen($filePath, 'r');
-        if (!$handle) {
+        if (! $handle) {
             return;
         }
 
@@ -71,17 +77,19 @@ class AnimeCommand extends Command
         $progress->start();
 
         $processedBytes = 0;
-        while (!feof($handle)) {
+        while (! feof($handle)) {
             $linePosition = ftell($handle);
             $line = fgets($handle);
             $trimmedLine = trim($line);
-            if (empty($trimmedLine)) continue;
+            if (empty($trimmedLine)) {
+                continue;
+            }
 
             if (preg_match('/^[a-zA-Z0-9]+$/', $trimmedLine)) {
                 $currentId = $trimmedLine;
                 $line = fgets($handle); // Assume the next line is the JSON data
                 $animeData = json_decode(trim($line), true);
-                if (!in_array($currentId, $dbItems)) {
+                if (! in_array($currentId, $dbItems)) {
                     $this->processData($animeData);
                 }
             }
@@ -117,47 +125,47 @@ class AnimeCommand extends Command
         $faker = Factory::create();
 
         return [
-            'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control'   => 'max-age=0',
-            'Connection'      => 'keep-alive',
-            'Keep-Alive'      => '300',
-            'User-Agent'      => $faker->chrome,
+            'Cache-Control' => 'max-age=0',
+            'Connection' => 'keep-alive',
+            'Keep-Alive' => '300',
+            'User-Agent' => $faker->chrome,
         ];
     }
 
     private function assignAnimeData($notifyAnime, array $downloadedData): void
     {
         $keys = [
-            'type'              => ['type'],
-            'title_canonical'   => ['title', 'canonical'],
-            'title_romaji'      => ['title', 'romaji'],
-            'title_english'     => ['title', 'english'],
-            'title_japanese'    => ['title', 'japanese'],
-            'title_hiragana'    => ['title', 'hiragana'],
-            'title_synonyms'    => ['title', 'synonyms'],
-            'summary'           => ['summary'],
-            'status'            => ['status'],
-            'genres'            => ['genres'],
-            'startDate'         => ['startDate'],
-            'endDate'           => ['endDate'],
-            'episodeCount'      => ['episodeCount'],
-            'episodeLength'     => ['episodeLength'],
-            'source'            => ['source'],
-            'image_extension'   => ['image', 'extension'],
-            'image_width'       => ['image', 'width'],
-            'image_height'      => ['image', 'height'],
-            'firstChannel'      => ['firstChannel'],
-            'rating_overall'    => ['rating', 'overall'],
-            'rating_story'      => ['rating', 'story'],
-            'rating_visuals'    => ['rating', 'visuals'],
+            'type' => ['type'],
+            'title_canonical' => ['title', 'canonical'],
+            'title_romaji' => ['title', 'romaji'],
+            'title_english' => ['title', 'english'],
+            'title_japanese' => ['title', 'japanese'],
+            'title_hiragana' => ['title', 'hiragana'],
+            'title_synonyms' => ['title', 'synonyms'],
+            'summary' => ['summary'],
+            'status' => ['status'],
+            'genres' => ['genres'],
+            'startDate' => ['startDate'],
+            'endDate' => ['endDate'],
+            'episodeCount' => ['episodeCount'],
+            'episodeLength' => ['episodeLength'],
+            'source' => ['source'],
+            'image_extension' => ['image', 'extension'],
+            'image_width' => ['image', 'width'],
+            'image_height' => ['image', 'height'],
+            'firstChannel' => ['firstChannel'],
+            'rating_overall' => ['rating', 'overall'],
+            'rating_story' => ['rating', 'story'],
+            'rating_visuals' => ['rating', 'visuals'],
             'rating_soundtrack' => ['rating', 'soundtrack'],
-            'trailers'          => ['trailers'],
-            'n_episodes'        => ['episodes'],
-            'mappings'          => ['mappings'],
-            'studios'           => ['studios'],
-            'producers'         => ['producers'],
-            'licensors'         => ['licensors'],
+            'trailers' => ['trailers'],
+            'n_episodes' => ['episodes'],
+            'mappings' => ['mappings'],
+            'studios' => ['studios'],
+            'producers' => ['producers'],
+            'licensors' => ['licensors'],
         ];
 
         foreach ($keys as $key => $path) {
@@ -172,4 +180,3 @@ class AnimeCommand extends Command
         }
     }
 }
-

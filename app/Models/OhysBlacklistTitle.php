@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class OhysBlacklistTitle extends Model
 {
-    use HasUuids;
-    use HasFactory;
     use ClearsResponseCache;
+    use HasFactory;
+    use HasUuids;
 
     /**
      * Indicates if the model should be timestamped.
@@ -30,12 +30,12 @@ class OhysBlacklistTitle extends Model
     protected $fillable = [
         'name',
         'is_active',
-        'reason'
+        'reason',
     ];
 
     protected $casts = [
-        'created_at'    => 'date:Y-m-d H:i:s',
-        'updated_at'    => 'date:Y-m-d H:i:s',
-        'is_active'     => 'boolean'
+        'created_at' => 'date:Y-m-d H:i:s',
+        'updated_at' => 'date:Y-m-d H:i:s',
+        'is_active' => 'boolean',
     ];
 }

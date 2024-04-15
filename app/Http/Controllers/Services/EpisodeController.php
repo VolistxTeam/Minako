@@ -22,6 +22,7 @@ class EpisodeController extends Controller
 
         return response()->json($response);
     }
+
     public function GetEpisode(int $id): JsonResponse
     {
         $episodeQuery = MALAnime::query()->where('id', $id)->first();

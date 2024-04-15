@@ -7,6 +7,7 @@ use App\Models\NotifyAnime;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+
 use function Laravel\Prompts\progress;
 
 class PosterCommand extends Command
@@ -32,7 +33,7 @@ class PosterCommand extends Command
 
     private function createCharacterDirectoryIfNotExists(): void
     {
-        if (!Storage::disk('local')->exists('posters')) {
+        if (! Storage::disk('local')->exists('posters')) {
             Storage::disk('local')->makeDirectory('posters');
         }
     }
@@ -45,7 +46,7 @@ class PosterCommand extends Command
         $progress->start();
 
         foreach ($allAnime as $item) {
-            if (!empty($item['image_extension'])) {
+            if (! empty($item['image_extension'])) {
                 if (Storage::disk('local')->exists('posters/'.$item['uniqueID'].'.jpg')) {
                     continue;
                 }

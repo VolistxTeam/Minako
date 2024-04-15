@@ -26,7 +26,7 @@ class CompanyController extends Controller
     {
         $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
 
-        if (!$itemQuery) {
+        if (! $itemQuery) {
             return response('Company not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
