@@ -39,7 +39,7 @@ class DownloadCommand extends Command
 
         $this->components->info('Downloading All Ohys-Raws Torrents...');
         $nyaaCrawler = new NyaaCrawler();
-        $allTorrents = $nyaaCrawler->getTorrents();
+        $allTorrents = $nyaaCrawler->getAllTorrents();
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
