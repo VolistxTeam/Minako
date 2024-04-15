@@ -35,13 +35,18 @@ ensure_octane_running() {
             echo "Port 27195 on 127.0.0.1 is in use. Attempting to free the port..."
             # Extract PID of the process using the port
             PID=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp | awk '{print $9}' | cut -d':' -f1)
-            # Convert PID from hexadecimal to decimal
-            PID_DEC=$(printf "%d" "0x$PID")
-            if [ ! -z "$PID_DEC" ]; then
-                kill -9 "$PID_DEC"
-                echo "Port has been freed."
+            # Check if PID is not empty and is a valid hexadecimal number
+            if [[ ! -z "$PID" && "$PID" =~ ^[0-9A-Fa-f]+$ ]]; then
+                # Convert PID from hexadecimal to decimal
+                PID_DEC=$(printf "%d" "0x$PID")
+                if [[ ! -z "$PID_DEC" && "$PID_DEC" != "0" ]]; then
+                    kill -9 "$PID_DEC"
+                    echo "Port has been freed."
+                else
+                    echo "Failed to convert PID or invalid PID."
+                fi
             else
-                echo "Could not find a process to kill that's using the port."
+                echo "Could not find a valid process to kill that's using the port."
             fi
         else
             echo "Port 27195 on 127.0.0.1 is not in use."
