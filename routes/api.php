@@ -6,13 +6,8 @@ use App\Http\Controllers\Services\CharacterController;
 use App\Http\Controllers\Services\CompanyController;
 use App\Http\Controllers\Services\EpisodeController;
 use App\Http\Controllers\Services\OhysController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/', function (Request $request) {
-    return $request->header();
-});
 
 Route::middleware('throttle:2000,1')->group(function () {
     Route::prefix('cache')->group(function () {
