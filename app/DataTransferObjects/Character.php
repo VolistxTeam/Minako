@@ -18,8 +18,8 @@ class Character extends DataTransferObjectBase
             'image' => $this->formatImage(),
             'attributes' => $this->entity->attributes,
             'mappings' => $this->formatMappings(),
-            'created_at' => $this->entity->created_at,
-            'updated_at' => $this->entity->updated_at,
+            'created_at' => (string) $this->entity->created_at,
+            'updated_at' => (string) $this->entity->updated_at,
         ];
     }
 

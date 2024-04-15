@@ -16,8 +16,8 @@ class Episode extends DataTransferObjectBase
             'episode_number' => $this->entity['episode_id'],
             'titles' => $this->formatTitles(),
             'aired' => $this->entity['aired'],
-            'created_at' => $this->entity['created_at'],
-            'updated_at' => $this->entity['updated_at'],
+            'created_at' => (string) $this->entity['created_at'],
+            'updated_at' => (string) $this->entity['updated_at'],
         ];
     }
 

@@ -30,8 +30,8 @@ class Anime extends DataTransferObjectBase
             'episode_info' => $this->formatEpisodeInfo(),
             'mappings' => $this->formatMappings(),
             'trailers' => $this->formatTrailers(),
-            'created_at' => $this->entity->created_at,
-            'updated_at' => $this->entity->updated_at,
+            'created_at' => (string) $this->entity->created_at,
+            'updated_at' => (string) $this->entity->updated_at,
         ];
     }
 

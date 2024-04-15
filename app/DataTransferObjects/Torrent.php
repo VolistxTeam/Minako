@@ -22,6 +22,8 @@ class Torrent extends DataTransferObjectBase
             'info' => $this->formatInfo(),
             'metadata' => $this->formatMetadata(),
             'download' => $this->formatDownloadLinks(),
+            'created_at' => (string) $this->entity['created_at'],
+            'updated_at' => (string) $this->entity['updated_at'],
         ];
     }
 
@@ -30,7 +32,7 @@ class Torrent extends DataTransferObjectBase
         return [
             'hash' => $this->entity['info_totalHash'],
             'size' => $this->entity['info_totalSize'],
-            'created_at' => $this->entity['info_createdDate'],
+            'created_at' => (string) $this->entity['info_createdDate'],
             'announces' => $this->getAnnounces(),
             'files' => $this->entity['info_torrent_files'],
         ];
