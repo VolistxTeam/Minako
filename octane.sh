@@ -24,13 +24,21 @@ ensure_octane_running() {
         echo "Octane server is running smoothly."
     else
         echo "Checking if port 27195 is already in use..."
-        # Convert port number to hexadecimal
-        HEX_PORT=$(printf '%X\n' 27195)
+        # Convert port number to hexadecimal with leading zeros
+        HEX_PORT=$(printf '%04X' 27195)
         # Check if the port is in use by searching /proc/net/tcp
-        if grep -q "0A 0A0A:$(printf '%04X' $HEX_PORT)" /proc/net/tcp; then
+        # We search for the local address entries where the port might be used
+        # Local address entries are of the form IP:PORT, with the IP typically as 00000000 (for all IPs)
+        if grep -i -q "00000000:$HEX_PORT" /proc/net/tcp; then
             echo "Port 27195 is in use. Attempting to free the port..."
-            PID=$(grep "0A 0A0A:$(printf '%04X' $HEX_PORT)" /proc/net/tcp | cut -d' ' -f8 | cut -d':' -f1)
-            [ ! -z "$PID" ] && kill -9 $PID && echo "Port has been freed."
+            # Extract PID of the process using the port
+            PID=$(grep -i "00000000:$HEX_PORT" /proc/net/tcp | awk '{print $9}' | cut -d':' -f1)
+            if [ ! -z "$PID" ]; then
+                kill -9 "$PID"
+                echo "Port has been freed."
+            else
+                echo "Could not find a process to kill that's using the port."
+            fi
         fi
 
         echo "Attempting to start Octane server..."
