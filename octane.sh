@@ -95,7 +95,8 @@ check_website_health() {
     # Check for HTTP success status codes
     if [[ "$HTTP_STATUS" -ne 200 ]]; then
         echo "Website is down or not functioning correctly, HTTP status: $HTTP_STATUS, restarting Octane..."
-        php artisan octane:start --server=swoole --port=27195
+        php artisan octane:stop
+        ensure_octane_running
     else
         echo "Website is up, HTTP status: $HTTP_STATUS."
     fi
