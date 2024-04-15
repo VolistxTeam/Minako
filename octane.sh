@@ -165,3 +165,4 @@ ensure_octane_running
 check_website_health
 
 # The lock directory will be removed by the trap
+rmdir "$LOCKFILE"
