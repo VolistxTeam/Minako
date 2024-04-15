@@ -9,13 +9,13 @@ GIT_REPO_PATH="/home/u721179272/domains/cryental.dev/public_html/api/production/
 cd "$GIT_REPO_PATH" || exit
 
 # Use mkdir to attempt to create the lock directory
-if ! mkdir "$LOCKDIR" 2>/dev/null; then
+if ! mkdir "$LOCKFILE" 2>/dev/null; then
     echo "Another instance of the script is already running." >&2
     exit 1
 fi
 
 # Setup a trap to remove the lock directory when the script exits
-trap 'rmdir "$LOCKDIR"' INT TERM EXIT
+trap 'rmdir "$LOCKFILE"' INT TERM EXIT
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
