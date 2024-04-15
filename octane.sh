@@ -19,28 +19,28 @@ trap 'rmdir "$LOCKFILE"' INT TERM EXIT
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
-    # Check if Octane is running
+    echo "Checking if Octane server is running..."
     if php artisan octane:status | grep -q 'Octane server is running'; then
         echo "Octane server is running smoothly."
     else
         echo "Checking if port 27195 is already in use..."
-        if lsof -i :27195; then
+        # Convert port number to hexadecimal
+        HEX_PORT=$(printf '%X\n' 27195)
+        # Check if the port is in use by searching /proc/net/tcp
+        if grep -q "0A 0A0A:$(printf '%04X' $HEX_PORT)" /proc/net/tcp; then
             echo "Port 27195 is in use. Attempting to free the port..."
-            lsof -ti :27195 | xargs kill -9
-            echo "Port has been freed."
+            PID=$(grep "0A 0A0A:$(printf '%04X' $HEX_PORT)" /proc/net/tcp | cut -d' ' -f8 | cut -d':' -f1)
+            [ ! -z "$PID" ] && kill -9 $PID && echo "Port has been freed."
         fi
 
         echo "Attempting to start Octane server..."
-        # Try to start Octane in the background and ignore hangup signals
         nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &
         sleep 2  # Wait for a few seconds to allow the server to start
 
-        # Check again if Octane has started successfully
         if php artisan octane:status | grep -q 'Octane server is running'; then
             echo "Octane server started successfully."
         else
             echo "Failed to start Octane server, attempting to restart..."
-            # Attempt to restart Octane in the background
             nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &
             if php artisan octane:status | grep -q 'Octane server is running'; then
                 echo "Octane server restarted successfully."
