@@ -35,6 +35,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\TrustProxies::class,
             \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
         );
+        $middleware->trustProxies(at: [
+            '127.0.0.1',
+            'localhost',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
