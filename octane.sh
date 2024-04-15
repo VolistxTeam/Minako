@@ -24,21 +24,21 @@ ensure_octane_running() {
         echo "Octane server is running smoothly."
     else
         echo "Octane server is not running, attempting to start..."
-        # Try to start Octane
-        if ! php artisan octane:start --server=swoole --port=27195; then
-            sleep 2  # Wait for a few seconds to allow the server to start
+        # Try to start Octane in the background and ignore hangup signals
+        nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &
+        sleep 2  # Wait for a few seconds to allow the server to start
 
-            # Check again if Octane has started successfully
+        # Check again if Octane has started successfully
+        if php artisan octane:status | grep -q 'Server is running'; then
+            echo "Octane server started successfully."
+        else
+            echo "Failed to start Octane server, attempting to restart..."
+            # Attempt to restart Octane in the background
+            nohup php artisan octane:restart --server=swoole --port=27195 > octane.log 2>&1 &
             if php artisan octane:status | grep -q 'Server is running'; then
-                echo "Octane server started successfully."
+                echo "Octane server restarted successfully."
             else
-                echo "Failed to start Octane server, attempting to restart..."
-                # Attempt to restart Octane
-                if ! php artisan octane:restart --server=swoole --port=27195; then
-                    echo "Failed to restart Octane server."
-                else
-                    echo "Octane server restarted successfully."
-                fi
+                echo "Failed to restart Octane server."
             fi
         fi
     fi
