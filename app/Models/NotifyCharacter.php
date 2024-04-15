@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Classes\StringCompareJaroWinkler;
+use App\Facades\StringOperations;
 use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -56,13 +56,13 @@ class NotifyCharacter extends Model
     public static function searchByName(string $originalTerm, int $maxLength, $type = null): array
     {
         $minStringSimilarity = 0.89;
-        $term = self::normalizeTerm($originalTerm);
+        $term = StringOperations::normalizeTerm($originalTerm);
         $cacheKey = "minako_search_character_by_name_{$term}_{$maxLength}_{$type}";
 
-        //        // Return cached results if available
-        //        if (Cache::has($cacheKey)) {
-        //            return Cache::get($cacheKey);
-        //        }
+//        // Return cached results if available
+//        if (Cache::has($cacheKey)) {
+////            return Cache::get($cacheKey);
+//        }
 
         $results = [];
         $notifyQuery = self::query();
@@ -72,7 +72,9 @@ class NotifyCharacter extends Model
 
         // Consider implementing pagination or batch processing if still too slow
         foreach ($notifyQuery->limit(1000)->cursor() as $item) {
-            $titles = self::getNormalizedTitles($item);
+            $titles = StringOperations::getNormalizedTitles($item, [
+                'name_canonical', 'name_english', 'name_japanese',
+            ]);
             $bestSimilarity = -1;
             $exactMatch = false;
 
@@ -82,7 +84,7 @@ class NotifyCharacter extends Model
                     $bestSimilarity = 1;
                     break;
                 }
-                $similarity = self::advancedStringSimilarity($term, $normalizedTitle);
+                $similarity = StringOperations::advancedStringSimilarity($term, $normalizedTitle);
 
                 if ($similarity > $bestSimilarity && $similarity >= $minStringSimilarity) {
                     $bestSimilarity = $similarity;
@@ -102,63 +104,14 @@ class NotifyCharacter extends Model
             if ($a->exactMatch !== $b->exactMatch) {
                 return $b->exactMatch - $a->exactMatch;
             }
-
             return $b->similarity <=> $a->similarity;
         });
 
         $results = array_slice($results, 0, $maxLength);
 
         // Cache the results for 1 hour
-        //        Cache::put($cacheKey, $results, 3600);
+//        Cache::put($cacheKey, $results, 3600);
 
         return $results;
-    }
-
-    private static function normalizeTerm(string $term): string
-    {
-        return mb_strtolower($term);
-    }
-
-    private static function getNormalizedTitles($item): array
-    {
-        $titleFields = [
-            'name_canonical', 'name_english', 'name_japanese',
-        ];
-        $titles = [];
-
-        foreach ($titleFields as $field) {
-            if ($item->$field) {
-                $titles[self::normalizeTerm($item->$field)] = $item->$field;
-            }
-        }
-
-        $synonyms = $item->name_synonyms ?? [];
-
-        foreach ($synonyms as $synonym) {
-            $normalizedSynonym = self::normalizeTerm($synonym);
-            $titles[$normalizedSynonym] = $synonym;
-        }
-
-        return $titles;
-    }
-
-    private static function advancedStringSimilarity(string $term, string $from): float
-    {
-        static $comparator = null;
-        if (! $comparator) {
-            $comparator = new StringCompareJaroWinkler();
-        }
-
-        $similarity = $comparator->jaroWinkler($term, $from, 0.7, 6);
-        if ($similarity > 0.85) {  // Only check substrings if similarity is high
-            if (str_contains($from, $term)) {
-                $similarity += 0.6;
-                if (str_starts_with($from, $term)) {
-                    $similarity += 0.4;
-                }
-            }
-        }
-
-        return $similarity;
     }
 }
