@@ -19,11 +19,18 @@ trap 'rmdir "$LOCKFILE"' INT TERM EXIT
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
-    # First, check if Octane is running
+    # Check if Octane is running
     if php artisan octane:status | grep -q 'Octane server is running'; then
         echo "Octane server is running smoothly."
     else
-        echo "Octane server is not running, attempting to start..."
+        echo "Checking if port 27195 is already in use..."
+        if lsof -i :27195; then
+            echo "Port 27195 is in use. Attempting to free the port..."
+            lsof -ti :27195 | xargs kill -9
+            echo "Port has been freed."
+        fi
+
+        echo "Attempting to start Octane server..."
         # Try to start Octane in the background and ignore hangup signals
         nohup php artisan octane:start --server=swoole --port=27195 > octane.log 2>&1 &
         sleep 2  # Wait for a few seconds to allow the server to start
@@ -58,32 +65,44 @@ check_git_updates() {
         return 1
     fi
 
-    LOCAL=$(git rev-parse @)
+    LOCAL=$(git rev-parse HEAD)
     REMOTE=$(git rev-parse @{u})
-    BASE=$(git merge-base @ @{u})
+    BASE=$(git merge-base HEAD @{u})
 
     if [ "$LOCAL" = "$REMOTE" ]; then
         echo "Git repository is up-to-date."
     elif [ "$LOCAL" = "$BASE" ]; then
-        echo "Need to pull, the repository is not up-to-date."
-        if git pull; then
+        echo "Local is behind; need to pull changes from remote."
+        if git pull --ff-only; then
             echo "Pulled successfully. Updating composer dependencies..."
             composer_update
-            echo "Reloading Octane server..."
-            if php artisan octane:reload; then
-                echo "Octane server reloaded successfully."
-            else
-                echo "Failed to reload Octane server."
-                return 1
-            fi
+            echo "Attempting to restart Octane server to apply changes..."
+            restart_octane_server
         else
             echo "Failed to pull changes."
             return 1
         fi
     elif [ "$REMOTE" = "$BASE" ]; then
-        echo "Need to push local changes."
+        echo "Local is ahead of remote; need to push changes."
     else
-        echo "Repository has diverged from remote, manual intervention required."
+        echo "Local and remote have diverged; manual intervention required."
+    fi
+}
+
+composer_update() {
+    if ! composer2 update; then
+        echo "Failed to update Composer dependencies."
+    else
+        echo "Composer dependencies updated successfully. Reloading Octane..."
+    fi
+}
+
+restart_octane_server() {
+    if php artisan octane:stop && php artisan octane:start --server=swoole --port=27195; then
+        echo "Octane server restarted successfully."
+    else
+        echo "Failed to restart Octane server."
+        return 1
     fi
 }
 
