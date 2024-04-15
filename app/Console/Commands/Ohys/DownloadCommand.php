@@ -27,7 +27,7 @@ class DownloadCommand extends Command
 
         $headers = $this->getHeaders();
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
-        $temporaryDirectory = (new TemporaryDirectory())->force()->create();
+        $temporaryDirectory = (new TemporaryDirectory())->create();
 
         $response = $client->get('https://nyaa.si', ['headers' => $headers]);
 
@@ -39,46 +39,47 @@ class DownloadCommand extends Command
 
         $this->components->info('Downloading All Ohys-Raws Torrents...');
         $nyaaCrawler = new NyaaCrawler();
-        $allTorrents = $nyaaCrawler->getAllTorrents();
+        $allTorrents = $nyaaCrawler->getTorrents();
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
-//            if (OhysTorrent::query()->where('torrentName', $torrent['title'].'.torrent')->exists()) {
-//                break;
-//            }
-
-            $tempFile = $temporaryDirectory->path($torrent['title'].'.torrent');
+            $tempFile = $temporaryDirectory->path(Str::random(15) . '.torrent');
 
             try {
                 $response = $client->request('GET', $torrent['downloads']['url'], ['headers' => $headers, 'sink' => $tempFile]);
             } catch (GuzzleException $e) {
-                $this->line('Not Found. Continue...');
+                $this->line('Download failed: ' . $e->getMessage() . ' Continue...');
+                continue;
+            }
 
+            if (!file_exists($tempFile) || !is_readable($tempFile)) {
+                $this->line('Temporary file not found or not readable. Continue...');
                 continue;
             }
 
             $fileNameParsedArray = $this->parseFileName($torrent['title'].'.torrent');
             if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
-                $this->line('Not Found. Continue...');
-
+                $this->line('Filename parsing failed. Continue...');
                 continue;
             }
 
             $torrentData = $this->extractTorrentData(file_get_contents($tempFile), $torrent['title'], $fileNameParsedArray);
 
             $directoryPath = 'torrents';
-
-            if (! Storage::disk('local')->exists($directoryPath)) {
+            if (!Storage::disk('local')->exists($directoryPath)) {
                 Storage::disk('local')->makeDirectory($directoryPath);
             }
 
-            Storage::disk('local')->copy($tempFile, $directoryPath.'/'.$torrentData['torrentName']);
+            $destinationPath = $directoryPath . '/' . $torrent['title'] . '.torrent';
+            if (!Storage::disk('local')->put($destinationPath, file_get_contents($tempFile))) {
+                $this->error("Failed to write file to '$destinationPath'. Check permissions and disk space.");
+                continue;
+            }
 
             $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
-
             $createdInfo->touch();
 
-            $this->info('[Debug] Done: '.$torrent['title'].'.torrent');
+            $this->info('[Debug] Done: ' . $torrent['title'] . '.torrent');
         }
 
         $temporaryDirectory->delete();
