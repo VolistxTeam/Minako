@@ -16,6 +16,7 @@ use App\Models\NotifyAnime;
 use App\Models\NotifyAnimeCharacter;
 use App\Models\NotifyCharacter;
 use App\Models\NotifyCompany;
+use App\Repositories\AnimeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Response;
@@ -23,6 +24,13 @@ use Illuminate\Support\Facades\Storage;
 
 class AnimeController extends Controller
 {
+    private AnimeRepository $animeRepository;
+
+    public function __construct(AnimeRepository $animeRepository)
+    {
+        $this->animeRepository = $animeRepository;
+    }
+
     public function Search(Request $request, $name)
     {
         $name = urldecode($name);
@@ -30,7 +38,7 @@ class AnimeController extends Controller
 
         $type = $request->input('type');
 
-        $searchQuery = NotifyAnime::searchByTitle($name, 50, $type ?? null);
+        $searchQuery = $this->animeRepository->searchByTitle($name, 50, $type ?? null);
 
         $response = [];
 
@@ -48,7 +56,7 @@ class AnimeController extends Controller
             ->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $response = Anime::fromModel($itemQuery)->GetDTO();
@@ -61,15 +69,15 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $id = $itemQuery->uniqueID;
 
-        $contents = Storage::disk('local')->get('posters/'.$id.'.jpg');
+        $contents = Storage::disk('local')->get('posters/' . $id . '.jpg');
 
         if (empty($contents)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         return Response::make($contents, 200)->header('Content-Type', 'image/jpeg');
@@ -80,13 +88,13 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $episodeQuery = $itemQuery->episodes->where('episode_id', $episodeNumber)->first();
 
         if (empty($episodeQuery)) {
-            return response('Episode not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Episode not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $response = Episode::fromModel($episodeQuery)->GetDTO();
@@ -99,11 +107,11 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $itemsFiltered = $itemQuery->torrents->filter(function ($torrent) use ($itemQuery) {
-            return ! OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_canonical ?? '') || ! OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_romaji ?? '');
+            return !OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_canonical ?? '') || !OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_romaji ?? '');
         })->map(function ($torrent) {
             return Torrent::fromModel($torrent)->GetDTO();
         });
@@ -122,11 +130,11 @@ class AnimeController extends Controller
         $searchQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($searchQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         if (empty($searchQuery->episodes)) {
-            return response('Episodes not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Episodes not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $episodesQuery = self::customPaginate($searchQuery->episodes, 15, $paginateNumber);
@@ -169,14 +177,14 @@ class AnimeController extends Controller
 
         $item = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
-        if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && ! is_array($item['mappings'])) {
-            return response('Not supported type: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+        if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
+            return response('Not supported type: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $malID = collect($item['mappings'])->firstWhere('service', 'myanimelist/anime')['serviceId'];
 
         if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
-            return response('No MAL ID found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('No MAL ID found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $data = $jikan->getAnimeEpisodes($malID);
@@ -188,12 +196,12 @@ class AnimeController extends Controller
                     'notifyID' => $item['notifyID'],
                     'episode_id' => $episodeItem['mal_id'],
                 ], [
-                    'title' => ! empty($episodeItem['title']) ? $episodeItem['title'] : null,
-                    'title_japanese' => ! empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
-                    'title_romanji' => ! empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
-                    'aired' => ! empty($episodeItem['aired']) ? Carbon::parse($episodeItem['aired']) : null,
-                    'filler' => (int) $episodeItem['filler'],
-                    'recap' => (int) $episodeItem['recap'],
+                    'title' => !empty($episodeItem['title']) ? $episodeItem['title'] : null,
+                    'title_japanese' => !empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
+                    'title_romanji' => !empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
+                    'aired' => !empty($episodeItem['aired']) ? Carbon::parse($episodeItem['aired']) : null,
+                    'filler' => (int)$episodeItem['filler'],
+                    'recap' => (int)$episodeItem['recap'],
                 ]);
 
                 $malItem->touch();
@@ -208,13 +216,13 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredMappingData = [
             [
                 'service' => 'notify/anime',
-                'service_id' => (string) $itemQuery->notifyID,
+                'service_id' => (string)$itemQuery->notifyID,
             ],
         ];
 
@@ -235,14 +243,14 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredStudioData = [];
 
         foreach ($itemQuery->studios as $item) {
             $studioQuery = NotifyCompany::query()->where('notifyID', $item)->first();
-            if (! empty($studioQuery)) {
+            if (!empty($studioQuery)) {
                 $filteredStudioData[] = Company::fromModel($studioQuery)->GetDTO();
             }
         }
@@ -260,14 +268,14 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredProducerData = [];
 
         foreach ($itemQuery->producers ?? [] as $item) {
             $producerQuery = NotifyCompany::query()->latest()->where('notifyID', $item)->first();
-            if (! empty($producerQuery)) {
+            if (!empty($producerQuery)) {
                 $filteredProducerData[] = Company::fromModel($producerQuery)->GetDTO();
             }
         }
@@ -285,7 +293,7 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredLicensorData = [];
@@ -293,7 +301,7 @@ class AnimeController extends Controller
         foreach ($itemQuery->licensors ?? [] as $item) {
             $licensorQuery = NotifyCompany::query()->where('notifyID', $item)->first();
 
-            if (! empty($licensorQuery)) {
+            if (!empty($licensorQuery)) {
                 $filteredLicensorData[] = Company::fromModel($licensorQuery)->GetDTO();
             }
         }
@@ -311,14 +319,14 @@ class AnimeController extends Controller
         $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($itemQuery)) {
-            return response('Key not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredRelationData = [];
 
         $itemArray = $itemQuery->relations;
 
-        if (! empty($itemArray) && ! empty($itemArray['items'])) {
+        if (!empty($itemArray) && !empty($itemArray['items'])) {
             foreach ($itemArray['items'] as $item) {
                 $filteredRelationData[] = Relation::fromModel($item)->GetDTO();
             }
@@ -337,7 +345,7 @@ class AnimeController extends Controller
         $animeCharacter = NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
 
         if (empty($animeCharacter)) {
-            return response('Character not found: '.$uniqueID, 404)->header('Content-Type', 'text/plain');
+            return response('Character not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredCharacterData = [];
@@ -345,7 +353,7 @@ class AnimeController extends Controller
         foreach ($animeCharacter->items ?? [] as $item) {
             $characterQuery = NotifyCharacter::query()->where('notifyID', $item['characterId'])->first();
 
-            if (! empty($characterQuery)) {
+            if (!empty($characterQuery)) {
                 $filteredCharacterData[] = Character::fromModel($characterQuery)->GetDTO();
             }
         }

@@ -4,16 +4,24 @@ namespace App\Http\Controllers\Services;
 
 use App\DataTransferObjects\Episode;
 use App\Models\MALAnime;
+use App\Repositories\AnimeRepository;
 use Illuminate\Http\JsonResponse;
 
 class EpisodeController extends Controller
 {
+    public AnimeRepository $animeRepository;
+
+    public function __construct(AnimeRepository $animeRepository)
+    {
+        $this->animeRepository = $animeRepository;
+    }
+
     public function Search($name)
     {
         $name = urldecode($name);
         $name = $this->escapeElasticReservedChars($name);
 
-        $searchQuery = MALAnime::searchByName($name, 50);
+        $searchQuery = $this->animeRepository->searchByName($name, 50);
         $response = [];
 
         foreach ($searchQuery as $query) {

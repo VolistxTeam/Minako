@@ -7,6 +7,7 @@ use App\Helpers\NyaaCrawler;
 use App\Models\NotifyAnime;
 use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
+use App\Repositories\AnimeRepository;
 use Faker\Factory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -20,6 +21,14 @@ class DownloadCommand extends Command
     protected $signature = 'minako:ohys:download';
 
     protected $description = 'Check, download and parse the latest torrents using a special permission link.';
+
+    protected AnimeRepository $animeRepository;
+
+    public function __construct(AnimeRepository $animeRepository)
+    {
+        parent::__construct();
+        $this->animeRepository = $animeRepository;
+    }
 
     public function handle()
     {
@@ -43,7 +52,7 @@ class DownloadCommand extends Command
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
-            if (OhysTorrent::query()->where('torrentName', $torrent['title'].'.torrent')->first()) {
+            if (OhysTorrent::query()->where('torrentName', $torrent['title'] . '.torrent')->first()) {
                 break;
             }
 
@@ -61,7 +70,7 @@ class DownloadCommand extends Command
                 continue;
             }
 
-            $fileNameParsedArray = $this->parseFileName($torrent['title'].'.torrent');
+            $fileNameParsedArray = $this->parseFileName($torrent['title'] . '.torrent');
             if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
                 $this->line('Filename parsing failed. Continue...');
                 continue;
@@ -146,7 +155,7 @@ class DownloadCommand extends Command
 
     private function getDecodedOhysRepo($response)
     {
-        $responseBody = (string) $response->getBody();
+        $responseBody = (string)$response->getBody();
 
         return json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $responseBody), true);
     }
@@ -178,9 +187,9 @@ class DownloadCommand extends Command
             $metadataCodecParsed[0] = 'x264';
         }
 
-        $searchArray = NotifyAnime::searchByTitle($fileNameParsedArray[2], 1);
+        $searchArray = $this->animeRepository->searchByTitle($fileNameParsedArray[2], 1);
 
-        if (! empty($searchArray)) {
+        if (!empty($searchArray)) {
             $animeUniqueID = $searchArray[0]->obj['uniqueID'];
             OhysRelation::query()->updateOrCreate([
                 'uniqueID' => $itemID,
