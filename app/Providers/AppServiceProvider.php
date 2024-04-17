@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             $requestBypassSecret = $request->input('secret', null);
             if ($requestBypassSecret != config('minako.secret')) {
-                return Limit::perMinute(2000)->by($request->getClientIp());
+                return Limit::perMinute(200)->by($request->getClientIp());
             } else {
                 return Limit::none();
             }
