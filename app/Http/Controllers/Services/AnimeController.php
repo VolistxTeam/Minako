@@ -38,7 +38,7 @@ class AnimeController extends Controller
 
         $type = $request->input('type');
 
-        $searchQuery = $this->animeRepository->searchByTitle($name, 50, $type ?? null);
+        $searchQuery = $this->animeRepository->searchNotifyAnimeByTitle($name, 50, $type ?? null);
 
         $response = [];
 

@@ -187,7 +187,7 @@ class DownloadCommand extends Command
             $metadataCodecParsed[0] = 'x264';
         }
 
-        $searchArray = $this->animeRepository->searchByTitle($fileNameParsedArray[2], 1);
+        $searchArray = $this->animeRepository->searchNotifyAnimeByTitle($fileNameParsedArray[2], 1);
 
         if (!empty($searchArray)) {
             $animeUniqueID = $searchArray[0]->obj['uniqueID'];

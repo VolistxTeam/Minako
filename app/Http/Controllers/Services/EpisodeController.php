@@ -21,7 +21,7 @@ class EpisodeController extends Controller
         $name = urldecode($name);
         $name = $this->escapeElasticReservedChars($name);
 
-        $searchQuery = $this->animeRepository->searchByName($name, 50);
+        $searchQuery = $this->animeRepository->searchMALAnimeByName($name, 50);
         $response = [];
 
         foreach ($searchQuery as $query) {
