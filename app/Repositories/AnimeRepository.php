@@ -12,33 +12,53 @@ use App\Models\NotifyCompany;
 class AnimeRepository
 {
     const MIN_STRING_SIMILARITY = 0.89;
+    const CACHE_DURATION = 3600; // Cache results for 1 hour
 
     public function searchNotifyAnimeByTitle(string $originalTerm, int $maxLength, $type = null): array
     {
+        return $this->searchModel($originalTerm, $maxLength, NotifyAnime::class, [
+            'title_canonical', 'title_english', 'title_romaji', 'title_japanese', 'title_hiragana', 'title_synonyms'
+        ]);
+    }
+
+    public function searchMALAnimeByName(string $originalTerm, int $maxLength, $type = null): array
+    {
+        return $this->searchModel($originalTerm, $maxLength, MALAnime::class, [
+            'title', 'title_japanese', 'title_romanji'
+        ]);
+    }
+
+    public function searchNotifyCharacterByName(string $originalTerm, int $maxLength, $type = null): array
+    {
+        return $this->searchModel($originalTerm, $maxLength, NotifyCharacter::class, [
+            'name_canonical', 'name_english', 'name_japanese', 'name_japanese', 'name_synonyms'
+        ]);
+    }
+
+    public function searchCompanyByName(string $originalTerm, int $maxLength, $type = null): array
+    {
+        return $this->searchModel($originalTerm, $maxLength, NotifyCompany::class, [
+            'name_english', 'name_japanese', 'name_synonyms'
+        ]);
+    }
+
+    public function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
+    {
         $term = StringOperations::normalizeTerm($originalTerm);
 
-        $cacheKey = "minako_search_anime_by_title_{$term}_{$maxLength}_{$type}";
-
+//        $cacheKey = "search_{$model}_{$term}_{$maxLength}_$type";
 //        // Return cached results if available
 //        if (Cache::has($cacheKey)) {
 //            return Cache::get($cacheKey);
 //        }
 
         $results = [];
-        $notifyQuery = NotifyAnime::query();
+        $query = $model::query();
+        $matchAgainst = 'MATCH(' . implode(', ', $searchFields) . ') AGAINST(? IN NATURAL LANGUAGE MODE)';
+        $query->whereRaw($matchAgainst, [$term]);
 
-        // Apply full-text search
-        $notifyQuery->whereRaw('MATCH(title_canonical, title_english, title_romaji, title_japanese, title_hiragana, title_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)', [$term]);
-
-        if (!empty($type)) {
-            $notifyQuery->where('type', $type);
-        }
-
-        // Consider implementing pagination or batch processing if still too slow
-        foreach ($notifyQuery->limit(1000)->cursor() as $item) {
-            $titles = StringOperations::getNormalizedTitles($item, [
-                'title_canonical', 'title_english', 'title_romaji', 'title_japanese', 'title_hiragana',
-            ]);
+        foreach ($query->limit(1000)->cursor() as $item) {
+            $titles = StringOperations::getNormalizedTitles($item, $searchFields);
 
             $bestSimilarity = -1;
             $exactMatch = false;
@@ -65,201 +85,18 @@ class AnimeRepository
             }
         }
 
-        usort($results, function ($a, $b) {
-            if ($a->exactMatch !== $b->exactMatch) {
-                return $b->exactMatch - $a->exactMatch;
-            }
-            return $b->similarity <=> $a->similarity;
-        });
-
+        usort($results, [$this, 'compareResults']);
         $results = array_slice($results, 0, $maxLength);
-
-        // Cache the results for 1 hour
-//        Cache::put($cacheKey, $results, 3600);
+        //      Cache::put($cacheKey, $results, self::CACHE_DURATION);
 
         return $results;
     }
-    public function searchMALAnimeByName(string $originalTerm, int $maxLength, $type = null): array
+
+    private function compareResults($a, $b)
     {
-        $term = StringOperations::normalizeTerm($originalTerm);
-        $cacheKey = "minako_search_episode_by_name_{$term}_{$maxLength}_{$type}";
-
-        //        // Return cached results if available
-        //        if (Cache::has($cacheKey)) {
-        //            return Cache::get($cacheKey);
-        //        }
-
-        $results = [];
-        $notifyQuery = MALAnime::query();
-
-        // Apply full-text search
-        $notifyQuery->whereRaw('MATCH(title, title_japanese, title_romanji) AGAINST(? IN NATURAL LANGUAGE MODE)', [$term]);
-
-        // Consider implementing pagination or batch processing if still too slow
-        foreach ($notifyQuery->limit(1000)->cursor() as $item) {
-            $titles = StringOperations::getNormalizedTitles($item, [
-                'title', 'title_japanese', 'title_romanji',
-            ]);
-            $bestSimilarity = -1;
-            $exactMatch = false;
-
-            foreach ($titles as $normalizedTitle => $title) {
-                if ($term === $normalizedTitle) {
-                    $exactMatch = true;
-                    $bestSimilarity = 1;
-                    break;
-                }
-                $similarity = StringOperations::advancedStringSimilarity($term, $normalizedTitle);
-
-                if ($similarity > $bestSimilarity && $similarity >= self::MIN_STRING_SIMILARITY) {
-                    $bestSimilarity = $similarity;
-                }
-            }
-
-            if ($bestSimilarity >= self::MIN_STRING_SIMILARITY) {
-                $results[] = (object)[
-                    'obj' => $item,
-                    'similarity' => $bestSimilarity,
-                    'exactMatch' => $exactMatch,
-                ];
-            }
+        if ($a->exactMatch !== $b->exactMatch) {
+            return $b->exactMatch - $a->exactMatch;
         }
-
-        usort($results, function ($a, $b) {
-            if ($a->exactMatch !== $b->exactMatch) {
-                return $b->exactMatch - $a->exactMatch;
-            }
-
-            return $b->similarity <=> $a->similarity;
-        });
-
-        $results = array_slice($results, 0, $maxLength);
-
-        // Cache the results for 1 hour
-        //        Cache::put($cacheKey, $results, 3600);
-
-        return $results;
-    }
-    public function searchNotifyCharacterByName(string $originalTerm, int $maxLength, $type = null): array
-    {
-        $term = StringOperations::normalizeTerm($originalTerm);
-        $cacheKey = "minako_search_character_by_name_{$term}_{$maxLength}_{$type}";
-
-//        // Return cached results if available
-//        if (Cache::has($cacheKey)) {
-////            return Cache::get($cacheKey);
-//        }
-
-        $results = [];
-        $notifyQuery = NotifyCharacter::query();
-
-        // Apply full-text search
-        $notifyQuery->whereRaw('MATCH(name_canonical, name_english, name_japanese, name_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)', [$term]);
-
-        // Consider implementing pagination or batch processing if still too slow
-        foreach ($notifyQuery->limit(1000)->cursor() as $item) {
-            $titles = StringOperations::getNormalizedTitles($item, [
-                'name_canonical', 'name_english', 'name_japanese',
-            ]);
-            $bestSimilarity = -1;
-            $exactMatch = false;
-
-            foreach ($titles as $normalizedTitle => $title) {
-                if ($term === $normalizedTitle) {
-                    $exactMatch = true;
-                    $bestSimilarity = 1;
-                    break;
-                }
-                $similarity = StringOperations::advancedStringSimilarity($term, $normalizedTitle);
-
-                if ($similarity > $bestSimilarity && $similarity >= self::MIN_STRING_SIMILARITY) {
-                    $bestSimilarity = $similarity;
-                }
-            }
-
-            if ($bestSimilarity >= self::MIN_STRING_SIMILARITY) {
-                $results[] = (object)[
-                    'obj' => $item,
-                    'similarity' => $bestSimilarity,
-                    'exactMatch' => $exactMatch,
-                ];
-            }
-        }
-
-        usort($results, function ($a, $b) {
-            if ($a->exactMatch !== $b->exactMatch) {
-                return $b->exactMatch - $a->exactMatch;
-            }
-            return $b->similarity <=> $a->similarity;
-        });
-
-        $results = array_slice($results, 0, $maxLength);
-
-        // Cache the results for 1 hour
-//        Cache::put($cacheKey, $results, 3600);
-
-        return $results;
-    }
-    public function searchCompanyByName(string $originalTerm, int $maxLength, $type = null): array
-    {
-        $term = StringOperations::normalizeTerm($originalTerm);
-        $cacheKey = "minako_search_company_by_name_{$term}_{$maxLength}_{$type}";
-
-        //        // Return cached results if available
-        //        if (Cache::has($cacheKey)) {
-        //            return Cache::get($cacheKey);
-        //        }
-
-        $results = [];
-        $notifyQuery = NotifyCompany::query();
-
-        // Apply full-text search
-        $notifyQuery->whereRaw('MATCH(name_english, name_japanese, name_synonyms) AGAINST(? IN NATURAL LANGUAGE MODE)', [$term]);
-
-        // Consider implementing pagination or batch processing if still too slow
-        foreach ($notifyQuery->limit(1000)->cursor() as $item) {
-            $titles = StringOperations::getNormalizedTitles($item, [
-                'name_english', 'name_japanese',
-            ]);
-
-            $bestSimilarity = -1;
-            $exactMatch = false;
-
-            foreach ($titles as $normalizedTitle => $title) {
-                if ($term === $normalizedTitle) {
-                    $exactMatch = true;
-                    $bestSimilarity = 1;
-                    break;
-                }
-                $similarity = StringOperations::advancedStringSimilarity($term, $normalizedTitle);
-
-                if ($similarity > $bestSimilarity && $similarity >= self::MIN_STRING_SIMILARITY) {
-                    $bestSimilarity = $similarity;
-                }
-            }
-
-            if ($bestSimilarity >= self::MIN_STRING_SIMILARITY) {
-                $results[] = (object)[
-                    'obj' => $item,
-                    'similarity' => $bestSimilarity,
-                    'exactMatch' => $exactMatch,
-                ];
-            }
-        }
-
-        usort($results, function ($a, $b) {
-            if ($a->exactMatch !== $b->exactMatch) {
-                return $b->exactMatch - $a->exactMatch;
-            }
-
-            return $b->similarity <=> $a->similarity;
-        });
-
-        $results = array_slice($results, 0, $maxLength);
-
-        // Cache the results for 1 hour
-        //        Cache::put($cacheKey, $results, 3600);
-
-        return $results;
+        return $b->similarity <=> $a->similarity;
     }
 }

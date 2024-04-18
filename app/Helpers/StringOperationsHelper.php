@@ -22,19 +22,22 @@ class StringOperationsHelper
     {
         $titles = [];
 
+        //handle normal fields
         foreach ($titleFields as $field) {
-            if ($item->$field) {
+            if ($item->$field && is_string($item->$field)) {
                 $titles[$this->normalizeTerm($item->$field)] = $item->$field;
             }
         }
 
-        $synonyms = $item->title_synonyms ?? [];
-
-        foreach ($synonyms as $synonym) {
-            $normalizedSynonym = $this->normalizeTerm($synonym);
-            $titles[$normalizedSynonym] = $synonym;
+        //handle array fields
+        foreach ($titleFields as $arrayField) {
+            if ($item->$arrayField && is_array($item->$arrayField)) {
+                foreach ($item->$arrayField as $term) {
+                    $normalizedSynonym = $this->normalizeTerm($term);
+                    $titles[$normalizedSynonym] = $term;
+                }
+            }
         }
-
         return $titles;
     }
 
