@@ -10,7 +10,7 @@ HEX_IP="0100007F"
 
 echo "Laravel Octane Manager For Shared Hosting" >&2
 echo "Made By Cryental" >&2
-echo "Version 1.3.6" >&2
+echo "Version 1.3.2" >&2
 echo "" >&2
 
 # Change to the directory where your Laravel application is located
@@ -35,6 +35,41 @@ cleanup() {
     # Additional cleanup commands can be added here
 }
 
+# Check website health and manage server accordingly
+check_website_health() {
+    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
+    if [[ "$HTTP_STATUS" -ne 200 ]]; then
+        echo "Website is down or not functioning correctly, HTTP status: $HTTP_STATUS."
+        manage_octane_server
+    else
+        echo "Website is up, HTTP status: $HTTP_STATUS."
+    fi
+}
+
+# Manage Octane server
+manage_octane_server() {
+    # Stop any currently running Octane server
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Stopping current Octane server..."
+        php artisan octane:stop
+    fi
+
+    # Release the port
+    release_port
+
+    # Start the Octane server
+    echo "Starting Octane server..."
+    php artisan octane:start --server=swoole --port=$PORT > octane.log 2>&1 &
+    sleep 2
+
+    # Verify that the server has started
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Octane server started successfully."
+        check_website_health
+    else
+        echo "Failed to start Octane server."
+    fi
+}
 
 # Release the port by killing processes using it
 release_port() {
@@ -54,7 +89,7 @@ release_port() {
                     kill -15 "$pid"  # Send SIGTERM
                     sleep 5  # Allow some time for the process to terminate
 
-                    # Check if the process is still running and use SIGKILL if necessary
+                    # Use SIGKILL if necessary
                     if ps -p $pid > /dev/null 2>&1; then
                         echo "Process $pid did not terminate, using SIGKILL..."
                         kill -9 "$pid"
@@ -66,65 +101,9 @@ release_port() {
             done
         fi
     done
-
-    # Verify if the port is finally free
-    if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
-        echo "Port is still in use. Manual intervention may be required."
-    else
-        echo "Port is now free."
-    fi
 }
 
-# Function to ensure the Octane server is running
-ensure_octane_running() {
-    echo "Checking if Octane server is running..."
-    if php artisan octane:status | grep -q 'Octane server is running'; then
-        echo "Octane server is running smoothly."
-        check_website_health
-    else
-        echo "Octane server is not running, attempting to start..."
-        start_octane
-    fi
-}
-
-# Start or restart the Octane server
-start_octane() {
-    # Check if port is in use
-    stop_octane
-    sleep 3
-    if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
-        echo "Port $PORT on 127.0.0.1 is in use. Attempting to free the port..."
-        release_port
-    fi
-    echo "Starting Octane server..."
-    php artisan octane:start --server=swoole --port=$PORT > octane.log 2>&1 &
-    sleep 2
-    if php artisan octane:status | grep -q 'Octane server is running'; then
-        echo "Octane server started successfully."
-    else
-        echo "Failed to start Octane server."
-    fi
-}
-
-# Stop the Octane server
-stop_octane() {
-    echo "Stopping Octane server..."
-    php artisan octane:stop
-    release_port
-}
-
-# Function to check the website's health
-check_website_health() {
-    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
-    if [[ "$HTTP_STATUS" -ne 200 ]]; then
-        echo "Website is down or not functioning correctly, HTTP status: $HTTP_STATUS."
-        start_octane
-    else
-        echo "Website is up, HTTP status: $HTTP_STATUS."
-    fi
-}
-
-# Function to check if Git repository is up-to-date and manage updates
+# Check and update Git repository, then manage server
 check_git_updates() {
     echo "Fetching latest changes from remote..."
     git fetch
@@ -136,9 +115,13 @@ check_git_updates() {
         echo "Git repository is up-to-date."
     elif [ "$LOCAL" = "$BASE" ]; then
         echo "Local is behind; pulling changes from remote..."
-        git pull --ff-only && echo "Pulled successfully."
-        composer_update
-        start_octane
+        if git pull --ff-only; then
+            echo "Pulled successfully."
+            composer_update
+            manage_octane_server
+        else
+            echo "Failed to pull changes."
+        fi
     elif [ "$REMOTE" = "$BASE" ]; then
         echo "Local is ahead of remote; need to push changes."
     else
@@ -149,10 +132,13 @@ check_git_updates() {
 # Update Composer dependencies
 composer_update() {
     echo "Updating Composer dependencies..."
-    composer2 update && echo "Composer dependencies updated successfully."
+    if composer2 update; then
+        echo "Composer dependencies updated successfully."
+    else
+        echo "Failed to update Composer dependencies."
+    fi
 }
 
 # Main execution block
 check_git_updates
-ensure_octane_running
 check_website_health
