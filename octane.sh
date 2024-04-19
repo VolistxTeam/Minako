@@ -95,6 +95,7 @@ check_git_updates() {
     REMOTE=$(git rev-parse @{u})
     BASE=$(git merge-base HEAD @{u})
 
+    echo "Local: $LOCAL, Remote: $REMOTE, Base: $BASE"
     if [ "$LOCAL" = "$REMOTE" ]; then
         echo "Git repository is up-to-date."
     elif [ "$LOCAL" = "$BASE" ]; then
