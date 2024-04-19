@@ -83,12 +83,6 @@ release_port() {
 
 # Function to check if Git repository is up-to-date and manage updates
 check_git_updates() {
-    echo "Checking for local uncommitted changes..."
-    if ! git diff-index --quiet HEAD --; then
-        echo "There are uncommitted changes in the repository."
-        return
-    fi
-
     echo "Fetching latest changes from remote..."
     git fetch
     LOCAL=$(git rev-parse HEAD)
