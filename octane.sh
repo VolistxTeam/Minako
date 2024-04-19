@@ -91,6 +91,7 @@ ensure_octane_running() {
 start_octane() {
     # Check if port is in use
     stop_octane
+    sleep 3
     if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
         echo "Port $PORT on 127.0.0.1 is in use. Attempting to free the port..."
         release_port
