@@ -21,7 +21,7 @@ if ! flock -n 200; then
 fi
 
 # Trap that will execute on any script exit, successful or not
-trap 'cleanup' EXIT INT TERM SIGTSTP
+trap 'cleanup' EXIT INT TERM
 
 cleanup() {
     echo "Cleaning up..."
@@ -31,9 +31,8 @@ cleanup() {
 }
 
 handle_sigtstp() {
-    echo "Script is suspended. Releasing resources..."
     cleanup
-    kill -s SIGSTOP $$  # Send STOP signal to current process
+    kill -STOP $$
 }
 
 trap 'handle_sigtstp' SIGTSTP
