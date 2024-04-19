@@ -46,36 +46,41 @@ check_website_health() {
     fi
 }
 
-# Release the port by killing processes using it
 release_port() {
-    PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
-    if [ -z "$PID_LINES" ]; then
-        echo "Port $PORT is not currently in use."
-        return 0
-    fi
+    local attempts=0
+    local max_attempts=3
+    local wait_time=5
 
-    echo "$PID_LINES" | while IFS= read -r line; do
-        local inode=$(echo "$line" | awk '{print $10}')
-        if [[ "$inode" != "0" && "$inode" != "" ]]; then
-            for FD in /proc/[0-9]*/fd/*; do
-                if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
-                    local pid=$(echo "$FD" | cut -d'/' -f3)
-                    echo "Attempting to gracefully kill process $pid using port $PORT..."
-                    kill -15 "$pid"  # Send SIGTERM
-                    sleep 5  # Allow some time for the process to terminate
-
-                    # Use SIGKILL if necessary
-                    if ps -p $pid > /dev/null 2>&1; then
-                        echo "Process $pid did not terminate, using SIGKILL..."
-                        kill -9 "$pid"
-                        echo "Process with PID $pid has been force-killed."
-                    else
-                        echo "Process with PID $pid has terminated gracefully."
-                    fi
-                fi
-            done
+    while [ $attempts -lt $max_attempts ]; do
+        PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
+        if [ -z "$PID_LINES" ]; then
+            echo "Port $PORT is now free."
+            return 0
         fi
+
+        echo "Attempting to release port $PORT, attempt $((attempts + 1))..."
+
+        echo "$PID_LINES" | while IFS= read -r line; do
+            local inode=$(echo "$line" | awk '{print $10}')
+            if [[ "$inode" != "0" && "$inode" != "" ]]; then
+                for FD in /proc/[0-9]*/fd/*; do
+                    if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
+                        local pid=$(echo "$FD" | cut -d'/' -f3)
+                        echo "Attempting to kill process $pid using port $PORT..."
+                        kill -9 "$pid"
+                        echo "Process with PID $pid has been killed."
+                    fi
+                done
+            fi
+        done
+
+        # Check again after waiting for some time
+        sleep $wait_time
+        ((attempts++))
     done
+
+    echo "Port $PORT is still in use after $max_attempts attempts. Manual intervention may be required."
+    return 1
 }
 
 # Manage Octane server
