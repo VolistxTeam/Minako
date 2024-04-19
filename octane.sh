@@ -35,34 +35,6 @@ cleanup() {
     # Additional cleanup commands can be added here
 }
 
-# Function to ensure the Octane server is running
-ensure_octane_running() {
-    echo "Checking if Octane server is running..."
-    if php artisan octane:status | grep -q 'Octane server is running'; then
-        echo "Octane server is running smoothly."
-        check_website_health
-    else
-        echo "Octane server is not running, attempting to start..."
-        start_octane
-    fi
-}
-
-# Start or restart the Octane server
-start_octane() {
-    # Check if port is in use
-    if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
-        echo "Port $PORT on 127.0.0.1 is in use. Attempting to free the port..."
-        release_port
-    fi
-    echo "Starting Octane server..."
-    php artisan octane:start --server=swoole --port=$PORT > octane.log 2>&1 &
-    sleep 2
-    if php artisan octane:status | grep -q 'Octane server is running'; then
-        echo "Octane server started successfully."
-    else
-        echo "Failed to start Octane server."
-    fi
-}
 
 # Release the port by killing processes using it
 release_port() {
@@ -103,6 +75,36 @@ release_port() {
     fi
 }
 
+# Function to ensure the Octane server is running
+ensure_octane_running() {
+    echo "Checking if Octane server is running..."
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Octane server is running smoothly."
+        check_website_health
+    else
+        echo "Octane server is not running, attempting to start..."
+        start_octane
+    fi
+}
+
+# Start or restart the Octane server
+start_octane() {
+    # Check if port is in use
+    stop_octane
+    if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
+        echo "Port $PORT on 127.0.0.1 is in use. Attempting to free the port..."
+        release_port
+    fi
+    echo "Starting Octane server..."
+    php artisan octane:start --server=swoole --port=$PORT > octane.log 2>&1 &
+    sleep 2
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Octane server started successfully."
+    else
+        echo "Failed to start Octane server."
+    fi
+}
+
 # Stop the Octane server
 stop_octane() {
     echo "Stopping Octane server..."
@@ -115,7 +117,6 @@ check_website_health() {
     HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
     if [[ "$HTTP_STATUS" -ne 200 ]]; then
         echo "Website is down or not functioning correctly, HTTP status: $HTTP_STATUS."
-        stop_octane
         start_octane
     else
         echo "Website is up, HTTP status: $HTTP_STATUS."
