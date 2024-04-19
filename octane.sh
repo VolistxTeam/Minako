@@ -30,12 +30,8 @@ cleanup() {
     # Additional cleanup commands can be added here
 }
 
-handle_sigtstp() {
-    cleanup
-    kill -STOP $$
-}
-
-trap 'handle_sigtstp' SIGTSTP
+# Correctly handle SIGTSTP by allowing the script to suspend normally
+trap 'cleanup; kill -STOP $$' SIGTSTP
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
