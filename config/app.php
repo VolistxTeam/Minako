@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\HttpClient;
 use App\Facades\StringOperations;
 
 return [
@@ -41,7 +42,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -127,5 +128,6 @@ return [
 
     'aliases' => [
         'StringOperations' => StringOperations::class,
+        'HttpClient' => HttpClient::class
     ],
 ];
