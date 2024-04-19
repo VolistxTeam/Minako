@@ -65,20 +65,35 @@ start_octane() {
 # Release the port by killing processes using it
 release_port() {
     PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
+    if [ -z "$PID_LINES" ]; then
+        echo "Port $PORT is not currently in use."
+        return 0
+    fi
+
     echo "$PID_LINES" | while IFS= read -r line; do
-        INODE=$(echo "$line" | awk '{print $10}')
-        if [[ "$INODE" != "0" && "$INODE" != "" ]]; then
+        local inode=$(echo "$line" | awk '{print $10}')
+        if [[ "$inode" != "0" && "$inode" != "" ]]; then
             for FD in /proc/[0-9]*/fd/*; do
-                if [[ "$(readlink $FD)" == "socket:[$INODE]" ]]; then
-                    PID=$(echo "$FD" | cut -d'/' -f3)
-                    echo "Attempting to kill process $PID using port $PORT..."
-                    kill -9 "$PID"
-                    echo "Process with PID $PID has been killed."
+                if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
+                    local pid=$(echo "$FD" | cut -d'/' -f3)
+                    echo "Attempting to gracefully kill process $pid using port $PORT..."
+                    kill -15 "$pid"  # Send SIGTERM
+                    sleep 5  # Allow some time for the process to terminate
+
+                    # Check if the process is still running and use SIGKILL if necessary
+                    if ps -p $pid > /dev/null 2>&1; then
+                        echo "Process $pid did not terminate, using SIGKILL..."
+                        kill -9 "$pid"
+                        echo "Process with PID $pid has been force-killed."
+                    else
+                        echo "Process with PID $pid has terminated gracefully."
+                    fi
                 fi
             done
         fi
     done
-    # Check again if the port is free
+
+    # Verify if the port is finally free
     if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
         echo "Port is still in use. Manual intervention may be required."
     else
