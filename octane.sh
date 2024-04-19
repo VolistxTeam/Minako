@@ -33,9 +33,6 @@ cleanup() {
     # Additional cleanup commands can be added here
 }
 
-# Correctly handle SIGTSTP by allowing the script to suspend normally
-trap 'cleanup; kill -STOP $$' SIGTSTP
-
 # Function to ensure the Octane server is running
 ensure_octane_running() {
     echo "Checking if Octane server is running..."
