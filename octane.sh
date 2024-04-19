@@ -21,7 +21,22 @@ if ! flock -n 200; then
 fi
 
 # Trap that will execute on any script exit, successful or not
-trap 'flock -u 200; rm -f "$LOCKFILE"' EXIT INT TERM
+trap 'cleanup' EXIT INT TERM SIGTSTP
+
+cleanup() {
+    echo "Cleaning up..."
+    flock -u 200
+    rm -f "$LOCKFILE"
+    # Additional cleanup commands can be added here
+}
+
+handle_sigtstp() {
+    echo "Script is suspended. Releasing resources..."
+    cleanup
+    kill -s SIGSTOP $$  # Send STOP signal to current process
+}
+
+trap 'handle_sigtstp' SIGTSTP
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
