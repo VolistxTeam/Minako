@@ -9,6 +9,7 @@ HEX_PORT=$(printf '%04X' $PORT)
 HEX_IP="0100007F"
 
 echo "Laravel Octane Manager For Shared Hosting" >&2
+echo "Made By Cryental" >&2
 echo "Version 1.3.1" >&2
 echo "" >&2
 # Change to the directory where your Laravel application is located
