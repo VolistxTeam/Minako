@@ -11,15 +11,17 @@ HEX_IP="0100007F"
 # Change to the directory where your Laravel application is located
 cd "$GIT_REPO_PATH" || exit
 
-# Lock management with file locking
+# Open lock file for reading and writing (fd 200), create if not exists
 exec 200>"$LOCKFILE"
+
+# Acquire an exclusive non-blocking lock (fd 200)
 if ! flock -n 200; then
     echo "Another instance of the script is already running." >&2
     exit 1
 fi
 
-# Setup a trap to release the lock when the script exits
-trap 'flock -u 200' INT TERM EXIT
+# Trap that will execute on any script exit, successful or not
+trap 'flock -u 200; rm -f "$LOCKFILE"' EXIT INT TERM
 
 # Function to ensure the Octane server is running
 ensure_octane_running() {
@@ -114,6 +116,3 @@ check_website_health() {
 check_git_updates
 ensure_octane_running
 check_website_health
-
-# Release the lock explicitly
-flock -u 200
