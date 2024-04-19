@@ -70,11 +70,20 @@ release_port() {
             for FD in /proc/[0-9]*/fd/*; do
                 if [[ "$(readlink $FD)" == "socket:[$INODE]" ]]; then
                     PID=$(echo "$FD" | cut -d'/' -f3)
-                    kill -9 "$PID" && echo "Killed process $PID using port $PORT."
+                    echo "Attempting to kill process $PID using port $PORT..."
+                    kill -9 "$PID"
+                    echo "Process with PID $PID has been killed."
+                    sleep 2  # Give some time for the port to be released
                 fi
             done
         fi
     done
+    # Check again if the port is free
+    if grep -i -q "$HEX_IP:$HEX_PORT" /proc/net/tcp; then
+        echo "Port is still in use. Manual intervention may be required."
+    else
+        echo "Port is now free."
+    fi
 }
 
 # Function to check if Git repository is up-to-date and manage updates
