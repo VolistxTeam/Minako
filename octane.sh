@@ -12,6 +12,7 @@ echo "Laravel Octane Manager For Shared Hosting" >&2
 echo "Made By Cryental" >&2
 echo "Version 1.3.2" >&2
 echo "" >&2
+
 # Change to the directory where your Laravel application is located
 cd "$GIT_REPO_PATH" || exit
 
@@ -37,11 +38,12 @@ cleanup() {
 # Function to ensure the Octane server is running
 ensure_octane_running() {
     echo "Checking if Octane server is running..."
-    if ! php artisan octane:status | grep -q 'Octane server is running'; then
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Octane server is running smoothly."
+        check_website_health
+    else
         echo "Octane server is not running, attempting to start..."
         start_octane
-    else
-        echo "Octane server is running smoothly."
     fi
 }
 
@@ -101,6 +103,25 @@ release_port() {
     fi
 }
 
+# Stop the Octane server
+stop_octane() {
+    echo "Stopping Octane server..."
+    php artisan octane:stop
+    release_port
+}
+
+# Function to check the website's health
+check_website_health() {
+    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
+    if [[ "$HTTP_STATUS" -ne 200 ]]; then
+        echo "Website is down or not functioning correctly, HTTP status: $HTTP_STATUS."
+        stop_octane
+        start_octane
+    else
+        echo "Website is up, HTTP status: $HTTP_STATUS."
+    fi
+}
+
 # Function to check if Git repository is up-to-date and manage updates
 check_git_updates() {
     echo "Fetching latest changes from remote..."
@@ -127,17 +148,6 @@ check_git_updates() {
 composer_update() {
     echo "Updating Composer dependencies..."
     composer2 update && echo "Composer dependencies updated successfully."
-}
-
-# Function to check the website's health
-check_website_health() {
-    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
-    if [[ "$HTTP_STATUS" -ne 200 ]]; then
-        echo "Website is down or not functioning correctly, HTTP status: $HTTP_STATUS."
-        start_octane
-    else
-        echo "Website is up, HTTP status: $HTTP_STATUS."
-    fi
 }
 
 # Main execution block
