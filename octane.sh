@@ -73,7 +73,6 @@ release_port() {
                     echo "Attempting to kill process $PID using port $PORT..."
                     kill -9 "$PID"
                     echo "Process with PID $PID has been killed."
-                    sleep 2  # Give some time for the port to be released
                 fi
             done
         fi
