@@ -46,31 +46,6 @@ check_website_health() {
     fi
 }
 
-# Manage Octane server
-manage_octane_server() {
-    # Stop any currently running Octane server
-    if php artisan octane:status | grep -q 'Octane server is running'; then
-        echo "Stopping current Octane server..."
-        php artisan octane:stop
-    fi
-
-    # Release the port
-    release_port
-
-    # Start the Octane server
-    echo "Starting Octane server..."
-    php artisan octane:start --server=swoole --port=$PORT > octane.log 2>&1 &
-    sleep 2
-
-    # Verify that the server has started
-    if php artisan octane:status | grep -q 'Octane server is running'; then
-        echo "Octane server started successfully."
-        check_website_health
-    else
-        echo "Failed to start Octane server."
-    fi
-}
-
 # Release the port by killing processes using it
 release_port() {
     PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
@@ -101,6 +76,31 @@ release_port() {
             done
         fi
     done
+}
+
+# Manage Octane server
+manage_octane_server() {
+    # Stop any currently running Octane server
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Stopping current Octane server..."
+        php artisan octane:stop
+    fi
+
+    # Release the port
+    release_port
+
+    # Start the Octane server
+    echo "Starting Octane server..."
+    php artisan octane:start --server=swoole --port=$PORT > octane.log 2>&1 &
+    sleep 2
+
+    # Verify that the server has started
+    if php artisan octane:status | grep -q 'Octane server is running'; then
+        echo "Octane server started successfully."
+        check_website_health
+    else
+        echo "Failed to start Octane server."
+    fi
 }
 
 # Check and update Git repository, then manage server
