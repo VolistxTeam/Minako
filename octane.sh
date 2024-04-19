@@ -46,41 +46,48 @@ check_website_health() {
     fi
 }
 
+# Release the port by killing processes using it
 release_port() {
-    local attempts=0
-    local max_attempts=3
-    local wait_time=5
+    PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
+    if [ -z "$PID_LINES" ]; then
+        echo "Port $PORT is not currently in use."
+        return 0
+    fi
 
-    while [ $attempts -lt $max_attempts ]; do
-        PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
-        if [ -z "$PID_LINES" ]; then
-            echo "Port $PORT is now free."
-            return 0
-        fi
+       local attempts=0
+       local max_attempts=3
+       local wait_time=5
 
-        echo "Attempting to release port $PORT, attempt $((attempts + 1))..."
+       while [ $attempts -lt $max_attempts ]; do
+           PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
+           if [ -z "$PID_LINES" ]; then
+               echo "Port $PORT is now free."
+               return 0
+           fi
 
-        echo "$PID_LINES" | while IFS= read -r line; do
-            local inode=$(echo "$line" | awk '{print $10}')
-            if [[ "$inode" != "0" && "$inode" != "" ]]; then
-                for FD in /proc/[0-9]*/fd/*; do
-                    if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
-                        local pid=$(echo "$FD" | cut -d'/' -f3)
-                        echo "Attempting to kill process $pid using port $PORT..."
-                        kill -9 "$pid"
-                        echo "Process with PID $pid has been killed."
-                    fi
-                done
-            fi
-        done
+           echo "Attempting to release port $PORT, attempt $((attempts + 1))..."
 
-        # Check again after waiting for some time
-        sleep $wait_time
-        ((attempts++))
-    done
+           echo "$PID_LINES" | while IFS= read -r line; do
+               local inode=$(echo "$line" | awk '{print $10}')
+               if [[ "$inode" != "0" && "$inode" != "" ]]; then
+                   for FD in /proc/[0-9]*/fd/*; do
+                       if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
+                           local pid=$(echo "$FD" | cut -d'/' -f3)
+                           echo "Attempting to kill process $pid using port $PORT..."
+                           kill -9 "$pid"
+                           echo "Process with PID $pid has been killed."
+                       fi
+                   done
+               fi
+           done
 
-    echo "Port $PORT is still in use after $max_attempts attempts. Manual intervention may be required."
-    return 1
+           # Check again after waiting for some time
+           sleep $wait_time
+           ((attempts++))
+       done
+
+       echo "Port $PORT is still in use after $max_attempts attempts. Manual intervention may be required."
+       return 1
 }
 
 # Manage Octane server
