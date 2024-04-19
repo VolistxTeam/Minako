@@ -10,7 +10,7 @@ HEX_IP="0100007F"
 
 echo "Laravel Octane Manager For Shared Hosting" >&2
 echo "Made By Cryental" >&2
-echo "Version 1.3.9" >&2
+echo "Version 1.3.10" >&2
 echo "" >&2
 
 # Change to the directory where your Laravel application is located
@@ -46,48 +46,59 @@ check_website_health() {
     fi
 }
 
+is_port_free() {
+    local in_use=false
+    while IFS=' ' read -a line; do
+        local local_address="${line[1]}"  # Field 2 in /proc/net/tcp is local address and port
+        local inode="${line[9]}"  # Field 10 is inode
+
+        # Split the local address into IP and port
+        local ip="${local_address%%:*}"
+        local port="${local_address##*:}"
+
+        if [[ "$ip" == "$HEX_IP" && "$port" == "$HEX_PORT" ]]; then
+            echo "Port $PORT is currently in use."
+            in_use=true
+            break  # Exit the loop as soon as we find the port is in use
+        fi
+    done < /proc/net/tcp
+
+    if [ "$in_use" = false ]; then
+        echo "Port $PORT is free."
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Release the port by killing processes using it
 release_port() {
-    PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
-    if [ -z "$PID_LINES" ]; then
-        echo "Port $PORT is not currently in use."
-        return 0
+    if is_port_free; then
+        return 0  # Exit if the port is not in use
     fi
 
-       local attempts=0
-       local max_attempts=3
-       local wait_time=5
+    echo "$PID_LINES" | while IFS= read -r line; do
+        local inode=$(echo "$line" | awk '{print $10}')
+        if [[ "$inode" != "0" && "$inode" != "" ]]; then
+            for FD in /proc/[0-9]*/fd/*; do
+                if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
+                    local pid=$(echo "$FD" | cut -d'/' -f3)
+                    echo "Attempting to gracefully kill process $pid using port $PORT..."
+                    kill -15 "$pid"  # Send SIGTERM
+                    sleep 5  # Allow some time for the process to terminate
 
-       while [ $attempts -lt $max_attempts ]; do
-           PID_LINES=$(grep -i "$HEX_IP:$HEX_PORT" /proc/net/tcp)
-           if [ -z "$PID_LINES" ]; then
-               echo "Port $PORT is now free."
-               return 0
-           fi
-
-           echo "Attempting to release port $PORT, attempt $((attempts + 1))..."
-
-           echo "$PID_LINES" | while IFS= read -r line; do
-               local inode=$(echo "$line" | awk '{print $10}')
-               if [[ "$inode" != "0" && "$inode" != "" ]]; then
-                   for FD in /proc/[0-9]*/fd/*; do
-                       if [[ "$(readlink $FD)" == "socket:[$inode]" ]]; then
-                           local pid=$(echo "$FD" | cut -d'/' -f3)
-                           echo "Attempting to kill process $pid using port $PORT..."
-                           kill -9 "$pid"
-                           echo "Process with PID $pid has been killed."
-                       fi
-                   done
-               fi
-           done
-
-           # Check again after waiting for some time
-           sleep $wait_time
-           ((attempts++))
-       done
-
-       echo "Port $PORT is still in use after $max_attempts attempts. Manual intervention may be required."
-       return 1
+                    # Use SIGKILL if necessary
+                    if ps -p $pid > /dev/null 2>&1; then
+                        echo "Process $pid did not terminate, using SIGKILL..."
+                        kill -9 "$pid"
+                        echo "Process with PID $pid has been force-killed."
+                    else
+                        echo "Process with PID $pid has terminated gracefully."
+                    fi
+                fi
+            done
+        fi
+    done
 }
 
 # Manage Octane server
