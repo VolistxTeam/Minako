@@ -55,6 +55,6 @@ class OhysTorrent extends Model
 
     public function anime()
     {
-        return $this->hasOneDeep('App\Models\NotifyAnime', ['App\Models\OhysRelation'], ['uniqueID', 'uniqueID'], ['uniqueID', 'matchingID']);
+        return $this->hasOneDeep(\App\Models\NotifyAnime::class, [\App\Models\OhysRelation::class], ['uniqueID', 'uniqueID'], ['uniqueID', 'matchingID']);
     }
 }

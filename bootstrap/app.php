@@ -42,18 +42,18 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            return response('', 404);
+            return response()->noContent(404);
         });
 
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
-            return response('', 405);
+            return response()->noContent(405);
         });
 
         $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
-            return response('', 429);
+            return response()->noContent(429);
         });
 
         $exceptions->render(function (ErrorException $e, Request $request) {
-            return response(view('errors/500'), 500);
+            return response()->view('errors/500', 500)->noContent(200);
         });
     })->create();

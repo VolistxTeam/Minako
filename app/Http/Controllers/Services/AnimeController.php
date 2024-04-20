@@ -208,7 +208,7 @@ class AnimeController extends Controller
             }
         }
 
-        return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
+        return response('Sync successfully.')->header('Content-Type', 'text/plain');
     }
 
     public function GetMappings($uniqueID)
