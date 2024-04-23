@@ -7,6 +7,7 @@ use App\Facades\Auth;
 use App\Helpers\AuthHelper;
 use App\Http\Controllers\Controller;
 use App\Models\OhysBlacklistTitle;
+use App\Repositories\OhysBlacklistRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,12 +15,19 @@ use Illuminate\Support\Facades\Validator;
 
 class OhysBlacklistController extends Controller
 {
+    private OhysBlacklistRepository $blacklistRepository;
+
+    public function __construct(OhysBlacklistRepository $blacklistRepository)
+    {
+        $this->blacklistRepository = $blacklistRepository;
+    }
+
     public function Create(Request $request): JsonResponse
     {
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (! $token) {
+            if (!$token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -33,11 +41,7 @@ class OhysBlacklistController extends Controller
                 return response()->json($validator->errors()->first(), 400);
             }
 
-            $newTitle = OhysBlacklistTitle::query()->create([
-                'name' => strtolower($request->input('name')),
-                'is_active' => true,
-                'reason' => $request->input('reason') ?? 'DMCA',
-            ]);
+            $newTitle = $this->blacklistRepository->Create($request->all());
 
             return response()->json(OhysBlacklist::fromModel($newTitle)->GetDTO(), 201);
         } catch (Exception $ex) {
@@ -50,7 +54,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (! $token) {
+            if (!$token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -67,25 +71,7 @@ class OhysBlacklistController extends Controller
                 return response()->json($validator->errors()->first(), 400);
             }
 
-            $title = OhysBlacklistTitle::query()->Find($title_id);
-
-            if (! $title_id) {
-                return response()->json('Not found', 404);
-            }
-
-            if (! empty($request->input('name'))) {
-                $title->name = $request->input('name');
-            }
-
-            if (! empty($request->input('is_active'))) {
-                $title->is_active = $request->input('is_active');
-            }
-
-            if (! empty($request->input('reason'))) {
-                $title->reason = $request->input('reason');
-            }
-
-            $title->save();
+            $title = $this->blacklistRepository->Update($title_id, $request->all());
 
             return response()->json(OhysBlacklist::fromModel($title)->GetDTO(), 201);
         } catch (Exception $ex) {
@@ -98,7 +84,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (! $token) {
+            if (!$token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -112,13 +98,7 @@ class OhysBlacklistController extends Controller
                 return response()->json($validator->errors()->first(), 400);
             }
 
-            $toBeDeletedTitleBlacklist = OhysBlacklistTitle::query()->Find($title_id);
-
-            if (! $title_id) {
-                return response()->json('Not found', 404);
-            }
-
-            $toBeDeletedTitleBlacklist->delete();
+            $this->blacklistRepository->Delete($title_id);
 
             return response()->json(null, 204);
         } catch (Exception $ex) {
@@ -126,12 +106,18 @@ class OhysBlacklistController extends Controller
         }
     }
 
-    public function GetFromID(Request $request, $title_id): JsonResponse
+    public function Get(Request $request, $title_id): JsonResponse
     {
         try {
-            $title = OhysBlacklistTitle::query()->where('id', $title_id)->first();
+            $token = Auth::authAccessToken($request->bearerToken());
 
-            if (! $title) {
+            if (!$token) {
+                return response()->json('Unauthorized', 401);
+            }
+
+            $title = $this->blacklistRepository->Find($title_id);
+
+            if (!$title) {
                 return response()->json('Not found', 404);
             }
 
@@ -141,14 +127,22 @@ class OhysBlacklistController extends Controller
         }
     }
 
-    public function Get(Request $request): JsonResponse
+    public function GetAll(Request $request): JsonResponse
     {
         try {
-            $titles = OhysBlacklistTitle::all();
+            $token = Auth::authAccessToken($request->bearerToken());
 
-            $items = [];
+            if (!$token) {
+                return response()->json('Unauthorized', 401);
+            }
 
-            foreach ($titles as $item) {
+            $search = $request->input('search', '');
+            $page = $request->input('page', 1);
+            $limit = $request->input('limit', 50);
+
+            $items = $this->blacklistRepository->FindAll($search, $page, $limit);
+
+            foreach ($items as $item) {
                 $items[] = OhysBlacklist::fromModel($item)->GetDTO();
             }
 

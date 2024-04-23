@@ -64,9 +64,9 @@ Route::middleware('throttle:2000,1')->group(function () {
     });
 
     Route::prefix('blacklist')->group(function () {
-        Route::get('/', [OhysBlacklistController::class, 'Get']);
+        Route::get('/', [OhysBlacklistController::class, 'GetAll']);
         Route::post('/', [OhysBlacklistController::class, 'Create']);
-        Route::get('/{title_id}', [OhysBlacklistController::class, 'GetFromID']);
+        Route::get('/{title_id}', [OhysBlacklistController::class, 'Get']);
         Route::delete('/{title_id}', [OhysBlacklistController::class, 'Delete']);
         Route::patch('/{title_id}', [OhysBlacklistController::class, 'Update']);
     });
