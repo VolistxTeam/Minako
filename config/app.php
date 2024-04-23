@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\Auth;
 use App\Facades\HttpClient;
 use App\Facades\StringOperations;
 
@@ -128,6 +129,7 @@ return [
 
     'aliases' => [
         'StringOperations' => StringOperations::class,
-        'HttpClient' => HttpClient::class
+        'HttpClient' => HttpClient::class,
+        'Auth' => Auth::class
     ],
 ];

@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\DataTransferObjects\OhysBlacklist;
-use App\Helpers\Key;
+use App\Facades\Auth;
+use App\Helpers\AuthHelper;
 use App\Http\Controllers\Controller;
 use App\Models\OhysBlacklistTitle;
 use Exception;
@@ -16,7 +17,7 @@ class OhysBlacklistController extends Controller
     public function Create(Request $request): JsonResponse
     {
         try {
-            $token = Key::authAccessToken($request->bearerToken());
+            $token = Auth::authAccessToken($request->bearerToken());
 
             if (! $token) {
                 return response()->json('Unauthorized', 401);
@@ -47,7 +48,7 @@ class OhysBlacklistController extends Controller
     public function Update(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = Key::authAccessToken($request->bearerToken());
+            $token = Auth::authAccessToken($request->bearerToken());
 
             if (! $token) {
                 return response()->json('Unauthorized', 401);
@@ -95,7 +96,7 @@ class OhysBlacklistController extends Controller
     public function Delete(Request $request, $title_id): JsonResponse
     {
         try {
-            $token = Key::authAccessToken($request->bearerToken());
+            $token = Auth::authAccessToken($request->bearerToken());
 
             if (! $token) {
                 return response()->json('Unauthorized', 401);
