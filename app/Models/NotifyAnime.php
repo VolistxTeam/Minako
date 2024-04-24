@@ -79,7 +79,7 @@ class NotifyAnime extends Model
 
     public function torrents()
     {
-        return $this->hasManyDeep('App\Models\OhysTorrent', ['App\Models\OhysRelation'], ['matchingID', 'uniqueID'], ['uniqueID', 'uniqueID']);
+        return $this->hasManyDeep(\App\Models\OhysTorrent::class, [\App\Models\OhysRelation::class], ['matchingID', 'uniqueID'], ['uniqueID', 'uniqueID']);
     }
 
     public function relations()

@@ -50,7 +50,7 @@ class OhysController extends Controller
     public function GetRSS()
     {
         $torrentQuery = OhysTorrent::query()
-            ->orderBy('info_createdDate', 'DESC')
+            ->orderByDesc('info_createdDate')
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
@@ -82,7 +82,7 @@ class OhysController extends Controller
 
     public function GetRecentTorrents()
     {
-        $torrentQuery = OhysTorrent::query()->orderBy('info_createdDate', 'DESC')->paginate(50, ['*'], 'p');
+        $torrentQuery = OhysTorrent::query()->orderByDesc('info_createdDate')->paginate(50, ['*'], 'p');
 
         $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
             return ! OhysBlacklistChecker::isBlacklistedTitle($torrent['title']);
@@ -107,7 +107,7 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
         if (empty($torrentQuery) || OhysBlacklistChecker::isBlacklistedTitle($torrentQuery->title)) {
-            return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response('Item not found: '.$id, )->header('Content-Type', 'text/plain');
         }
 
         $buildResponse = Torrent::fromModel($torrentQuery)->GetDTO();
@@ -122,7 +122,7 @@ class OhysController extends Controller
             ->first();
 
         if (empty($torrentQuery) || OhysBlacklistChecker::isBlacklistedTitle($torrentQuery->title)) {
-            return response('Item not found: '.$id, 404)->header('Content-Type', 'text/plain');
+            return response('Item not found: '.$id, )->header('Content-Type', 'text/plain');
         }
 
         $requestType = $request->input('type', 'magnet');
@@ -131,12 +131,12 @@ class OhysController extends Controller
             $contents = Storage::disk('local')->get('torrents/'.$torrentQuery->torrentName);
 
             if (empty($contents)) {
-                return response('Torrent file not found: '.$id, 404)->header('Content-Type', 'text/plain');
+                return response('Torrent file not found: '.$id, )->header('Content-Type', 'text/plain');
             }
 
             return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename='.$torrentQuery->uniqueID.'.torrent');
         } else {
-            return response('', 302, ['Location' => $torrentQuery->hidden_download_magnet]);
+            return response()->noContent(302)->withHeaders(['Location' => $torrentQuery->hidden_download_magnet]);
         }
     }
 }

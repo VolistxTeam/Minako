@@ -141,7 +141,7 @@ class RelationCommand extends Command
             'Cache-Control' => 'max-age=0',
             'Connection' => 'keep-alive',
             'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome,
+            'User-Agent' => $faker->chrome(),
         ];
     }
 
