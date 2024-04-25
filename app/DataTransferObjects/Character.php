@@ -11,38 +11,47 @@ class Character extends DataTransferObjectBase
 
     public function GetDTO(): array
     {
-        $filteredMappingData = [
-            [
-                'service' => 'notify/character',
-                'service_id' => (string)$this->entity->notifyID
-            ]
-        ];
-
-        foreach ($this->entity->mappings ?? [] as $item) {
-            $filteredMappingData[] = Mapping::fromModel($item)->GetDTO();
-        }
-
         return [
             'id' => $this->entity->uniqueID,
-            'names' => [
-                'canonical' => $this->entity->name_canonical,
-                'english' => $this->entity->name_english,
-                'japanese' => $this->entity->name_japanese,
-                'synonyms' => $this->entity->name_synonyms,
-            ],
+            'names' => $this->formatNames(),
             'description' => $this->entity->description,
-            'image' => [
-                'width' => $this->entity->image_width,
-                'height' => $this->entity->image_height,
-                'format' => 'jpg',
-                'link' => config('app.url', 'http://localhost') . '/character/' . $this->entity->uniqueID . '/image',
-            ],
+            'image' => $this->formatImage(),
             'attributes' => $this->entity->attributes,
-            'mappings' => $filteredMappingData,
-            'created_at' => (string)$this->entity->created_at,
-            'updated_at' => (string)$this->entity->updated_at,
+            'mappings' => $this->formatMappings(),
+            'created_at' => (string) $this->entity->created_at,
+            'updated_at' => (string) $this->entity->updated_at,
         ];
     }
 
+    private function formatNames(): array
+    {
+        return [
+            'canonical' => $this->entity->name_canonical,
+            'english' => $this->entity->name_english,
+            'japanese' => $this->entity->name_japanese,
+            'synonyms' => $this->entity->name_synonyms,
+        ];
+    }
 
+    private function formatImage(): array
+    {
+        $appUrl = config('app.url', 'http://localhost');
+
+        return [
+            'width' => $this->entity->image_width,
+            'height' => $this->entity->image_height,
+            'format' => 'jpg',
+            'link' => "$appUrl/character/{$this->entity->uniqueID}/image",
+        ];
+    }
+
+    private function formatMappings(): array
+    {
+        return collect($this->entity->mappings ?? [])->map(function ($mapping) {
+            return Mapping::fromModel($mapping)->GetDTO();
+        })->prepend([
+            'service' => 'notify/anime',
+            'service_id' => (string) $this->entity->uniqueID,
+        ])->toArray();
+    }
 }

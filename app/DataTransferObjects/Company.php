@@ -9,20 +9,25 @@ class Company extends DataTransferObjectBase
         return new self($company);
     }
 
-    public function GetDTO(): array
+    public function getDTO(): array
     {
         return [
-            'id'    => $this->entity->uniqueID,
-            'names' => [
-                'english'  => $this->entity->name_english,
-                'japanese' => $this->entity->name_japanese,
-                'synonyms' => $this->entity->name_synonyms,
-            ],
+            'id' => $this->entity->uniqueID,
+            'names' => $this->formatNames(),
             'description' => $this->entity->description,
-            'email'       => $this->entity->email,
-            'links'       => $this->entity->links,
-            'created_at'  => (string) $this->entity->created_at,
-            'updated_at'  => (string) $this->entity->updated_at,
+            'email' => $this->entity->email,
+            'links' => $this->entity->links,
+            'created_at' => (string) $this->entity->created_at,
+            'updated_at' => (string) $this->entity->updated_at,
+        ];
+    }
+
+    private function formatNames(): array
+    {
+        return [
+            'english' => $this->entity->name_english,
+            'japanese' => $this->entity->name_japanese,
+            'synonyms' => $this->entity->name_synonyms,
         ];
     }
 }

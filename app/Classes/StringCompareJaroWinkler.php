@@ -43,7 +43,6 @@ class StringCompareJaroWinkler
         return ($commons1_len / $str1_len + $commons2_len / $str2_len + ($commons1_len - $transpositions) / $commons1_len) / 3.0;
     }
 
-
     private function getCommonCharacters(string $string1, string $string2, int $allowedDistance): string
     {
         $str1_len = mb_strlen($string1);
@@ -57,7 +56,7 @@ class StringCompareJaroWinkler
             $end = min($i + $allowedDistance + 1, $str2_len);
 
             for ($j = $start; $j < $end; $j++) {
-                if (!$matchedPositions[$j] && $string2[$j] === $char1) {
+                if (! $matchedPositions[$j] && $string2[$j] === $char1) {
                     $commonCharacters .= $char1;
                     $matchedPositions[$j] = true;
                     break;

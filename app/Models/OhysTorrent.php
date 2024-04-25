@@ -9,9 +9,9 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class OhysTorrent extends Model
 {
+    use ClearsResponseCache;
     use HasFactory;
     use HasRelationships;
-    use ClearsResponseCache;
 
     /**
      * Indicates if the model should be timestamped.
@@ -46,14 +46,15 @@ class OhysTorrent extends Model
     ];
 
     protected $casts = [
+        'info_createdDate' => 'datetime:Y-m-d H:i:s',
         'info_torrent_announces' => 'array',
-        'info_torrent_files'     => 'array',
-        'created_at'             => 'datetime:Y-m-d H:i:s',
-        'updated_at'             => 'datetime:Y-m-d H:i:s',
+        'info_torrent_files' => 'array',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function anime()
     {
-        return $this->hasOneDeep('App\Models\NotifyAnime', ['App\Models\OhysRelation'], ['uniqueID', 'uniqueID'], ['uniqueID', 'matchingID']);
+        return $this->hasOneDeep(\App\Models\NotifyAnime::class, [\App\Models\OhysRelation::class], ['uniqueID', 'uniqueID'], ['uniqueID', 'matchingID']);
     }
 }

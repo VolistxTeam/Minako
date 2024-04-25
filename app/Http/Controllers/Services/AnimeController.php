@@ -14,7 +14,9 @@ use App\Helpers\OhysBlacklistChecker;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyAnimeCharacter;
+use App\Models\NotifyCharacter;
 use App\Models\NotifyCompany;
+use App\Repositories\AnimeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Response;
@@ -22,6 +24,13 @@ use Illuminate\Support\Facades\Storage;
 
 class AnimeController extends Controller
 {
+    private AnimeRepository $animeRepository;
+
+    public function __construct(AnimeRepository $animeRepository)
+    {
+        $this->animeRepository = $animeRepository;
+    }
+
     public function Search(Request $request, $name)
     {
         $name = urldecode($name);
@@ -29,7 +38,7 @@ class AnimeController extends Controller
 
         $type = $request->input('type');
 
-        $searchQuery = NotifyAnime::searchByTitle($name, 50, $type ?? null);
+        $searchQuery = $this->animeRepository->searchNotifyAnimeByTitle($name, 50, $type ?? null);
 
         $response = [];
 
@@ -199,7 +208,7 @@ class AnimeController extends Controller
             }
         }
 
-        return response('Sync successfully.', 200)->header('Content-Type', 'text/plain');
+        return response('Sync successfully.')->header('Content-Type', 'text/plain');
     }
 
     public function GetMappings($uniqueID)
@@ -213,14 +222,13 @@ class AnimeController extends Controller
         $filteredMappingData = [
             [
                 'service' => 'notify/anime',
-                'service_id' => (string)$itemQuery->notifyID
-            ]
+                'service_id' => (string)$itemQuery->notifyID,
+            ],
         ];
 
         foreach ($itemQuery->mappings ?? [] as $item) {
             $filteredMappingData[] = Mapping::fromModel($item)->GetDTO();
         }
-
 
         $response = [
             'id' => $itemQuery['uniqueID'],
@@ -298,7 +306,6 @@ class AnimeController extends Controller
             }
         }
 
-
         $response = [
             'id' => $itemQuery['uniqueID'],
             'licensors' => $filteredLicensorData,
@@ -335,16 +342,16 @@ class AnimeController extends Controller
 
     public function GetCharacters($uniqueID)
     {
-        $characterRelationQuery = NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
+        $animeCharacter = NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
 
-        if (empty($characterRelationQuery)) {
+        if (empty($animeCharacter)) {
             return response('Character not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
         $filteredCharacterData = [];
 
-        foreach ($characterRelationQuery->items ?? [] as $item) {
-            $characterQuery = NotifyAnimeCharacter::query()->latest()->where('notifyID', $item['characterId'])->first();
+        foreach ($animeCharacter->items ?? [] as $item) {
+            $characterQuery = NotifyCharacter::query()->where('notifyID', $item['characterId'])->first();
 
             if (!empty($characterQuery)) {
                 $filteredCharacterData[] = Character::fromModel($characterQuery)->GetDTO();

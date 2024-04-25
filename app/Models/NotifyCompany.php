@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Classes\StringCompareJaroWinkler;
 use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NotifyCompany extends Model
 {
-    use HasFactory;
     use ClearsResponseCache;
+    use HasFactory;
 
     /**
      * Indicates if the model should be timestamped.
@@ -17,6 +18,7 @@ class NotifyCompany extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The table associated with the model.
      *
@@ -39,10 +41,10 @@ class NotifyCompany extends Model
 
     protected $casts = [
         'name_synonyms' => 'array',
-        'links'         => 'array',
-        'mappings'      => 'array',
-        'location'      => 'array',
-        'created_at'    => 'datetime:Y-m-d H:i:s',
-        'updated_at'    => 'datetime:Y-m-d H:i:s',
+        'links' => 'array',
+        'mappings' => 'array',
+        'location' => 'array',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 }

@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Classes\StringCompareJaroWinkler;
+use App\Facades\StringOperations;
 use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MALAnime extends Model
 {
-    use HasFactory;
     use ClearsResponseCache;
+    use HasFactory;
 
     /**
      * Indicates if the model should be timestamped.
@@ -39,10 +41,10 @@ class MALAnime extends Model
     ];
 
     protected $casts = [
-        'aired'      => 'datetime:Y-m-d H:i:s',
-        'filler'     => 'boolean',
-        'recap'      => 'boolean',
-        'isHidden'   => 'boolean',
+        'aired' => 'datetime:Y-m-d H:i:s',
+        'filler' => 'boolean',
+        'recap' => 'boolean',
+        'isHidden' => 'boolean',
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];

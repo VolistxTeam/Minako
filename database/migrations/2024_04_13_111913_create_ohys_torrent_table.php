@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('torrentName')->nullable();
             $table->string('info_totalHash', 40)->nullable();
             $table->string('info_totalSize')->nullable();
-            $table->string('info_createdDate')->nullable();
+            $table->dateTime('info_createdDate')->nullable();
             $table->longText('info_torrent_announces')->nullable();
             $table->longText('info_torrent_files')->nullable();
             $table->string('metadata_video_resolution')->nullable();

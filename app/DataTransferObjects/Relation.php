@@ -13,7 +13,7 @@ class Relation extends DataTransferObjectBase
     {
         return [
             'id' => $this->entity['uniqueID'],
-            'type' => $this->entity['type']
+            'type' => $this->entity['type'],
         ];
     }
 }

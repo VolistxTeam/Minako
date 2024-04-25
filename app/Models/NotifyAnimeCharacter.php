@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class NotifyAnimeCharacter extends Model
 {
-    use HasFactory;
     use ClearsResponseCache;
+    use HasFactory;
 
     /**
      * Indicates if the model should be timestamped.
@@ -32,7 +32,7 @@ class NotifyAnimeCharacter extends Model
     ];
 
     protected $casts = [
-        'items'      => 'array',
+        'items' => 'array',
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];

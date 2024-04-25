@@ -1,5 +1,9 @@
 <?php
 
+use App\Facades\Auth;
+use App\Facades\HttpClient;
+use App\Facades\StringOperations;
+
 return [
 
     /*
@@ -39,7 +43,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -123,4 +127,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'aliases' => [
+        'StringOperations' => StringOperations::class,
+        'HttpClient' => HttpClient::class,
+        'Auth' => Auth::class
+    ],
 ];
