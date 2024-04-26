@@ -42,6 +42,26 @@ class AnimeRepository
         ]);
     }
 
+    public function getNotifyAnimeByUniqueID(string $uniqueID, bool $latest = false): object|null
+    {
+        $query = NotifyAnime::query();
+
+        if ($latest) {
+            $query = $query->latest();
+        }
+
+        return $query->where('uniqueID', $uniqueID)->first();
+    }
+
+    public function getNotifyAnimeEpisode(string $uniqueID, int $episodeNumber): object|null
+    {
+        return MALAnime::query()->where('mal_anime.episode_id', $episodeNumber)
+            ->join('notify_anime', 'notify_anime.uniqueID', '=', 'mal_anime.uniqueID')
+            ->where('notify_anime.uniqueID', $uniqueID)
+            ->select('mal_anime.*')
+            ->first();
+    }
+
     public function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
     {
         $term = StringOperations::normalizeTerm($originalTerm);

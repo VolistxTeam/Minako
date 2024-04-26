@@ -9,8 +9,8 @@ use App\DataTransferObjects\Episode;
 use App\DataTransferObjects\Mapping;
 use App\DataTransferObjects\Relation;
 use App\DataTransferObjects\Torrent;
+use App\Facades\OhysBlacklist;
 use App\Helpers\JikanAPI;
-use App\Helpers\OhysBlacklistChecker;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyAnimeCharacter;
@@ -51,28 +51,25 @@ class AnimeController extends Controller
 
     public function GetItem($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()
-            ->where('uniqueID', $uniqueID)
-            ->first();
+        $item = $this->animeRepository->getNotifyAnimeByUniqueID($uniqueID);
 
-        if (empty($itemQuery)) {
+        if (empty($item)) {
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response = Anime::fromModel($itemQuery)->GetDTO();
+        $response = Anime::fromModel($item)->GetDTO();
 
         return response()->json($response);
     }
 
     public function GetImage($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->where('uniqueID', $uniqueID)->first();
+        $id = $this->animeRepository->getNotifyAnimeByUniqueID($uniqueID)?->uniqueID;
 
-        if (empty($itemQuery)) {
+        if (empty($id)) {
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $id = $itemQuery->uniqueID;
 
         $contents = Storage::disk('local')->get('posters/' . $id . '.jpg');
 
@@ -80,38 +77,32 @@ class AnimeController extends Controller
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        return Response::make($contents, 200)->header('Content-Type', 'image/jpeg');
+        return Response::make($contents)->header('Content-Type', 'image/jpeg');
     }
 
     public function GetEpisode($uniqueID, $episodeNumber)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $item = $this->animeRepository->getNotifyAnimeEpisode($uniqueID, $episodeNumber);
 
-        if (empty($itemQuery)) {
-            return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
+        if (empty($item)) {
+            return response('Episode not found', 404)->header('Content-Type', 'text/plain');
         }
 
-        $episodeQuery = $itemQuery->episodes->where('episode_id', $episodeNumber)->first();
-
-        if (empty($episodeQuery)) {
-            return response('Episode not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
-        }
-
-        $response = Episode::fromModel($episodeQuery)->GetDTO();
+        $response = Episode::fromModel($item)->GetDTO();
 
         return response()->json($response);
     }
 
     public function GetTorrents($uniqueID)
     {
-        $itemQuery = NotifyAnime::query()->latest()->where('uniqueID', $uniqueID)->first();
+        $anime = $this->animeRepository->getNotifyAnimeByUniqueID($uniqueID, true);
 
-        if (empty($itemQuery)) {
+        if (empty($anime)) {
             return response('Key not found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $itemsFiltered = $itemQuery->torrents->filter(function ($torrent) use ($itemQuery) {
-            return !OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_canonical ?? '') || !OhysBlacklistChecker::isBlacklistedTitle($itemQuery->title_romaji ?? '');
+        $itemsFiltered = $anime->torrents->filter(function ($torrent) use ($anime) {
+            return !OhysBlacklist::isBlacklistedTitle($anime->title_canonical ?? '') || !OhysBlacklist::isBlacklistedTitle($anime->title_romaji ?? '');
         })->map(function ($torrent) {
             return Torrent::fromModel($torrent)->GetDTO();
         });

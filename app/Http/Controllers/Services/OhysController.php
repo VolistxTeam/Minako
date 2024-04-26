@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Services;
 
 use App\DataTransferObjects\Torrent;
-use App\Helpers\OhysBlacklistChecker;
+use App\Facades\OhysBlacklist;
+use App\Helpers\OhysBlacklistHelper;
 use App\Models\OhysTorrent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,7 +18,6 @@ class OhysController extends Controller
 {
     public function __construct()
     {
-        OhysBlacklistChecker::loadTitles();
     }
 
     public function Search(Request $request, $name)
@@ -30,7 +30,7 @@ class OhysController extends Controller
             ->paginate(50, ['*'], 'p');
 
         $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
-            return ! OhysBlacklistChecker::isBlacklistedTitle($torrent['title']);
+            return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
         })->map(function ($torrent) {
             return Torrent::fromModel($torrent)->GetDTO();
         });
@@ -54,7 +54,7 @@ class OhysController extends Controller
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
-                return ! OhysBlacklistChecker::isBlacklistedTitle($torrent['title']);
+                return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
             })
             ->toArray();
 
@@ -85,7 +85,7 @@ class OhysController extends Controller
         $torrentQuery = OhysTorrent::query()->orderByDesc('info_createdDate')->paginate(50, ['*'], 'p');
 
         $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
-            return ! OhysBlacklistChecker::isBlacklistedTitle($torrent['title']);
+            return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
         })->map(function ($torrent) {
             return Torrent::fromModel($torrent)->GetDTO();
         });
@@ -106,7 +106,7 @@ class OhysController extends Controller
     {
         $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
 
-        if (empty($torrentQuery) || OhysBlacklistChecker::isBlacklistedTitle($torrentQuery->title)) {
+        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
             return response('Item not found: '.$id, )->header('Content-Type', 'text/plain');
         }
 
@@ -121,7 +121,7 @@ class OhysController extends Controller
             ->where('uniqueID', $id)
             ->first();
 
-        if (empty($torrentQuery) || OhysBlacklistChecker::isBlacklistedTitle($torrentQuery->title)) {
+        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
             return response('Item not found: '.$id, )->header('Content-Type', 'text/plain');
         }
 
@@ -134,7 +134,7 @@ class OhysController extends Controller
                 return response('Torrent file not found: '.$id, )->header('Content-Type', 'text/plain');
             }
 
-            return Response::make($contents, 200)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename='.$torrentQuery->uniqueID.'.torrent');
+            return Response::make($contents)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename='.$torrentQuery->uniqueID.'.torrent');
         } else {
             return response()->noContent(302)->withHeaders(['Location' => $torrentQuery->hidden_download_magnet]);
         }
