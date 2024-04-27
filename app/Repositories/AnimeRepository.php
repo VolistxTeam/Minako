@@ -6,8 +6,12 @@ namespace App\Repositories;
 use App\Facades\StringOperations;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
+use App\Models\NotifyAnimeCharacter;
 use App\Models\NotifyCharacter;
 use App\Models\NotifyCompany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class AnimeRepository
 {
@@ -53,6 +57,33 @@ class AnimeRepository
         return $query->where('uniqueID', $uniqueID)->first();
     }
 
+    public function getNotifyCompanyById(string $notifyID, bool $latest = false): object|null
+    {
+        $query = NotifyCompany::query();
+
+        if ($latest) {
+            $query = $query->latest();
+        }
+
+        return $query->where('notifyID', $notifyID)->first();
+    }
+
+    public function getNotifyAnimeCharactersByUniqueId(string $uniqueID): object|null
+    {
+        return NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
+    }
+
+    public function getNotifyCharacterById(string $characterId, bool $latest = false): object|null
+    {
+        $query = NotifyCharacter::query();
+
+        if ($latest) {
+            $query = $query->latest();
+        }
+
+        return $query->where('notifyID', $characterId)->first();
+    }
+
     public function getNotifyAnimeEpisode(string $uniqueID, int $episodeNumber): object|null
     {
         return MALAnime::query()->where('mal_anime.episode_id', $episodeNumber)
@@ -60,6 +91,26 @@ class AnimeRepository
             ->where('notify_anime.uniqueID', $uniqueID)
             ->select('mal_anime.*')
             ->first();
+    }
+
+    public function createOrUpdateMALEpisode($anime, $episode): Model|Builder
+    {
+        $episode = MALAnime::query()->updateOrCreate([
+            'uniqueID' => $anime['uniqueID'],
+            'notifyID' => $anime['notifyID'],
+            'episode_id' => $episode['mal_id'],
+        ], [
+            'title' => !empty($episode['title']) ? $episode['title'] : null,
+            'title_japanese' => !empty($episode['title_japanese']) ? $episode['title_japanese'] : null,
+            'title_romanji' => !empty($episode['title_romanji']) ? $episode['title_romanji'] : null,
+            'aired' => !empty($episode['aired']) ? Carbon::parse($episode['aired']) : null,
+            'filler' => (int)$episode['filler'],
+            'recap' => (int)$episode['recap'],
+        ]);
+
+        $episode->touch();
+
+        return $episode;
     }
 
     public function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
