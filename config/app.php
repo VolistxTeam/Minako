@@ -2,6 +2,7 @@
 
 use App\Facades\Auth;
 use App\Facades\HttpClient;
+use App\Facades\OhysBlacklist;
 use App\Facades\StringOperations;
 
 return [
@@ -130,6 +131,7 @@ return [
     'aliases' => [
         'StringOperations' => StringOperations::class,
         'HttpClient' => HttpClient::class,
-        'Auth' => Auth::class
+        'Auth' => Auth::class,
+        'OhysBlacklist' => OhysBlacklist::class
     ],
 ];

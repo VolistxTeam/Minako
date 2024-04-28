@@ -92,4 +92,9 @@ class OhysBlacklistRepository
             ->where($values[0], 'LIKE', "%$searchValue%")
             ->paginate($limit, ['*'], 'page', $page);
     }
+
+    public function FindAllBlacklistedNames(): array
+    {
+        return OhysBlacklistTitle::query()->pluck('name')->toArray();
+    }
 }
