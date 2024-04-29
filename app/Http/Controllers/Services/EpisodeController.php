@@ -33,13 +33,13 @@ class EpisodeController extends Controller
 
     public function GetEpisode(int $id): JsonResponse
     {
-        $episodeQuery = MALAnime::query()->where('id', $id)->first();
+        $episode = $this->animeRepository->getMALEpisodeById($id);
 
-        if (empty($episodeQuery)) {
+        if (empty($episode)) {
             return response()->json(['error' => "Episode not found: {$id}"], 404);
         }
 
-        $response = Episode::fromModel($episodeQuery)->GetDTO();
+        $response = Episode::fromModel($episode)->GetDTO();
 
         return response()->json($response);
     }

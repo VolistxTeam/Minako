@@ -34,13 +34,13 @@ class CharacterController extends Controller
 
     public function GetImage($id)
     {
-        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
+        $character = $this->animeRepository->getNotifyCharacterByUniqueId($id);
 
-        if (!$itemQuery) {
+        if (!$character) {
             return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $id = $itemQuery->uniqueID;
+        $id = $character->uniqueID;
         $imagePath = 'characters/' . $id . '.jpg';
 
         if (!Storage::disk('local')->exists($imagePath)) {
@@ -54,13 +54,13 @@ class CharacterController extends Controller
 
     public function GetCharacter($id)
     {
-        $itemQuery = NotifyCharacter::query()->where('uniqueID', $id)->first();
+        $character = $this->animeRepository->getNotifyCharacterByUniqueId($id);
 
-        if (!$itemQuery) {
+        if (!$character) {
             return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response = Character::fromModel($itemQuery)->GetDTO();
+        $response = Character::fromModel($character)->GetDTO();
 
         return response()->json($response);
     }

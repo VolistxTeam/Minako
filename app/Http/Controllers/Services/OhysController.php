@@ -6,6 +6,7 @@ use App\DataTransferObjects\Torrent;
 use App\Facades\OhysBlacklist;
 use App\Helpers\OhysBlacklistHelper;
 use App\Models\OhysTorrent;
+use App\Repositories\AnimeRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -16,26 +17,27 @@ use Suin\RSSWriter\Item;
 
 class OhysController extends Controller
 {
-    public function __construct()
+    private AnimeRepository $animeRepository;
+
+    public function __construct(AnimeRepository $animeRepository)
     {
+        $this->animeRepository = $animeRepository;
     }
+
 
     public function Search(Request $request, $name)
     {
         $name = urldecode($name);
 
-        $torrentQuery = OhysTorrent::query()
-            ->where('title', 'LIKE', "%$name%")
-            ->orWhere('torrentName', 'LIKE', "%$name%")
-            ->paginate(50, ['*'], 'p');
+        $torrentQuery = $this->animeRepository->searchOhysTorrentsByName($name);
 
         $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
-            return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
+            return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
         })->map(function ($torrent) {
             return Torrent::fromModel($torrent)->GetDTO();
         });
 
-        $buildResponse = [
+        $response = [
             'pagination' => [
                 'per_page' => $torrentQuery->perPage(),
                 'current' => $torrentQuery->currentPage(),
@@ -44,19 +46,12 @@ class OhysController extends Controller
             'items' => $itemsFiltered->values(),
         ];
 
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 
     public function GetRSS()
     {
-        $torrentQuery = OhysTorrent::query()
-            ->orderByDesc('info_createdDate')
-            ->limit(100)
-            ->get()
-            ->filter(function ($torrent) {
-                return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
-            })
-            ->toArray();
+        $torrentQuery = $this->animeRepository->getOhysTorrentsRSS()->toArray();
 
         $feed = new Feed();
         $channel = new Channel();
@@ -64,14 +59,14 @@ class OhysController extends Controller
             ->title('Anime Database')
             ->description('Anime Database RSS Service')
             ->url('https://cryental.dev/services/anime')
-            ->feedUrl(config('app.url', 'http://localhost').'/ohys/service/rss')
+            ->feedUrl(config('app.url', 'http://localhost') . '/ohys/service/rss')
             ->appendTo($feed);
 
         foreach ($torrentQuery as $torrentItem) {
             $item = new Item();
             $item
                 ->title("{$torrentItem['torrentName']}")
-                ->url(config('app.url', 'http://localhost')."/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
+                ->url(config('app.url', 'http://localhost') . "/ohys/{$torrentItem['uniqueID']}/download?type=torrent")
                 ->pubDate(Carbon::createFromTimeString($torrentItem['info_createdDate'], 'Asia/Tokyo')->getTimestamp())
                 ->appendTo($channel);
         }
@@ -82,61 +77,60 @@ class OhysController extends Controller
 
     public function GetRecentTorrents()
     {
-        $torrentQuery = OhysTorrent::query()->orderByDesc('info_createdDate')->paginate(50, ['*'], 'p');
+        $recentTorrents = $this->animeRepository->getRecentOhysTorrents();
 
-        $itemsFiltered = $torrentQuery->getCollection()->filter(function ($torrent) {
-            return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
+        $itemsFiltered = $recentTorrents->getCollection()->filter(function ($torrent) {
+            return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
         })->map(function ($torrent) {
             return Torrent::fromModel($torrent)->GetDTO();
         });
 
-        $buildResponse = [
+        $response = [
             'pagination' => [
-                'per_page' => $torrentQuery->perPage(),
-                'current' => $torrentQuery->currentPage(),
-                'total' => $torrentQuery->lastPage(),
+                'per_page' => $recentTorrents->perPage(),
+                'current' => $recentTorrents->currentPage(),
+                'total' => $recentTorrents->lastPage(),
             ],
             'items' => $itemsFiltered->values(),
         ];
 
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 
     public function GetTorrent($id)
     {
-        $torrentQuery = OhysTorrent::query()->where('uniqueID', $id)->first();
+        $torrent = $this->animeRepository->getOhysTorrentByUniqueID($id);
 
-        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
-            return response('Item not found: '.$id, )->header('Content-Type', 'text/plain');
+        if (empty($torrent) || OhysBlacklist::isBlacklistedTitle($torrent->title)) {
+            return response('Item not found: ' . $id,)->header('Content-Type', 'text/plain');
         }
 
-        $buildResponse = Torrent::fromModel($torrentQuery)->GetDTO();
+        $response = Torrent::fromModel($torrent)->GetDTO();
 
-        return response()->json($buildResponse);
+        return response()->json($response);
     }
 
     public function DownloadTorrent(Request $request, $id)
     {
-        $torrentQuery = OhysTorrent::query()
-            ->where('uniqueID', $id)
-            ->first();
+        $torrent = $this->animeRepository->getOhysTorrentByUniqueID($id);
 
-        if (empty($torrentQuery) || OhysBlacklist::isBlacklistedTitle($torrentQuery->title)) {
-            return response('Item not found: '.$id, )->header('Content-Type', 'text/plain');
+
+        if (empty($torrent) || OhysBlacklist::isBlacklistedTitle($torrent->title)) {
+            return response('Item not found: ' . $id,)->header('Content-Type', 'text/plain');
         }
 
         $requestType = $request->input('type', 'magnet');
 
         if ($requestType == 'torrent') {
-            $contents = Storage::disk('local')->get('torrents/'.$torrentQuery->torrentName);
+            $contents = Storage::disk('local')->get('torrents/' . $torrent->torrentName);
 
             if (empty($contents)) {
-                return response('Torrent file not found: '.$id, )->header('Content-Type', 'text/plain');
+                return response('Torrent file not found: ' . $id,)->header('Content-Type', 'text/plain');
             }
 
-            return Response::make($contents)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename='.$torrentQuery->uniqueID.'.torrent');
+            return Response::make($contents)->header('Content-Type', 'application/x-bittorrent')->header('Content-disposition', 'attachment; filename=' . $torrent->uniqueID . '.torrent');
         } else {
-            return response()->noContent(302)->withHeaders(['Location' => $torrentQuery->hidden_download_magnet]);
+            return response()->noContent(302)->withHeaders(['Location' => $torrent->hidden_download_magnet]);
         }
     }
 }

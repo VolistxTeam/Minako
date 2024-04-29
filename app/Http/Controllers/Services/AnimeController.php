@@ -227,7 +227,7 @@ class AnimeController extends Controller
         $filteredStudioData = [];
 
         foreach ($anime->studios as $studioId) {
-            $studioQuery = $this->animeRepository->getNotifyCompanyById($studioId);
+            $studioQuery = $this->animeRepository->getNotifyCompanyByNotifyId($studioId);
             if (!empty($studioQuery)) {
                 $filteredStudioData[] = Company::fromModel($studioQuery)->GetDTO();
             }
@@ -252,7 +252,7 @@ class AnimeController extends Controller
         $filteredProducerData = [];
 
         foreach ($anime->producers ?? [] as $producerId) {
-            $producer = $this->animeRepository->getNotifyCompanyById($producerId, true);
+            $producer = $this->animeRepository->getNotifyCompanyByNotifyId($producerId, true);
             if (!empty($producer)) {
                 $filteredProducerData[] = Company::fromModel($producer)->GetDTO();
             }
@@ -277,7 +277,7 @@ class AnimeController extends Controller
         $filteredLicensorData = [];
 
         foreach ($anime->licensors ?? [] as $licensorId) {
-            $license = $this->animeRepository->getNotifyCompanyById($licensorId);
+            $license = $this->animeRepository->getNotifyCompanyByNotifyId($licensorId);
 
             if (!empty($license)) {
                 $filteredLicensorData[] = Company::fromModel($license)->GetDTO();
@@ -329,7 +329,7 @@ class AnimeController extends Controller
         $filteredCharacterData = [];
 
         foreach ($animeCharacters->items ?? [] as $notifyCharacter) {
-            $notifyCharacter = $this->animeRepository->getNotifyCharacterById($notifyCharacter['characterId']);
+            $notifyCharacter = $this->animeRepository->getNotifyCharacterByNotifyId($notifyCharacter['characterId']);
 
             if (!empty($notifyCharacter)) {
                 $filteredCharacterData[] = Character::fromModel($notifyCharacter)->GetDTO();

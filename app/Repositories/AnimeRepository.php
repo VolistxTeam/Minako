@@ -3,12 +3,15 @@
 namespace App\Repositories;
 
 
+use App\Facades\OhysBlacklist;
 use App\Facades\StringOperations;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use App\Models\NotifyAnimeCharacter;
 use App\Models\NotifyCharacter;
 use App\Models\NotifyCompany;
+use App\Models\OhysTorrent;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -46,7 +49,7 @@ class AnimeRepository
         ]);
     }
 
-    public function getNotifyAnimeByUniqueID(string $uniqueID, bool $latest = false): object|null
+    public function getNotifyAnimeByUniqueID($uniqueID, bool $latest = false): object|null
     {
         $query = NotifyAnime::query();
 
@@ -57,7 +60,7 @@ class AnimeRepository
         return $query->where('uniqueID', $uniqueID)->first();
     }
 
-    public function getNotifyCompanyById(string $notifyID, bool $latest = false): object|null
+    public function getNotifyCompanyByNotifyId($notifyID, bool $latest = false): object|null
     {
         $query = NotifyCompany::query();
 
@@ -68,12 +71,23 @@ class AnimeRepository
         return $query->where('notifyID', $notifyID)->first();
     }
 
-    public function getNotifyAnimeCharactersByUniqueId(string $uniqueID): object|null
+    public function getNotifyCompanyByUniqueId($uniqueID, bool $latest = false): object|null
+    {
+        $query = NotifyCompany::query();
+
+        if ($latest) {
+            $query = $query->latest();
+        }
+
+        return $query->where('uniqueID', $uniqueID)->first();
+    }
+
+    public function getNotifyAnimeCharactersByUniqueId($uniqueID): object|null
     {
         return NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
     }
 
-    public function getNotifyCharacterById(string $characterId, bool $latest = false): object|null
+    public function getNotifyCharacterByNotifyId($characterId, bool $latest = false): object|null
     {
         $query = NotifyCharacter::query();
 
@@ -84,13 +98,58 @@ class AnimeRepository
         return $query->where('notifyID', $characterId)->first();
     }
 
-    public function getNotifyAnimeEpisode(string $uniqueID, int $episodeNumber): object|null
+    public function getNotifyCharacterByUniqueId($characterId, bool $latest = false): object|null
+    {
+        $query = NotifyCharacter::query();
+
+        if ($latest) {
+            $query = $query->latest();
+        }
+
+        return $query->where('uniqueID', $characterId)->first();
+    }
+
+    public function getNotifyAnimeEpisode($uniqueID, int $episodeNumber): object|null
     {
         return MALAnime::query()->where('mal_anime.episode_id', $episodeNumber)
             ->join('notify_anime', 'notify_anime.uniqueID', '=', 'mal_anime.uniqueID')
             ->where('notify_anime.uniqueID', $uniqueID)
             ->select('mal_anime.*')
             ->first();
+    }
+
+    public function getMALEpisodeById($uniqueID)
+    {
+        return MALAnime::query()->where('id', $uniqueID)->first();
+    }
+
+    public function searchOhysTorrentsByName($name): LengthAwarePaginator
+    {
+        return OhysTorrent::query()
+            ->where('title', 'LIKE', "%$name%")
+            ->orWhere('torrentName', 'LIKE', "%$name%")
+            ->paginate(50, ['*'], 'p');
+    }
+
+    public function getOhysTorrentsRSS()
+    {
+        return OhysTorrent::query()
+            ->orderByDesc('info_createdDate')
+            ->limit(100)
+            ->get()
+            ->filter(function ($torrent) {
+                return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
+            });
+    }
+
+    public function getRecentOhysTorrents()
+    {
+        return OhysTorrent::query()->orderByDesc('info_createdDate')->paginate(50, ['*'], 'p');
+    }
+
+    public function getOhysTorrentByUniqueID($uniqueID)
+    {
+        return  OhysTorrent::query()->where('uniqueID', $uniqueID)->first();
     }
 
     public function createOrUpdateMALEpisode($anime, $episode): Model|Builder
@@ -113,7 +172,7 @@ class AnimeRepository
         return $episode;
     }
 
-    public function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
+    private function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
     {
         $term = StringOperations::normalizeTerm($originalTerm);
 

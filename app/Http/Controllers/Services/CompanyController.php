@@ -32,13 +32,13 @@ class CompanyController extends Controller
 
     public function GetCompany(string $id)
     {
-        $itemQuery = NotifyCompany::query()->where('uniqueID', $id)->first();
+        $company = $this->animeRepository->getNotifyCompanyByUniqueId($id);
 
-        if (!$itemQuery) {
+        if (!$company) {
             return response('Company not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
-        $response = Company::fromModel($itemQuery)->GetDTO();
+        $response = Company::fromModel($company)->GetDTO();
 
         return response()->json($response);
     }
