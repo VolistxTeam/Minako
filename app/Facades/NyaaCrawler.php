@@ -2,17 +2,17 @@
 
 namespace App\Facades;
 
-use App\Helpers\AuthHelper;
+use App\Helpers\NyaaCrawlerHelper;
 use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static Get(string $large)
- * @method static authAccessToken(string|null $bearerToken)
+ * @method static getAllTorrents()
  */
-class Auth extends Facade
+class NyaaCrawler extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return AuthHelper::class;
+        return NyaaCrawlerHelper::class;
     }
 }

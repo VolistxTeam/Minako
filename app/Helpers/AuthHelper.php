@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Facades\SHA256Hasher;
 use App\Models\AccessToken;
 use Illuminate\Support\Str;
 

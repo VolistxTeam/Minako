@@ -3,7 +3,8 @@
 namespace App\Console\Commands\Ohys;
 
 use App\Classes\Torrent;
-use App\Helpers\NyaaCrawler;
+use App\Facades\NyaaCrawler;
+use App\Helpers\NyaaCrawlerHelper;
 use App\Models\NotifyAnime;
 use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
@@ -47,8 +48,7 @@ class DownloadCommand extends Command
         }
 
         $this->components->info('Downloading All Ohys-Raws Torrents...');
-        $nyaaCrawler = new NyaaCrawler();
-        $allTorrents = $nyaaCrawler->getAllTorrents();
+        $allTorrents = NyaaCrawler::getAllTorrents();
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {

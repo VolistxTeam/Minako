@@ -9,16 +9,10 @@ use App\DataTransferObjects\Episode;
 use App\DataTransferObjects\Mapping;
 use App\DataTransferObjects\Relation;
 use App\DataTransferObjects\Torrent;
+use App\Facades\JikanAPI;
 use App\Facades\OhysBlacklist;
-use App\Helpers\JikanAPI;
-use App\Models\MALAnime;
-use App\Models\NotifyAnime;
-use App\Models\NotifyAnimeCharacter;
-use App\Models\NotifyCharacter;
-use App\Models\NotifyCompany;
 use App\Repositories\AnimeRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -164,7 +158,6 @@ class AnimeController extends Controller
 
     public function SyncEpisodes(Request $request, $uniqueID)
     {
-        $jikan = new JikanAPI();
 
         $anime = $this->animeRepository->getNotifyAnimeByUniqueID($uniqueID);
 
@@ -178,7 +171,7 @@ class AnimeController extends Controller
             return response('No MAL ID found: ' . $uniqueID, 404)->header('Content-Type', 'text/plain');
         }
 
-        $data = $jikan->getAnimeEpisodes($malID);
+        $data = JikanAPI::getAnimeEpisodes($malID);
 
         if ($data != null) {
             foreach ($data as $episode) {
