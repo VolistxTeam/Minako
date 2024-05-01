@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\Auth;
+use App\Facades\DTOUtils;
 use App\Facades\HttpClient;
 use App\Facades\JikanAPI;
 use App\Facades\NyaaCrawler;
@@ -136,6 +137,7 @@ return [
         'Auth' => Auth::class,
         'OhysBlacklist' => OhysBlacklist::class,
         'NyaaCrawler' => NyaaCrawler::class,
-        'JikanAPI' => JikanAPI::class
+        'JikanAPI' => JikanAPI::class,
+        'DTOUtils' => DTOUtils::class,
     ],
 ];
