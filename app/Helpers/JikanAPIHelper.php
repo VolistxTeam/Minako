@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class JikanAPIHelper
 {
-    public function getAnimeEpisodes($malID)
+    public function getAnimeEpisodes($malID): ?array
     {
         $allData = [];
         $page = 1;
