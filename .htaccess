@@ -1,2 +1,12 @@
-RewriteEngine On
-RewriteRule ^(.*)$ http://127.0.0.1:27195/$1 [P,L]
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+
+    # remove the trailing slash
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ $1 [R=301,L]
+
+    # redirect to public
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
