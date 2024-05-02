@@ -17,7 +17,7 @@ class DTOUtilsHelper
         ];
     }
 
-    private function getSanitizedTitlesDTO($entity): array
+    public function getSanitizedTitlesDTO($entity): array
     {
         return [
             'english' => $this->sanitizeString($entity->title),
@@ -26,7 +26,7 @@ class DTOUtilsHelper
         ];
     }
 
-    private function getNamesDTO($entity): array
+    public function getNamesDTO($entity): array
     {
         return [
             'canonical' => $entity->name_canonical,
@@ -104,7 +104,7 @@ class DTOUtilsHelper
             ->toArray();
     }
 
-    private function getMetadataDTO($entity): array
+    public function getMetadataDTO($entity): array
     {
         return [
             'video' => [
@@ -117,7 +117,7 @@ class DTOUtilsHelper
         ];
     }
 
-    private function getDownloadLinksDTO($entity, $key): array
+    public function getDownloadLinksDTO($entity, $key): array
     {
         $appUrl = config('app.url', 'http://localhost');
 
