@@ -2,6 +2,8 @@
 
 namespace App\DataTransferObjects;
 
+use App\Facades\DTOUtils;
+
 class Torrent extends DataTransferObjectBase
 {
     public static function fromModel($torrent): self
@@ -19,55 +21,11 @@ class Torrent extends DataTransferObjectBase
             'title' => $this->entity['title'],
             'episode' => $this->entity['episode'],
             'torrent_name' => $this->entity['torrentName'],
-            'info' => $this->formatInfo(),
-            'metadata' => $this->formatMetadata(),
-            'download' => $this->formatDownloadLinks(),
-            'created_at' => (string) $this->entity['created_at'],
-            'updated_at' => (string) $this->entity['updated_at'],
-        ];
-    }
-
-    private function formatInfo(): array
-    {
-        return [
-            'hash' => $this->entity['info_totalHash'],
-            'size' => $this->entity['info_totalSize'],
-            'created_at' => (string) $this->entity['info_createdDate'],
-            'announces' => $this->getAnnounces(),
-            'files' => $this->entity['info_torrent_files'],
-        ];
-    }
-
-    private function getAnnounces(): array
-    {
-        return collect($this->entity['info_torrent_announces'])
-            ->filter(function ($item) {
-                return count($item) > 0;
-            })
-            ->pluck(0)
-            ->toArray();
-    }
-
-    private function formatMetadata(): array
-    {
-        return [
-            'video' => [
-                'codec' => $this->entity['metadata_video_codec'],
-                'resolution' => $this->entity['metadata_video_resolution'],
-            ],
-            'audio' => [
-                'codec' => $this->entity['metadata_audio_codec'],
-            ],
-        ];
-    }
-
-    private function formatDownloadLinks(): array
-    {
-        $appUrl = config('app.url', 'http://localhost');
-
-        return [
-            'torrent' => "$appUrl/ohys/{$this->entity['uniqueID']}/download?type=torrent",
-            'magnet' => "$appUrl/ohys/{$this->entity['uniqueID']}/download?type=magnet",
+            'info' => DTOUtils::getInfoDTO($this->entity),
+            'metadata' => DTOUtils::getMetadataDTO($this->entity),
+            'download' => DTOUtils::getDownloadLinksDTO($this->entity, 'ohys'),
+            'created_at' => $this->entity['created_at'],
+            'updated_at' => $this->entity['updated_at'],
         ];
     }
 }

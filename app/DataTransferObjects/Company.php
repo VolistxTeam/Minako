@@ -2,6 +2,8 @@
 
 namespace App\DataTransferObjects;
 
+use App\Facades\DTOUtils;
+
 class Company extends DataTransferObjectBase
 {
     public static function fromModel($company): self
@@ -13,21 +15,14 @@ class Company extends DataTransferObjectBase
     {
         return [
             'id' => $this->entity->uniqueID,
-            'names' => $this->formatNames(),
+            'names' => DTOUtils::getNamesDTO($this->entity),
             'description' => $this->entity->description,
             'email' => $this->entity->email,
             'links' => $this->entity->links,
-            'created_at' => (string) $this->entity->created_at,
-            'updated_at' => (string) $this->entity->updated_at,
+            'created_at' => $this->entity->created_at,
+            'updated_at' => $this->entity->updated_at,
         ];
     }
 
-    private function formatNames(): array
-    {
-        return [
-            'english' => $this->entity->name_english,
-            'japanese' => $this->entity->name_japanese,
-            'synonyms' => $this->entity->name_synonyms,
-        ];
-    }
+
 }

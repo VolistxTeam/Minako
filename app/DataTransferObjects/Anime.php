@@ -24,7 +24,7 @@ class Anime extends DataTransferObjectBase
             'start_date' => $this->entity->startDate,
             'end_date' => $this->entity->endDate,
             'source' => $this->entity->source,
-            'poster_image' => DTOUtils::getPosterImageDTO($this->entity),
+            'poster_image' => DTOUtils::getImageDTO($this->entity, 'anime'),
             'rating' => DTOUtils::getRatingDTO($this->entity),
             'first_broadcaster' => $this->entity->firstChannel,
             'episode_info' => DTOUtils::getEpisodeInfoDTO($this->entity),
