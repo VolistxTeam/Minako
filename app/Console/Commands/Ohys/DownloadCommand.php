@@ -4,8 +4,6 @@ namespace App\Console\Commands\Ohys;
 
 use App\Classes\Torrent;
 use App\Facades\NyaaCrawler;
-use App\Helpers\NyaaCrawlerHelper;
-use App\Models\NotifyAnime;
 use App\Models\OhysRelation;
 use App\Models\OhysTorrent;
 use App\Repositories\AnimeRepository;
@@ -52,47 +50,51 @@ class DownloadCommand extends Command
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
-            if (OhysTorrent::query()->where('torrentName', $torrent['title'] . '.torrent')->first()) {
+            if (OhysTorrent::query()->where('torrentName', $torrent['title'].'.torrent')->first()) {
                 break;
             }
 
-            $tempFile = $temporaryDirectory->path(Str::random(15) . '.torrent');
+            $tempFile = $temporaryDirectory->path(Str::random(15).'.torrent');
 
             try {
                 $response = $client->request('GET', $torrent['downloads']['url'], ['headers' => $headers, 'sink' => $tempFile]);
             } catch (GuzzleException $e) {
-                $this->line('Download failed: ' . $e->getMessage() . ' Continue...');
+                $this->line('Download failed: '.$e->getMessage().' Continue...');
+
                 continue;
             }
 
-            if (!file_exists($tempFile) || !is_readable($tempFile)) {
+            if (! file_exists($tempFile) || ! is_readable($tempFile)) {
                 $this->line('Temporary file not found or not readable. Continue...');
+
                 continue;
             }
 
-            $fileNameParsedArray = $this->parseFileName($torrent['title'] . '.torrent');
+            $fileNameParsedArray = $this->parseFileName($torrent['title'].'.torrent');
             if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
                 $this->line('Filename parsing failed. Continue...');
+
                 continue;
             }
 
             $torrentData = $this->extractTorrentData(file_get_contents($tempFile), $torrent['title'], $fileNameParsedArray);
 
             $directoryPath = 'torrents';
-            if (!Storage::disk('local')->exists($directoryPath)) {
+            if (! Storage::disk('local')->exists($directoryPath)) {
                 Storage::disk('local')->makeDirectory($directoryPath);
             }
 
-            $destinationPath = $directoryPath . '/' . $torrent['title'] . '.torrent';
-            if (!Storage::disk('local')->put($destinationPath, file_get_contents($tempFile))) {
+            $destinationPath = $directoryPath.'/'.$torrent['title'].'.torrent';
+            if (! Storage::disk('local')->put($destinationPath, file_get_contents($tempFile))) {
                 $this->error("Failed to write file to '$destinationPath'. Check permissions and disk space.");
+
                 continue;
             }
 
             $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
             $createdInfo->touch();
 
-            $this->info('[Debug] Done: ' . $torrent['title'] . '.torrent');
+            $this->info('[Debug] Done: '.$torrent['title'].'.torrent');
         }
 
         $temporaryDirectory->delete();
@@ -100,44 +102,43 @@ class DownloadCommand extends Command
         return 0;
     }
 
-//    public function handle()
-//    {
-//        set_time_limit(0);
-//
-//        $directoryPath = 'torrents'; // Specify your directory containing torrent files
-//        $files = Storage::disk('local')->files($directoryPath); // Get all files in the directory
-//
-//        $this->components->info('Processing Torrents from local folder...');
-//
-//        foreach ($files as $file) {
-//            $tempFile = storage_path('app/' . $file); // Adjust path according to your storage configuration
-//
-//            if (!file_exists($tempFile) || !is_readable($tempFile)) {
-//                $this->line("Temporary file $tempFile not found or not readable. Continue...");
-//                continue;
-//            }
-//
-//            $fileName = basename($file); // Get the filename from path
-//            $fileNameParsedArray = $this->parseFileName($fileName);
-//
-//            if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
-//                $this->line('Filename parsing failed for ' . $fileName . '. Continue...');
-//                continue;
-//            }
-//
-//            $fileContents = file_get_contents($tempFile);
-//            $torrentData = $this->extractTorrentData($fileContents, $fileNameParsedArray[0], $fileNameParsedArray);
-//
-//            // If uniqueID and other required data are handled in extractTorrentData
-//            $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
-//            $createdInfo->touch();
-//
-//            $this->info('[Debug] Done: ' . $fileName);
-//        }
-//
-//        return 0;
-//    }
-
+    //    public function handle()
+    //    {
+    //        set_time_limit(0);
+    //
+    //        $directoryPath = 'torrents'; // Specify your directory containing torrent files
+    //        $files = Storage::disk('local')->files($directoryPath); // Get all files in the directory
+    //
+    //        $this->components->info('Processing Torrents from local folder...');
+    //
+    //        foreach ($files as $file) {
+    //            $tempFile = storage_path('app/' . $file); // Adjust path according to your storage configuration
+    //
+    //            if (!file_exists($tempFile) || !is_readable($tempFile)) {
+    //                $this->line("Temporary file $tempFile not found or not readable. Continue...");
+    //                continue;
+    //            }
+    //
+    //            $fileName = basename($file); // Get the filename from path
+    //            $fileNameParsedArray = $this->parseFileName($fileName);
+    //
+    //            if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
+    //                $this->line('Filename parsing failed for ' . $fileName . '. Continue...');
+    //                continue;
+    //            }
+    //
+    //            $fileContents = file_get_contents($tempFile);
+    //            $torrentData = $this->extractTorrentData($fileContents, $fileNameParsedArray[0], $fileNameParsedArray);
+    //
+    //            // If uniqueID and other required data are handled in extractTorrentData
+    //            $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
+    //            $createdInfo->touch();
+    //
+    //            $this->info('[Debug] Done: ' . $fileName);
+    //        }
+    //
+    //        return 0;
+    //    }
 
     private function getHeaders()
     {
@@ -155,7 +156,7 @@ class DownloadCommand extends Command
 
     private function getDecodedOhysRepo($response)
     {
-        $responseBody = (string)$response->getBody();
+        $responseBody = (string) $response->getBody();
 
         return json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $responseBody), true);
     }
@@ -189,7 +190,7 @@ class DownloadCommand extends Command
 
         $searchArray = $this->animeRepository->searchNotifyAnimeByTitle($fileNameParsedArray[2], 1);
 
-        if (!empty($searchArray)) {
+        if (! empty($searchArray)) {
             $animeUniqueID = $searchArray[0]->obj['uniqueID'];
             OhysRelation::query()->updateOrCreate([
                 'uniqueID' => $itemID,
@@ -204,7 +205,7 @@ class DownloadCommand extends Command
             'broadcaster' => $fileNameParsedArray[4] ?? null,
             'title' => $fileNameParsedArray[2],
             'episode' => $episode,
-            'torrentName' => $file . '.torrent',
+            'torrentName' => $file.'.torrent',
             'info_totalHash' => $torrent->hash_info(),
             'info_totalSize' => $torrent->size(2),
             'info_createdDate' => date('Y-m-d H:i:s', $torrent->creation_date()),

@@ -2,7 +2,6 @@
 
 namespace App\Facades;
 
-use App\Helpers\HttpClientHelper;
 use App\Helpers\SHA256HasherHelper;
 use Illuminate\Support\Facades\Facade;
 

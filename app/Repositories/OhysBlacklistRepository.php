@@ -24,7 +24,7 @@ class OhysBlacklistRepository
     {
         $title = $this->Find($titleId);
 
-        if (!$title) {
+        if (! $title) {
             return null;
         }
 
@@ -54,7 +54,7 @@ class OhysBlacklistRepository
     {
         $toBeDeletedTitle = $this->Find($titleId);
 
-        if (!$toBeDeletedTitle) {
+        if (! $toBeDeletedTitle) {
             return null;
         }
 
@@ -74,7 +74,7 @@ class OhysBlacklistRepository
             $search = 'id:';
         }
 
-        if (!str_contains($search, ':')) {
+        if (! str_contains($search, ':')) {
             return null;
         }
 
@@ -82,7 +82,7 @@ class OhysBlacklistRepository
         $values = explode(':', $search, 2);
         $columnName = strtolower(trim($values[0]));
 
-        if (!in_array($columnName, $columns)) {
+        if (! in_array($columnName, $columns)) {
             return null;
         }
 

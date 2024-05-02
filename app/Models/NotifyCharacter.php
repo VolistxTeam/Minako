@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Facades\StringOperations;
 use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

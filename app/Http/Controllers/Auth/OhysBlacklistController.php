@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\DataTransferObjects\OhysBlacklist;
 use App\Facades\Auth;
-use App\Helpers\AuthHelper;
 use App\Http\Controllers\Controller;
-use App\Models\OhysBlacklistTitle;
 use App\Repositories\OhysBlacklistRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +25,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -54,7 +52,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -84,7 +82,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
@@ -111,13 +109,13 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 
             $title = $this->blacklistRepository->Find($title_id);
 
-            if (!$title) {
+            if (! $title) {
                 return response()->json('Not found', 404);
             }
 
@@ -132,7 +130,7 @@ class OhysBlacklistController extends Controller
         try {
             $token = Auth::authAccessToken($request->bearerToken());
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json('Unauthorized', 401);
             }
 

@@ -3,7 +3,6 @@
 namespace App\Console\Commands\MAL;
 
 use App\Facades\JikanAPI;
-use App\Helpers\JikanAPIHelper;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
 use Carbon\Carbon;
@@ -96,7 +95,7 @@ class EpisodeCommand extends Command
                 continue;
             }
 
-            $data =  JikanAPI::getAnimeEpisodes($malID);
+            $data = JikanAPI::getAnimeEpisodes($malID);
 
             if ($data != null) {
                 foreach ($data as $episodeItem) {

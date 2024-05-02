@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Facades\HttpClient;
-use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -22,6 +21,7 @@ class NotifyCharacterImageJob implements ShouldQueue
     protected string $notifyID;
 
     protected string $uniqueID;
+
     protected string $imageExtension;
 
     public function __construct(int $id, string $notifyID, string $uniqueID, string $imageExtension)
@@ -46,14 +46,14 @@ class NotifyCharacterImageJob implements ShouldQueue
 
         $imageData = HttpClient::Get($imageUrls['large']);
 
-        if (!$imageData) {
+        if (! $imageData) {
             $imageData = HttpClient::Get($imageUrls['original']);
-            if (!$imageData) {
+            if (! $imageData) {
                 return;
             }
         }
 
         $image = Image::read($imageData)->encode(new JpegEncoder(quality: 100));
-        Storage::disk('local')->put('characters/' . $this->uniqueID . '.jpg', $image);
+        Storage::disk('local')->put('characters/'.$this->uniqueID.'.jpg', $image);
     }
 }

@@ -4,9 +4,6 @@ namespace App\Helpers;
 
 use App\DataTransferObjects\Mapping;
 use App\Facades\DTOUtils;
-use App\Facades\SHA256Hasher;
-use App\Models\AccessToken;
-use Illuminate\Support\Str;
 
 class DTOUtilsHelper
 {
@@ -50,7 +47,6 @@ class DTOUtilsHelper
             'link' => "$appUrl/$key/{$entity->uniqueID}/image",
         ];
     }
-
 
     public function getRatingDTO($entity): array
     {
@@ -133,12 +129,12 @@ class DTOUtilsHelper
 
     private function calculateRating($rating): ?float
     {
-        return !empty($rating) ? round($rating * 10, 2) : null;
+        return ! empty($rating) ? round($rating * 10, 2) : null;
     }
 
     private function sanitizeString($string): ?string
     {
         // Remove UTF-8 non-breaking space and trim normal spaces
-        return !empty($string) ? trim($string, chr(0xC2) . chr(0xA0) . " \t\n\r\0\x0B") : null;
+        return ! empty($string) ? trim($string, chr(0xC2).chr(0xA0)." \t\n\r\0\x0B") : null;
     }
 }

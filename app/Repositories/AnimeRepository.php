@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-
 use App\Facades\OhysBlacklist;
 use App\Facades\StringOperations;
 use App\Models\MALAnime;
@@ -19,37 +18,38 @@ use Illuminate\Support\Carbon;
 class AnimeRepository
 {
     const MIN_STRING_SIMILARITY = 0.89;
+
     const CACHE_DURATION = 3600; // Cache results for 1 hour
 
     public function searchNotifyAnimeByTitle(string $originalTerm, int $maxLength, $type = null): array
     {
         return $this->searchModel($originalTerm, $maxLength, NotifyAnime::class, [
-            'title_canonical', 'title_english', 'title_romaji', 'title_japanese', 'title_hiragana', 'title_synonyms'
+            'title_canonical', 'title_english', 'title_romaji', 'title_japanese', 'title_hiragana', 'title_synonyms',
         ]);
     }
 
     public function searchMALAnimeByName(string $originalTerm, int $maxLength, $type = null): array
     {
         return $this->searchModel($originalTerm, $maxLength, MALAnime::class, [
-            'title', 'title_japanese', 'title_romanji'
+            'title', 'title_japanese', 'title_romanji',
         ]);
     }
 
     public function searchNotifyCharacterByName(string $originalTerm, int $maxLength, $type = null): array
     {
         return $this->searchModel($originalTerm, $maxLength, NotifyCharacter::class, [
-            'name_canonical', 'name_english', 'name_japanese', 'name_japanese', 'name_synonyms'
+            'name_canonical', 'name_english', 'name_japanese', 'name_japanese', 'name_synonyms',
         ]);
     }
 
     public function searchCompanyByName(string $originalTerm, int $maxLength, $type = null): array
     {
         return $this->searchModel($originalTerm, $maxLength, NotifyCompany::class, [
-            'name_english', 'name_japanese', 'name_synonyms'
+            'name_english', 'name_japanese', 'name_synonyms',
         ]);
     }
 
-    public function getNotifyAnimeByUniqueID($uniqueID, bool $latest = false): object|null
+    public function getNotifyAnimeByUniqueID($uniqueID, bool $latest = false): ?object
     {
         $query = NotifyAnime::query();
 
@@ -60,7 +60,7 @@ class AnimeRepository
         return $query->where('uniqueID', $uniqueID)->first();
     }
 
-    public function getNotifyCompanyByNotifyId($notifyID, bool $latest = false): object|null
+    public function getNotifyCompanyByNotifyId($notifyID, bool $latest = false): ?object
     {
         $query = NotifyCompany::query();
 
@@ -71,7 +71,7 @@ class AnimeRepository
         return $query->where('notifyID', $notifyID)->first();
     }
 
-    public function getNotifyCompanyByUniqueId($uniqueID, bool $latest = false): object|null
+    public function getNotifyCompanyByUniqueId($uniqueID, bool $latest = false): ?object
     {
         $query = NotifyCompany::query();
 
@@ -82,12 +82,12 @@ class AnimeRepository
         return $query->where('uniqueID', $uniqueID)->first();
     }
 
-    public function getNotifyAnimeCharactersByUniqueId($uniqueID): object|null
+    public function getNotifyAnimeCharactersByUniqueId($uniqueID): ?object
     {
         return NotifyAnimeCharacter::query()->where('uniqueID', $uniqueID)->first();
     }
 
-    public function getNotifyCharacterByNotifyId($characterId, bool $latest = false): object|null
+    public function getNotifyCharacterByNotifyId($characterId, bool $latest = false): ?object
     {
         $query = NotifyCharacter::query();
 
@@ -98,7 +98,7 @@ class AnimeRepository
         return $query->where('notifyID', $characterId)->first();
     }
 
-    public function getNotifyCharacterByUniqueId($characterId, bool $latest = false): object|null
+    public function getNotifyCharacterByUniqueId($characterId, bool $latest = false): ?object
     {
         $query = NotifyCharacter::query();
 
@@ -109,7 +109,7 @@ class AnimeRepository
         return $query->where('uniqueID', $characterId)->first();
     }
 
-    public function getNotifyAnimeEpisode($uniqueID, int $episodeNumber): object|null
+    public function getNotifyAnimeEpisode($uniqueID, int $episodeNumber): ?object
     {
         return MALAnime::query()->where('mal_anime.episode_id', $episodeNumber)
             ->join('notify_anime', 'notify_anime.uniqueID', '=', 'mal_anime.uniqueID')
@@ -138,7 +138,7 @@ class AnimeRepository
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
-                return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
+                return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
             });
     }
 
@@ -149,7 +149,7 @@ class AnimeRepository
 
     public function getOhysTorrentByUniqueID($uniqueID)
     {
-        return  OhysTorrent::query()->where('uniqueID', $uniqueID)->first();
+        return OhysTorrent::query()->where('uniqueID', $uniqueID)->first();
     }
 
     public function createOrUpdateMALEpisode($anime, $episode): Model|Builder
@@ -159,12 +159,12 @@ class AnimeRepository
             'notifyID' => $anime['notifyID'],
             'episode_id' => $episode['mal_id'],
         ], [
-            'title' => !empty($episode['title']) ? $episode['title'] : null,
-            'title_japanese' => !empty($episode['title_japanese']) ? $episode['title_japanese'] : null,
-            'title_romanji' => !empty($episode['title_romanji']) ? $episode['title_romanji'] : null,
-            'aired' => !empty($episode['aired']) ? Carbon::parse($episode['aired']) : null,
-            'filler' => (int)$episode['filler'],
-            'recap' => (int)$episode['recap'],
+            'title' => ! empty($episode['title']) ? $episode['title'] : null,
+            'title_japanese' => ! empty($episode['title_japanese']) ? $episode['title_japanese'] : null,
+            'title_romanji' => ! empty($episode['title_romanji']) ? $episode['title_romanji'] : null,
+            'aired' => ! empty($episode['aired']) ? Carbon::parse($episode['aired']) : null,
+            'filler' => (int) $episode['filler'],
+            'recap' => (int) $episode['recap'],
         ]);
 
         $episode->touch();
@@ -176,15 +176,15 @@ class AnimeRepository
     {
         $term = StringOperations::normalizeTerm($originalTerm);
 
-//        $cacheKey = "search_{$model}_{$term}_{$maxLength}_$type";
-//        // Return cached results if available
-//        if (Cache::has($cacheKey)) {
-//            return Cache::get($cacheKey);
-//        }
+        //        $cacheKey = "search_{$model}_{$term}_{$maxLength}_$type";
+        //        // Return cached results if available
+        //        if (Cache::has($cacheKey)) {
+        //            return Cache::get($cacheKey);
+        //        }
 
         $results = [];
         $query = $model::query();
-        $matchAgainst = 'MATCH(' . implode(', ', $searchFields) . ') AGAINST(? IN NATURAL LANGUAGE MODE)';
+        $matchAgainst = 'MATCH('.implode(', ', $searchFields).') AGAINST(? IN NATURAL LANGUAGE MODE)';
         $query->whereRaw($matchAgainst, [$term]);
 
         foreach ($query->limit(1000)->cursor() as $item) {
@@ -207,7 +207,7 @@ class AnimeRepository
             }
 
             if ($bestSimilarity >= self::MIN_STRING_SIMILARITY) {
-                $results[] = (object)[
+                $results[] = (object) [
                     'obj' => $item,
                     'similarity' => $bestSimilarity,
                     'exactMatch' => $exactMatch,
@@ -227,6 +227,7 @@ class AnimeRepository
         if ($a->exactMatch !== $b->exactMatch) {
             return $b->exactMatch - $a->exactMatch;
         }
+
         return $b->similarity <=> $a->similarity;
     }
 }

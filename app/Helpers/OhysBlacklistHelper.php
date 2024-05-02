@@ -2,13 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\OhysBlacklistTitle;
-use App\Repositories\AnimeRepository;
 use App\Repositories\OhysBlacklistRepository;
 
 class OhysBlacklistHelper
 {
     private array $titles = [];
+
     private OhysBlacklistRepository $blacklistRepository;
 
     public function __construct()

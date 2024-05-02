@@ -13,7 +13,7 @@ class SHA256HasherHelper
     {
         $salt = $options['salt'] ?? '';
 
-        return hash('sha256', $value . $salt);
+        return hash('sha256', $value.$salt);
     }
 
     public function check(string $value, $hashedValue, array $options = []): bool
@@ -24,6 +24,6 @@ class SHA256HasherHelper
             return false;
         }
 
-        return $hashedValue === hash('sha256', $value . $salt);
+        return $hashedValue === hash('sha256', $value.$salt);
     }
 }

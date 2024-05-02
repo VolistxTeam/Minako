@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Helpers\AuthHelper;
 use App\Helpers\DTOUtilsHelper;
 use Illuminate\Support\ServiceProvider;
 

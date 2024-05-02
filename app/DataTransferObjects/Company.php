@@ -23,6 +23,4 @@ class Company extends DataTransferObjectBase
             'updated_at' => $this->entity->updated_at,
         ];
     }
-
-
 }

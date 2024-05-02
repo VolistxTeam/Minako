@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Helpers\OhysBlacklistHelper;
 use App\Helpers\SHA256HasherHelper;
 use Illuminate\Support\ServiceProvider;
 

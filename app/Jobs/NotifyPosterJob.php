@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Facades\HttpClient;
-use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -41,20 +40,20 @@ class NotifyPosterJob implements ShouldQueue
     public function handle()
     {
         $imageUrls = [
-            'original' => 'https://media.notify.moe/images/anime/original/' . $this->notifyID . $this->imageExtension,
-            'large' => 'https://media.notify.moe/images/anime/large/' . $this->notifyID . $this->imageExtension,
+            'original' => 'https://media.notify.moe/images/anime/original/'.$this->notifyID.$this->imageExtension,
+            'large' => 'https://media.notify.moe/images/anime/large/'.$this->notifyID.$this->imageExtension,
         ];
 
         $imageData = HttpClient::Get($imageUrls['large']);
 
-        if (!$imageData) {
+        if (! $imageData) {
             $imageData = HttpClient::Get($imageUrls['original']);
-            if (!$imageData) {
+            if (! $imageData) {
                 return;
             }
         }
 
         $image = Image::read($imageData)->encode(new JpegEncoder(quality: 100));
-        Storage::disk('local')->put('posters/' . $this->uniqueID . '.jpg', $image);
+        Storage::disk('local')->put('posters/'.$this->uniqueID.'.jpg', $image);
     }
 }

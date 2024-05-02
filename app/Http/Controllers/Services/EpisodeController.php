@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\DataTransferObjects\Episode;
-use App\Models\MALAnime;
 use App\Repositories\AnimeRepository;
 use Illuminate\Http\JsonResponse;
 

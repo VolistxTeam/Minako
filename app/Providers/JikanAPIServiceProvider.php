@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Helpers\JikanAPIHelper;
-use App\Helpers\NyaaCrawlerHelper;
 use Illuminate\Support\ServiceProvider;
 
 class JikanAPIServiceProvider extends ServiceProvider

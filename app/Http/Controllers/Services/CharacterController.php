@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\DataTransferObjects\Character;
-use App\Models\NotifyCharacter;
 use App\Repositories\AnimeRepository;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -36,15 +35,15 @@ class CharacterController extends Controller
     {
         $character = $this->animeRepository->getNotifyCharacterByUniqueId($id);
 
-        if (!$character) {
-            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        if (! $character) {
+            return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $id = $character->uniqueID;
-        $imagePath = 'characters/' . $id . '.jpg';
+        $imagePath = 'characters/'.$id.'.jpg';
 
-        if (!Storage::disk('local')->exists($imagePath)) {
-            return response('Key not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        if (! Storage::disk('local')->exists($imagePath)) {
+            return response('Key not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $contents = Storage::disk('local')->get($imagePath);
@@ -56,8 +55,8 @@ class CharacterController extends Controller
     {
         $character = $this->animeRepository->getNotifyCharacterByUniqueId($id);
 
-        if (!$character) {
-            return response('Character not found: ' . $id, 404)->header('Content-Type', 'text/plain');
+        if (! $character) {
+            return response('Character not found: '.$id, 404)->header('Content-Type', 'text/plain');
         }
 
         $response = Character::fromModel($character)->GetDTO();

@@ -15,7 +15,7 @@ class NyaaCrawlerHelper
         $maxPages = 15; // Set a limit to prevent endless requests
         $previousTorrents = null; // To store data from the previous page
 
-        while (!$isEmpty && $page < $maxPages) {
+        while (! $isEmpty && $page < $maxPages) {
             sleep(1);
             $torrents = $this->getTorrents($page);
 
@@ -32,23 +32,24 @@ class NyaaCrawlerHelper
                 $page++;
             }
         }
+
         return $allTorrents;
     }
 
     private function getTorrents($page = 1): array
     {
-        $response = HttpClient::Get('/?f=0&c=0_0&q=' . urlencode('[Ohys-Raws]') . '&p=' . $page);
+        $response = HttpClient::Get('/?f=0&c=0_0&q='.urlencode('[Ohys-Raws]').'&p='.$page);
 
         $crawler = new Crawler($response);
 
         return $crawler->filter('div.table-responsive table tbody tr.default')->each(function (Crawler $node) {
             return [
                 'title' => $node->filter('td[colspan="2"] a')->last()->text(),
-                'link' => 'https://nyaa.si' . $node->filter('td.text-center a[href^="/download/"]')->attr('href'),
+                'link' => 'https://nyaa.si'.$node->filter('td.text-center a[href^="/download/"]')->attr('href'),
                 'size' => $node->filter('td.text-center')->eq(1)->text(),
                 'date' => $node->filter('td.text-center')->eq(2)->text(),
                 'downloads' => [
-                    'url' => 'https://nyaa.si' . $node->filter('td.text-center a[href^="/download/"]')->attr('href'),
+                    'url' => 'https://nyaa.si'.$node->filter('td.text-center a[href^="/download/"]')->attr('href'),
                     'magnet' => $node->filter('td.text-center a[href^="magnet:"]')->attr('href'),
                 ],
             ];
