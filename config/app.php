@@ -22,4 +22,3 @@ return [
         'StringOperations' => StringOperations::class,
     ])->toArray(),
 
-];
