@@ -43,22 +43,22 @@ class EpisodeCommand extends Command
 
         $skipCount = 0;
 
-        if (! empty($this->option('skip'))) {
-            $skipCount = (int) $this->option('skip');
+        if (!empty($this->option('skip'))) {
+            $skipCount = (int)$this->option('skip');
         }
 
         foreach ($allAnime as $item) {
 
             if ($remainingCount < $skipCount) {
                 $remainingCount++;
-                $this->info('[-] Skipping Item ['.$remainingCount.'/'.$totalCount.']');
+                $this->info('[-] Skipping Item [' . $remainingCount . '/' . $totalCount . ']');
 
                 continue;
             }
 
             $allowCrawl = false;
 
-            if (! empty($dbItem)) {
+            if (!empty($dbItem)) {
                 if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($item['updated_at']))) {
                     $allowCrawl = true;
                 }
@@ -66,15 +66,15 @@ class EpisodeCommand extends Command
                 $allowCrawl = true;
             }
 
-            if (! $allowCrawl) {
-                $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. ['.$remainingCount.'/'.$totalCount.']');
+            if (!$allowCrawl) {
+                $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. [' . $remainingCount . '/' . $totalCount . ']');
                 $remainingCount++;
 
                 continue;
             }
 
-            if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && ! is_array($item['mappings'])) {
-                $this->error('[-] Skipping item. Reason: Not supported type. ['.$remainingCount.'/'.$totalCount.']');
+            if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
+                $this->error('[-] Skipping item. Reason: Not supported type. [' . $remainingCount . '/' . $totalCount . ']');
                 $remainingCount++;
 
                 continue;
@@ -89,7 +89,7 @@ class EpisodeCommand extends Command
             }
 
             if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
-                $this->error('[-] Skipping item. Reason: No MAL ID found. ['.$remainingCount.'/'.$totalCount.']');
+                $this->error('[-] Skipping item. Reason: No MAL ID found. [' . $remainingCount . '/' . $totalCount . ']');
                 $remainingCount++;
 
                 continue;
@@ -104,20 +104,20 @@ class EpisodeCommand extends Command
                         'notifyID' => $item['notifyID'],
                         'episode_id' => $episodeItem['mal_id'],
                     ], [
-                        'title' => ! empty($episodeItem['title']) ? $episodeItem['title'] : null,
-                        'title_japanese' => ! empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
-                        'title_romanji' => ! empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
-                        'aired' => ! empty($episodeItem['aired']) ? \Illuminate\Support\Carbon::parse($episodeItem['aired']) : null,
-                        'filler' => (int) $episodeItem['filler'],
-                        'recap' => (int) $episodeItem['recap'],
+                        'title' => !empty($episodeItem['title']) ? $episodeItem['title'] : null,
+                        'title_japanese' => !empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
+                        'title_romanji' => !empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
+                        'aired' => !empty($episodeItem['aired']) ? \Illuminate\Support\Carbon::parse($episodeItem['aired']) : null,
+                        'filler' => (int)$episodeItem['filler'],
+                        'recap' => (int)$episodeItem['recap'],
                     ]);
 
                     $malItem->touch();
                 }
 
-                $this->info('[-] Item Processed ['.$remainingCount.'/'.$totalCount.']');
+                $this->info('[-] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
             } else {
-                $this->error('[-] Item Not Processed ['.$remainingCount.'/'.$totalCount.']');
+                $this->error('[-] Item Not Processed [' . $remainingCount . '/' . $totalCount . ']');
             }
 
             $remainingCount++;

@@ -28,6 +28,56 @@ class AnimeRepository
         ]);
     }
 
+    private function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
+    {
+        $term = StringOperations::normalizeTerm($originalTerm);
+
+        //        $cacheKey = "search_{$model}_{$term}_{$maxLength}_$type";
+        //        // Return cached results if available
+        //        if (Cache::has($cacheKey)) {
+        //            return Cache::get($cacheKey);
+        //        }
+
+        $results = [];
+        $query = $model::query();
+        $matchAgainst = 'MATCH(' . implode(', ', $searchFields) . ') AGAINST(? IN NATURAL LANGUAGE MODE)';
+        $query->whereRaw($matchAgainst, [$term]);
+
+        foreach ($query->limit(1000)->cursor() as $item) {
+            $titles = StringOperations::getNormalizedTitles($item, $searchFields);
+
+            $bestSimilarity = -1;
+            $exactMatch = false;
+
+            foreach ($titles as $normalizedTitle => $title) {
+                if ($term === $normalizedTitle) {
+                    $exactMatch = true;
+                    $bestSimilarity = 1;
+                    break;
+                }
+                $similarity = StringOperations::advancedStringSimilarity($term, $normalizedTitle);
+
+                if ($similarity > $bestSimilarity && $similarity >= self::MIN_STRING_SIMILARITY) {
+                    $bestSimilarity = $similarity;
+                }
+            }
+
+            if ($bestSimilarity >= self::MIN_STRING_SIMILARITY) {
+                $results[] = (object)[
+                    'obj' => $item,
+                    'similarity' => $bestSimilarity,
+                    'exactMatch' => $exactMatch,
+                ];
+            }
+        }
+
+        usort($results, [$this, 'compareResults']);
+        $results = array_slice($results, 0, $maxLength);
+        //      Cache::put($cacheKey, $results, self::CACHE_DURATION);
+
+        return $results;
+    }
+
     public function searchMALAnimeByName(string $originalTerm, int $maxLength, $type = null): array
     {
         return $this->searchModel($originalTerm, $maxLength, MALAnime::class, [
@@ -138,7 +188,7 @@ class AnimeRepository
             ->limit(100)
             ->get()
             ->filter(function ($torrent) {
-                return ! OhysBlacklist::isBlacklistedTitle($torrent['title']);
+                return !OhysBlacklist::isBlacklistedTitle($torrent['title']);
             });
     }
 
@@ -159,67 +209,17 @@ class AnimeRepository
             'notifyID' => $anime['notifyID'],
             'episode_id' => $episode['mal_id'],
         ], [
-            'title' => ! empty($episode['title']) ? $episode['title'] : null,
-            'title_japanese' => ! empty($episode['title_japanese']) ? $episode['title_japanese'] : null,
-            'title_romanji' => ! empty($episode['title_romanji']) ? $episode['title_romanji'] : null,
-            'aired' => ! empty($episode['aired']) ? Carbon::parse($episode['aired']) : null,
-            'filler' => (int) $episode['filler'],
-            'recap' => (int) $episode['recap'],
+            'title' => !empty($episode['title']) ? $episode['title'] : null,
+            'title_japanese' => !empty($episode['title_japanese']) ? $episode['title_japanese'] : null,
+            'title_romanji' => !empty($episode['title_romanji']) ? $episode['title_romanji'] : null,
+            'aired' => !empty($episode['aired']) ? Carbon::parse($episode['aired']) : null,
+            'filler' => (int)$episode['filler'],
+            'recap' => (int)$episode['recap'],
         ]);
 
         $episode->touch();
 
         return $episode;
-    }
-
-    private function searchModel(string $originalTerm, int $maxLength, $model, array $searchFields, $type = null): array
-    {
-        $term = StringOperations::normalizeTerm($originalTerm);
-
-        //        $cacheKey = "search_{$model}_{$term}_{$maxLength}_$type";
-        //        // Return cached results if available
-        //        if (Cache::has($cacheKey)) {
-        //            return Cache::get($cacheKey);
-        //        }
-
-        $results = [];
-        $query = $model::query();
-        $matchAgainst = 'MATCH('.implode(', ', $searchFields).') AGAINST(? IN NATURAL LANGUAGE MODE)';
-        $query->whereRaw($matchAgainst, [$term]);
-
-        foreach ($query->limit(1000)->cursor() as $item) {
-            $titles = StringOperations::getNormalizedTitles($item, $searchFields);
-
-            $bestSimilarity = -1;
-            $exactMatch = false;
-
-            foreach ($titles as $normalizedTitle => $title) {
-                if ($term === $normalizedTitle) {
-                    $exactMatch = true;
-                    $bestSimilarity = 1;
-                    break;
-                }
-                $similarity = StringOperations::advancedStringSimilarity($term, $normalizedTitle);
-
-                if ($similarity > $bestSimilarity && $similarity >= self::MIN_STRING_SIMILARITY) {
-                    $bestSimilarity = $similarity;
-                }
-            }
-
-            if ($bestSimilarity >= self::MIN_STRING_SIMILARITY) {
-                $results[] = (object) [
-                    'obj' => $item,
-                    'similarity' => $bestSimilarity,
-                    'exactMatch' => $exactMatch,
-                ];
-            }
-        }
-
-        usort($results, [$this, 'compareResults']);
-        $results = array_slice($results, 0, $maxLength);
-        //      Cache::put($cacheKey, $results, self::CACHE_DURATION);
-
-        return $results;
     }
 
     private function compareResults($a, $b)

@@ -26,6 +26,12 @@ class DTOUtilsHelper
         ];
     }
 
+    private function sanitizeString($string): ?string
+    {
+        // Remove UTF-8 non-breaking space and trim normal spaces
+        return !empty($string) ? trim($string, chr(0xC2) . chr(0xA0) . " \t\n\r\0\x0B") : null;
+    }
+
     public function getNamesDTO($entity): array
     {
         return [
@@ -56,6 +62,11 @@ class DTOUtilsHelper
             'visuals' => $this->calculateRating($entity->rating_visuals),
             'soundtrack' => $this->calculateRating($entity->rating_soundtrack),
         ];
+    }
+
+    private function calculateRating($rating): ?float
+    {
+        return !empty($rating) ? round($rating * 10, 2) : null;
     }
 
     public function getEpisodeInfoDTO($entity): array
@@ -125,16 +136,5 @@ class DTOUtilsHelper
             'torrent' => "$appUrl/$key/$entity->uniqueID/download?type=torrent",
             'magnet' => "$appUrl/$key/$entity->uniqueID/download?type=magnet",
         ];
-    }
-
-    private function calculateRating($rating): ?float
-    {
-        return ! empty($rating) ? round($rating * 10, 2) : null;
-    }
-
-    private function sanitizeString($string): ?string
-    {
-        // Remove UTF-8 non-breaking space and trim normal spaces
-        return ! empty($string) ? trim($string, chr(0xC2).chr(0xA0)." \t\n\r\0\x0B") : null;
     }
 }

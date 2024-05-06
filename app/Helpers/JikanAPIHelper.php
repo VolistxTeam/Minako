@@ -16,10 +16,10 @@ class JikanAPIHelper
 
         do {
             try {
-                $response = HttpClient::Get("anime/{$malID}/episodes?page={$page}");
+                $response = HttpClient::Get("https://api.jikan.moe/v4/anime/{$malID}/episodes?page={$page}");
                 $data = json_decode($response, true);
 
-                if (! empty($data['data'])) {
+                if (!empty($data['data'])) {
                     $allData = array_merge($allData, $data['data']);
                     $hasNextPage = $data['pagination']['has_next_page'] ?? false;
                     $page++;

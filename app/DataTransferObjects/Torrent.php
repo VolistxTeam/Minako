@@ -24,8 +24,8 @@ class Torrent extends DataTransferObjectBase
             'info' => DTOUtils::getInfoDTO($this->entity),
             'metadata' => DTOUtils::getMetadataDTO($this->entity),
             'download' => DTOUtils::getDownloadLinksDTO($this->entity, 'ohys'),
-            'created_at' => (string) $this->entity['created_at'],
-            'updated_at' => (string) $this->entity['updated_at'],
+            'created_at' => (string)$this->entity['created_at'],
+            'updated_at' => (string)$this->entity['updated_at'],
         ];
     }
 }

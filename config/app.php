@@ -17,5 +17,5 @@ return [
         'NyaaCrawler' => NyaaCrawler::class,
         'JikanAPI' => JikanAPI::class,
         'DTOUtils' => DTOUtils::class,
-    ]
+    ],
 ];

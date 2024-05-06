@@ -30,8 +30,8 @@ class Anime extends DataTransferObjectBase
             'episode_info' => DTOUtils::getEpisodeInfoDTO($this->entity),
             'mappings' => DTOUtils::getMappingDTO($this->entity),
             'trailers' => DTOUtils::getTrailersDTO($this->entity),
-            'created_at' => (string) $this->entity->created_at,
-            'updated_at' => (string) $this->entity->updated_at,
+            'created_at' => (string)$this->entity->created_at,
+            'updated_at' => (string)$this->entity->updated_at,
         ];
     }
 }

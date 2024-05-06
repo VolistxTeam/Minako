@@ -18,6 +18,13 @@ class AppServiceProvider extends ServiceProvider
         $this->registerAuth();
     }
 
+    public function registerAuth(): void
+    {
+        $this->app->scoped(AuthHelper::class, function ($app) {
+            return new AuthHelper();
+        });
+    }
+
     /**
      * Bootstrap any application services.
      */
@@ -35,13 +42,6 @@ class AppServiceProvider extends ServiceProvider
             } else {
                 return Limit::none();
             }
-        });
-    }
-
-    public function registerAuth(): void
-    {
-        $this->app->scoped(AuthHelper::class, function ($app) {
-            return new AuthHelper();
         });
     }
 }

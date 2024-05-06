@@ -11,5 +11,5 @@ return [
         'NyaaCrawler' => App\Facades\NyaaCrawler::class,
         'JikanAPI' => App\Facades\JikanAPI::class,
         'DTOUtils' => App\Facades\DTOUtils::class,
-    ])
+    ]),
 ];

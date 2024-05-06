@@ -8,7 +8,6 @@ use Carbon\Carbon;
 use Faker\Factory;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
-
 use function Laravel\Prompts\progress;
 
 class RelationCommand extends Command
@@ -28,7 +27,7 @@ class RelationCommand extends Command
         $headers = $this->getHeaders();
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
         $this->tempFilePath = $this->downloadData($client, $headers);
-        if (! $this->tempFilePath) {
+        if (!$this->tempFilePath) {
             $this->components->error('Failed to download data.');
 
             return;
@@ -39,6 +38,20 @@ class RelationCommand extends Command
         $this->parseAndProcessData($this->tempFilePath, $dbItems);
 
         unlink($this->tempFilePath);
+    }
+
+    private function getHeaders(): array
+    {
+        $faker = Factory::create();
+
+        return [
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Language' => 'en-US,en;q=0.9',
+            'Cache-Control' => 'max-age=0',
+            'Connection' => 'keep-alive',
+            'Keep-Alive' => '300',
+            'User-Agent' => $faker->chrome(),
+        ];
     }
 
     private function downloadData(Client $client, array $headers): ?string
@@ -67,7 +80,7 @@ class RelationCommand extends Command
     private function parseAndProcessData(string $filePath, array $dbItems)
     {
         $handle = fopen($filePath, 'r');
-        if (! $handle) {
+        if (!$handle) {
             return;
         }
 
@@ -81,7 +94,7 @@ class RelationCommand extends Command
         $progress->start();
 
         $processedBytes = 0;
-        while (! feof($handle)) {
+        while (!feof($handle)) {
             $linePosition = ftell($handle);
             $line = fgets($handle);
             $trimmedLine = trim($line);
@@ -96,7 +109,7 @@ class RelationCommand extends Command
 
                 // Check if the current ID is in the notifyAnime array, proceed if yes, skip if no
                 if (in_array($currentId, $notifyAnime)) {
-                    if (! in_array($currentId, $dbItems)) {
+                    if (!in_array($currentId, $dbItems)) {
                         $this->processData($animeData);
                     }
                 }
@@ -119,7 +132,7 @@ class RelationCommand extends Command
             $notifyRelation->touch();
             $notifyRelation->save();
         } else {
-            if (! empty($notifyAnime->uniqueID)) {
+            if (!empty($notifyAnime->uniqueID)) {
                 $newNotifyRelation = new NotifyRelation([
                     'uniqueID' => $notifyAnime->uniqueID,
                     'notifyID' => $animeData['animeId'],
@@ -129,20 +142,6 @@ class RelationCommand extends Command
                 $newNotifyRelation->save();
             }
         }
-    }
-
-    private function getHeaders(): array
-    {
-        $faker = Factory::create();
-
-        return [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome(),
-        ];
     }
 
     private function assignRelationData($notifyRelation, array $downloadedData): void

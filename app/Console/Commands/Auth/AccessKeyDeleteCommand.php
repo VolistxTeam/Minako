@@ -3,7 +3,6 @@
 namespace App\Console\Commands\Auth;
 
 use Illuminate\Console\Command;
-
 use function Laravel\Prompts\text;
 
 class AccessKeyDeleteCommand extends Command
@@ -41,7 +40,7 @@ class AccessKeyDeleteCommand extends Command
 
         $accessToken = Keys::authAccessToken($token);
 
-        if (! $accessToken) {
+        if (!$accessToken) {
             $this->components->error('The specified access key is invalid.');
 
             return;
@@ -49,12 +48,12 @@ class AccessKeyDeleteCommand extends Command
 
         $toBeDeletedToken = AccessToken::query()->Find($accessToken->id);
 
-        if (! $toBeDeletedToken) {
+        if (!$toBeDeletedToken) {
             return null;
         }
 
         $toBeDeletedToken->delete();
 
-        $this->components->info('Your access key is deleted: '.$token);
+        $this->components->info('Your access key is deleted: ' . $token);
     }
 }

@@ -28,8 +28,8 @@ class OhysBlacklist extends DataTransferObjectBase
             'name' => $this->name,
             'reason' => $this->reason,
             'is_active' => $this->is_active,
-            'created_at' => (string) $this->created_at,
-            'updated_at' => (string) $this->updated_at,
+            'created_at' => (string)$this->created_at,
+            'updated_at' => (string)$this->updated_at,
         ];
     }
 }

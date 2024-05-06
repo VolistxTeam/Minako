@@ -17,9 +17,9 @@ class Episode extends DataTransferObjectBase
             'id' => $this->entity['id'],
             'episode_number' => $this->entity['episode_id'],
             'titles' => DTOUtils::getSanitizedTitlesDTO($this->entity),
-            'aired' => (string) $this->entity['aired'],
-            'created_at' => (string) $this->entity['created_at'],
-            'updated_at' => (string) $this->entity['updated_at'],
+            'aired' => (string)$this->entity['aired'],
+            'created_at' => (string)$this->entity['created_at'],
+            'updated_at' => (string)$this->entity['updated_at'],
         ];
     }
 }

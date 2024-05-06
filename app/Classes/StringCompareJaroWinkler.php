@@ -26,7 +26,7 @@ class StringCompareJaroWinkler
     {
         $str1_len = mb_strlen($string1);
         $str2_len = mb_strlen($string2);
-        $distance = (int) floor(min($str1_len, $str2_len) / 2.0);
+        $distance = (int)floor(min($str1_len, $str2_len) / 2.0);
 
         $commons1 = $this->getCommonCharacters($string1, $string2, $distance);
         $commons2 = $this->getCommonCharacters($string2, $string1, $distance);
@@ -56,7 +56,7 @@ class StringCompareJaroWinkler
             $end = min($i + $allowedDistance + 1, $str2_len);
 
             for ($j = $start; $j < $end; $j++) {
-                if (! $matchedPositions[$j] && $string2[$j] === $char1) {
+                if (!$matchedPositions[$j] && $string2[$j] === $char1) {
                     $commonCharacters .= $char1;
                     $matchedPositions[$j] = true;
                     break;
@@ -78,7 +78,7 @@ class StringCompareJaroWinkler
             }
         }
 
-        return (int) ($transpositions / 2.0);
+        return (int)($transpositions / 2.0);
     }
 
     private function getCommonPrefixLength(string $string1, string $string2, int $minPrefixLength = 4): int

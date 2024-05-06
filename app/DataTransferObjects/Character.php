@@ -20,8 +20,8 @@ class Character extends DataTransferObjectBase
             'image' => DTOUtils::getImageDTO($this->entity, 'character'),
             'attributes' => $this->entity->attributes,
             'mappings' => DTOUtils::getMappingDTO($this->entity),
-            'created_at' => (string) $this->entity->created_at,
-            'updated_at' => (string) $this->entity->updated_at,
+            'created_at' => (string)$this->entity->created_at,
+            'updated_at' => (string)$this->entity->updated_at,
         ];
     }
 }

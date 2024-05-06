@@ -50,27 +50,27 @@ class DownloadCommand extends Command
 
         $this->components->info('Processing Torrents...');
         foreach ($allTorrents as $torrent) {
-            if (OhysTorrent::query()->where('torrentName', $torrent['title'].'.torrent')->first()) {
+            if (OhysTorrent::query()->where('torrentName', $torrent['title'] . '.torrent')->first()) {
                 break;
             }
 
-            $tempFile = $temporaryDirectory->path(Str::random(15).'.torrent');
+            $tempFile = $temporaryDirectory->path(Str::random(15) . '.torrent');
 
             try {
                 $response = $client->request('GET', $torrent['downloads']['url'], ['headers' => $headers, 'sink' => $tempFile]);
             } catch (GuzzleException $e) {
-                $this->line('Download failed: '.$e->getMessage().' Continue...');
+                $this->line('Download failed: ' . $e->getMessage() . ' Continue...');
 
                 continue;
             }
 
-            if (! file_exists($tempFile) || ! is_readable($tempFile)) {
+            if (!file_exists($tempFile) || !is_readable($tempFile)) {
                 $this->line('Temporary file not found or not readable. Continue...');
 
                 continue;
             }
 
-            $fileNameParsedArray = $this->parseFileName($torrent['title'].'.torrent');
+            $fileNameParsedArray = $this->parseFileName($torrent['title'] . '.torrent');
             if (count($fileNameParsedArray) === 0 || empty($fileNameParsedArray[2])) {
                 $this->line('Filename parsing failed. Continue...');
 
@@ -80,12 +80,12 @@ class DownloadCommand extends Command
             $torrentData = $this->extractTorrentData(file_get_contents($tempFile), $torrent['title'], $fileNameParsedArray);
 
             $directoryPath = 'torrents';
-            if (! Storage::disk('local')->exists($directoryPath)) {
+            if (!Storage::disk('local')->exists($directoryPath)) {
                 Storage::disk('local')->makeDirectory($directoryPath);
             }
 
-            $destinationPath = $directoryPath.'/'.$torrent['title'].'.torrent';
-            if (! Storage::disk('local')->put($destinationPath, file_get_contents($tempFile))) {
+            $destinationPath = $directoryPath . '/' . $torrent['title'] . '.torrent';
+            if (!Storage::disk('local')->put($destinationPath, file_get_contents($tempFile))) {
                 $this->error("Failed to write file to '$destinationPath'. Check permissions and disk space.");
 
                 continue;
@@ -94,7 +94,7 @@ class DownloadCommand extends Command
             $createdInfo = OhysTorrent::query()->updateOrCreate(['uniqueID' => $torrentData['uniqueID']], $torrentData);
             $createdInfo->touch();
 
-            $this->info('[Debug] Done: '.$torrent['title'].'.torrent');
+            $this->info('[Debug] Done: ' . $torrent['title'] . '.torrent');
         }
 
         $temporaryDirectory->delete();
@@ -154,13 +154,6 @@ class DownloadCommand extends Command
         ];
     }
 
-    private function getDecodedOhysRepo($response)
-    {
-        $responseBody = (string) $response->getBody();
-
-        return json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $responseBody), true);
-    }
-
     private function parseFileName($file)
     {
         $fileBaseName = str_replace(['AACx2'], ['AAC'], $file);
@@ -190,7 +183,7 @@ class DownloadCommand extends Command
 
         $searchArray = $this->animeRepository->searchNotifyAnimeByTitle($fileNameParsedArray[2], 1);
 
-        if (! empty($searchArray)) {
+        if (!empty($searchArray)) {
             $animeUniqueID = $searchArray[0]->obj['uniqueID'];
             OhysRelation::query()->updateOrCreate([
                 'uniqueID' => $itemID,
@@ -205,7 +198,7 @@ class DownloadCommand extends Command
             'broadcaster' => $fileNameParsedArray[4] ?? null,
             'title' => $fileNameParsedArray[2],
             'episode' => $episode,
-            'torrentName' => $file.'.torrent',
+            'torrentName' => $file . '.torrent',
             'info_totalHash' => $torrent->hash_info(),
             'info_totalSize' => $torrent->size(2),
             'info_createdDate' => date('Y-m-d H:i:s', $torrent->creation_date()),
@@ -216,5 +209,12 @@ class DownloadCommand extends Command
             'metadata_audio_codec' => $metadataCodecParsed[1] ?? null,
             'hidden_download_magnet' => $torrent->magnet(false),
         ];
+    }
+
+    private function getDecodedOhysRepo($response)
+    {
+        $responseBody = (string)$response->getBody();
+
+        return json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $responseBody), true);
     }
 }

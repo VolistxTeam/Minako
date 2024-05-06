@@ -8,7 +8,6 @@ use Faker\Factory;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
-
 use function Laravel\Prompts\progress;
 
 class CharacterCommand extends Command
@@ -28,7 +27,7 @@ class CharacterCommand extends Command
         $headers = $this->getHeaders();
         $client = new Client(['http_errors' => false, 'timeout' => 60.0]);
         $this->tempFilePath = $this->downloadData($client, $headers);
-        if (! $this->tempFilePath) {
+        if (!$this->tempFilePath) {
             $this->components->error('Failed to download data.');
 
             return;
@@ -39,6 +38,20 @@ class CharacterCommand extends Command
         $this->parseAndProcessData($this->tempFilePath, $dbItems);
 
         unlink($this->tempFilePath);
+    }
+
+    private function getHeaders(): array
+    {
+        $faker = Factory::create();
+
+        return [
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Language' => 'en-US,en;q=0.9',
+            'Cache-Control' => 'max-age=0',
+            'Connection' => 'keep-alive',
+            'Keep-Alive' => '300',
+            'User-Agent' => $faker->chrome(),
+        ];
     }
 
     private function downloadData(Client $client, array $headers): ?string
@@ -67,7 +80,7 @@ class CharacterCommand extends Command
     private function parseAndProcessData(string $filePath, array $dbItems): void
     {
         $handle = fopen($filePath, 'r');
-        if (! $handle) {
+        if (!$handle) {
             return;
         }
 
@@ -77,7 +90,7 @@ class CharacterCommand extends Command
         $progress->start();
 
         $processedBytes = 0;
-        while (! feof($handle)) {
+        while (!feof($handle)) {
             $linePosition = ftell($handle);
             $line = fgets($handle);
             $trimmedLine = trim($line);
@@ -89,7 +102,7 @@ class CharacterCommand extends Command
                 $currentId = $trimmedLine;
                 $line = fgets($handle); // Assume the next line is the JSON data
                 $animeData = json_decode(trim($line), true);
-                if (! in_array($currentId, $dbItems)) {
+                if (!in_array($currentId, $dbItems)) {
                     $this->processData($animeData);
                 }
             }
@@ -118,20 +131,6 @@ class CharacterCommand extends Command
             $this->assignCharacterData($newNotifyCharacter, $animeData);
             $newNotifyCharacter->save();
         }
-    }
-
-    private function getHeaders(): array
-    {
-        $faker = Factory::create();
-
-        return [
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Language' => 'en-US,en;q=0.9',
-            'Cache-Control' => 'max-age=0',
-            'Connection' => 'keep-alive',
-            'Keep-Alive' => '300',
-            'User-Agent' => $faker->chrome(),
-        ];
     }
 
     private function assignCharacterData($notifyCharacter, array $downloadedData): void

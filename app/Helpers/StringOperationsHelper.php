@@ -13,11 +13,6 @@ class StringOperationsHelper
         $this->comparer = $comparer;
     }
 
-    public function normalizeTerm(string $term): string
-    {
-        return mb_strtolower($term);
-    }
-
     public function getNormalizedTitles($item, $titleFields): array
     {
         $titles = [];
@@ -40,6 +35,11 @@ class StringOperationsHelper
         }
 
         return $titles;
+    }
+
+    public function normalizeTerm(string $term): string
+    {
+        return mb_strtolower($term);
     }
 
     public function advancedStringSimilarity(string $term, string $from): float

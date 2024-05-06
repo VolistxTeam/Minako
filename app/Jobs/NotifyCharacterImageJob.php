@@ -46,14 +46,14 @@ class NotifyCharacterImageJob implements ShouldQueue
 
         $imageData = HttpClient::Get($imageUrls['large']);
 
-        if (! $imageData) {
+        if (!$imageData) {
             $imageData = HttpClient::Get($imageUrls['original']);
-            if (! $imageData) {
+            if (!$imageData) {
                 return;
             }
         }
 
         $image = Image::read($imageData)->encode(new JpegEncoder(quality: 100));
-        Storage::disk('local')->put('characters/'.$this->uniqueID.'.jpg', $image);
+        Storage::disk('local')->put('characters/' . $this->uniqueID . '.jpg', $image);
     }
 }

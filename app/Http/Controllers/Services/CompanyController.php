@@ -33,8 +33,8 @@ class CompanyController extends Controller
     {
         $company = $this->animeRepository->getNotifyCompanyByUniqueId($id);
 
-        if (! $company) {
-            return response('Company not found: '.$id, 404)->header('Content-Type', 'text/plain');
+        if (!$company) {
+            return response('Company not found: ' . $id, 404)->header('Content-Type', 'text/plain');
         }
 
         $response = Company::fromModel($company)->GetDTO();
