@@ -37,7 +37,6 @@ class EpisodeCommand extends Command
             })
             ->cursor();
 
-        $allAnime = NotifyAnime::query()->where('type', '!=', 'movie')->cursor();
         $totalCount = count($allAnime);
         $remainingCount = 0;
 
