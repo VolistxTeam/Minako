@@ -5,11 +5,20 @@ namespace App\Console\Commands\MAL;
 use App\Facades\JikanAPI;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
+use App\Repositories\AnimeRepository;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class EpisodeCommand extends Command
 {
+    private AnimeRepository $animeRepository;
+
+    public function __construct(AnimeRepository $animeRepository)
+    {
+        parent::__construct();
+        $this->animeRepository = $animeRepository;
+    }
+
     protected $signature = 'minako:mal:episodes {--skip=0}';
 
     protected $description = 'Retrieve all episode information from MAL using Jikan APIs.';
@@ -38,88 +47,43 @@ class EpisodeCommand extends Command
             ->cursor();
 
         $totalCount = count($allAnime);
-        $remainingCount = 0;
+        $skipCount = (int)($this->option('skip') ?? 0);
 
-        $skipCount = 0;
-
-        if (!empty($this->option('skip'))) {
-            $skipCount = (int)$this->option('skip');
-        }
-
-        foreach ($allAnime as $item) {
-
-            if ($remainingCount < $skipCount) {
-                $remainingCount++;
-                $this->info('[-] Skipping Item [' . $remainingCount . '/' . $totalCount . ']');
-
+        foreach ($allAnime as $index => $anime) {
+            if ($index < $skipCount) {
+                $this->info('[-] Skipping Item [' . $index + 1 . '/' . $totalCount . ']');
                 continue;
             }
 
-            $allowCrawl = false;
-
-            if (!empty($dbItem)) {
-                if (Carbon::now()->subDays(7)->greaterThan(Carbon::createFromTimeString($item['updated_at']))) {
-                    $allowCrawl = true;
-                }
-            } else {
-                $allowCrawl = true;
-            }
-
-            if (!$allowCrawl) {
-                $this->error('[-] Skipping item. Reason: The item has been updated within the last 7 days. [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-
+            if (empty($anime) || Carbon::now()->subDays(7)->lessThanOrEqualTo(Carbon::createFromTimeString($anime['updated_at']))) {
+                $this->error('[-] Skipping anime. Reason: The anime has been updated within the last 7 days. [' . $index + 1 . '/' . $totalCount . ']');
                 continue;
             }
 
-            if (($item['type'] == 'movie' || $item['type'] == 'music') && $item['episodeCount'] >= 2 && !is_array($item['mappings'])) {
-                $this->error('[-] Skipping item. Reason: Not supported type. [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-
+            if (($anime['type'] == 'movie' || $anime['type'] == 'music') && $anime['episodeCount'] >= 2 && !is_array($anime['mappings'])) {
+                $this->error('[-] Skipping anime. Reason: Not supported type. [' . $index + 1 . '/' . $totalCount . ']');
                 continue;
             }
 
-            $malID = null;
-
-            foreach ($item['mappings'] as $value) {
-                if ($value['service'] == 'myanimelist/anime') {
-                    $malID = $value['serviceId'];
-                }
-            }
+            $malID = array_reduce($anime['mappings'], function ($carry, $mapping) {
+                return $carry ?: ($mapping['service'] === 'myanimelist/anime' ? $mapping['serviceId'] : null);
+            });
 
             if (empty($malID) || filter_var($malID, FILTER_VALIDATE_INT) === false) {
-                $this->error('[-] Skipping item. Reason: No MAL ID found. [' . $remainingCount . '/' . $totalCount . ']');
-                $remainingCount++;
-
+                $this->error('[-] Skipping anime. Reason: No MAL ID found. [' . $index + 1 . '/' . $totalCount . ']');
                 continue;
             }
 
-            $data = JikanAPI::getAnimeEpisodes($malID);
+            $episodes = JikanAPI::getAnimeEpisodes($malID);
 
-            if ($data != null) {
-                foreach ($data as $episodeItem) {
-                    $malItem = MALAnime::query()->updateOrCreate([
-                        'uniqueID' => $item['uniqueID'],
-                        'notifyID' => $item['notifyID'],
-                        'episode_id' => $episodeItem['mal_id'],
-                    ], [
-                        'title' => !empty($episodeItem['title']) ? $episodeItem['title'] : null,
-                        'title_japanese' => !empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
-                        'title_romanji' => !empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
-                        'aired' => !empty($episodeItem['aired']) ? \Illuminate\Support\Carbon::parse($episodeItem['aired']) : null,
-                        'filler' => (int)$episodeItem['filler'],
-                        'recap' => (int)$episodeItem['recap'],
-                    ]);
-
-                    $malItem->touch();
+            if ($episodes != null) {
+                foreach ($episodes as $episode) {
+                    $this->animeRepository->createOrUpdateMALEpisode($anime, $episode);
                 }
-
-                $this->info('[-] Item Processed [' . $remainingCount . '/' . $totalCount . ']');
+                $this->info('[-] Item Processed [' . $index + 1 . '/' . $totalCount . ']');
             } else {
-                $this->error('[-] Item Not Processed [' . $remainingCount . '/' . $totalCount . ']');
+                $this->error('[-] Item Not Processed [' . $index + 1 . '/' . $totalCount . ']');
             }
-
-            $remainingCount++;
         }
     }
 }
