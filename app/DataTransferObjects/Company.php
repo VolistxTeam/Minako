@@ -19,8 +19,8 @@ class Company extends DataTransferObjectBase
             'description' => $this->entity->description,
             'email' => $this->entity->email,
             'links' => $this->entity->links,
-            'created_at' => $this->entity->created_at,
-            'updated_at' => $this->entity->updated_at,
+            'created_at' => (string) $this->entity->created_at,
+            'updated_at' => (string) $this->entity->updated_at,
         ];
     }
 }

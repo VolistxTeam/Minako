@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
 use App\Facades\Auth;
 use App\Facades\DTOUtils;
 use App\Facades\HttpClient;
@@ -11,14 +9,13 @@ use App\Facades\OhysBlacklist;
 use App\Facades\StringOperations;
 
 return [
-
-    'aliases' => Facade::defaultAliases()->merge([
-        'Auth' => Auth::class,
-        'DTOUtils' => DTOUtils::class,
-        'HttpClient' => HttpClient::class,
-        'JikanAPI' => JikanAPI::class,
-        'NyaaCrawler' => NyaaCrawler::class,
-        'OhysBlacklist' => OhysBlacklist::class,
+    'aliases' => [
         'StringOperations' => StringOperations::class,
-    ])->toArray(),
-
+        'HttpClient' => HttpClient::class,
+        'Auth' => Auth::class,
+        'OhysBlacklist' => OhysBlacklist::class,
+        'NyaaCrawler' => NyaaCrawler::class,
+        'JikanAPI' => JikanAPI::class,
+        'DTOUtils' => DTOUtils::class,
+    ]
+];

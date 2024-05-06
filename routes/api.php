@@ -23,7 +23,7 @@ Route::prefix('minako')->group(function () {
             Route::get('/{uniqueID}/sync', [AnimeController::class, 'SyncEpisodes']);
         });
 
-        Route::middleware(['CacheResponse'])->group(function () {
+        Route::middleware([])->group(function () {
             Route::prefix('anime')->group(function () {
                 Route::get('/{uniqueID}', [AnimeController::class, 'GetItem']);
                 Route::get('/{uniqueID}/image', [AnimeController::class, 'GetImage']);
