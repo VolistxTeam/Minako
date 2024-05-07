@@ -22,9 +22,9 @@ class HttpClientHelper
         $this->client = new Client(['http_errors' => false, 'timeout' => 60.0, 'headers' => $headers]);
     }
 
-    public function Get($imageUrl): ?string
+    public function Get($url): ?string
     {
-        $response = $this->client->get($imageUrl);
+        $response = $this->client->get($url);
 
         if ($response->getStatusCode() !== 200) {
             return null;
