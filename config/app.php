@@ -7,6 +7,7 @@ use App\Facades\JikanAPI;
 use App\Facades\NyaaCrawler;
 use App\Facades\OhysBlacklist;
 use App\Facades\StringOperations;
+use Illuminate\Support\Facades\Facade;
 
 return [
     'aliases' => [

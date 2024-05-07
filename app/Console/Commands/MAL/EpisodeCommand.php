@@ -5,8 +5,8 @@ namespace App\Console\Commands\MAL;
 use App\Facades\JikanAPI;
 use App\Models\MALAnime;
 use App\Models\NotifyAnime;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class EpisodeCommand extends Command
 {
@@ -47,7 +47,6 @@ class EpisodeCommand extends Command
         }
 
         foreach ($allAnime as $item) {
-
             if ($remainingCount < $skipCount) {
                 $remainingCount++;
                 $this->info('[-] Skipping Item [' . $remainingCount . '/' . $totalCount . ']');
@@ -106,7 +105,7 @@ class EpisodeCommand extends Command
                         'title' => !empty($episodeItem['title']) ? $episodeItem['title'] : null,
                         'title_japanese' => !empty($episodeItem['title_japanese']) ? $episodeItem['title_japanese'] : null,
                         'title_romanji' => !empty($episodeItem['title_romanji']) ? $episodeItem['title_romanji'] : null,
-                        'aired' => !empty($episodeItem['aired']) ? \Illuminate\Support\Carbon::parse($episodeItem['aired']) : null,
+                        'aired' => !empty($episodeItem['aired']) ? Carbon::parse($episodeItem['aired']) : null,
                         'filler' => (int)$episodeItem['filler'],
                         'recap' => (int)$episodeItem['recap'],
                     ]);
