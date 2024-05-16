@@ -217,9 +217,23 @@ class AnimeRepository
             'recap' => (int)$episode['recap'],
         ]);
 
-        $episode->touch();
+        $episode->save();
 
         return $episode;
+    }
+
+    public function createOrUpdateNotifyCharacter($uniqueID, $data): Model|Builder
+    {
+        $character = NotifyAnimeCharacter::query()->updateOrCreate([
+            'uniqueID' => $uniqueID,
+            'notifyID' => $data['animeId'],
+        ], [
+            'items' => $data['items'],
+        ]);
+
+        $character->save();
+
+        return $character;
     }
 
     private function compareResults($a, $b)
